@@ -26,6 +26,7 @@
 
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
+require_once(__DIR__ . '/download_form.php');
 
 $courseid = required_param('courseid', PARAM_INT);
 
@@ -37,15 +38,34 @@ $context = context_course::instance($course->id);
 
 require_capability('local/downloadcenter:view', $context);
 
+
+
 $PAGE->set_url(new moodle_url('/local/downloadcenter/index.php', array('courseid' => $course->id)));
+$PAGE->navbar->add(get_string('navigationlink', 'local_downloadcenter'), $PAGE->url);
 $PAGE->set_pagelayout('incourse');
 
-$PAGE->set_title($course->shortname . ': ' . get_string('navigationlink', 'local_downloadcenter'));
+$downloadcenter = new local_downloadcenter_factory($course, $USER);
+
+$userresources = $downloadcenter->get_resources_for_user();
+
+$downloadform = new local_downloadcenter_download_form(null, array('res' => $userresources));
+
+if ($data = $downloadform->get_data()) {
+    $downloadcenter->parse_form_data($data);
+    $downloadcenter->create_zip();
+    die;
+} else if ($downloadform->is_cancelled()) {
+    redirect(new moodle_url('/course/view.php', array('id' => $course->id)));
+    die;
+}
+
+
+$PAGE->set_title(get_string('navigationlink', 'local_downloadcenter') . ': ' . $course->fullname);
 $PAGE->set_heading($course->fullname);
 
 
-$PAGE->navbar->add(get_string('navigationlink', 'local_downloadcenter'), $PAGE->url);
-
-
 echo $OUTPUT->header();
+
+$downloadform->display();
+
 echo $OUTPUT->footer();

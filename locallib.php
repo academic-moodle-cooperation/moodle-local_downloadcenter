@@ -26,29 +26,178 @@
 defined('MOODLE_INTERNAL') || die();
 
 class local_downloadcenter_factory {
-    private $courseid;
+    private $course;
+    private $user;
+    private $sortedresources;
+    private $filteredresources;
+    private $availableresources = array('resource', 'folder');
 
-    public function __construct($courseid) {
-        $this->courseid = $courseid;
+    public function __construct($course, $user) {
+        $this->course = $course;
+        $this->user = $user;
     }
 
-    public function get_resources_for_user($user) {
-        //TODO:
+    public function get_resources_for_user() {
+        global $DB, $CFG;
+
+        //only downloadable resources should be shown
+        if (!empty($this->sortedresources)) {
+            return $this->sortedresources;
+        }
+
+        $modinfo = get_fast_modinfo($this->course);
+        $usesections = course_format_uses_sections($this->course->format);
+
+        $sorted = array();
+
+        if ($usesections) {
+            $sections = $DB->get_records('course_sections', array('course' => $this->course->id));
+            foreach ($sections as $section) {
+                if (!isset($sorted[$section->section])) {
+                    $sorted[$section->section] = new stdClass;
+                    $sorted[$section->section]->title = get_section_name($this->course, $section->section);
+                    $sorted[$section->section]->res = array();
+                }
+            }
+        } else {
+            $sorted['default'] = new stdClass;//TODO: fix here if needed
+            $sorted['default']->title = '0';
+            $sorted['default']->res = array();
+        }
+        $cms = array();
+        $resources = array();
+        foreach ($modinfo->cms as $cm) {
+            if (!in_array($cm->modname, $this->availableresources)) {
+                continue;
+            }
+            if (!$cm->uservisible) {
+                continue;
+            }
+            if (!$cm->has_view()) {
+                // Exclude label and similar
+                continue;
+            }
+            $cms[$cm->id] = $cm;
+            $resources[$cm->modname][] = $cm->instance;
+        }
+
+        // preload instances
+        foreach ($resources as $modname=>$instances) {
+            $resources[$modname] = $DB->get_records_list($modname, 'id', $instances, 'id');
+        }
+
+        $currentsection = '';
+        foreach ($cms as $cm) {
+            if (!isset($resources[$cm->modname][$cm->instance])) {
+                continue;
+            }
+            $resource = $resources[$cm->modname][$cm->instance];
+
+            if ($usesections) {
+                if ($cm->sectionnum !== $currentsection) {
+                    $currentsection = $cm->sectionnum;
+                }
+            } else {
+                $currentsection = 'default';
+            }
+
+
+            $icon = '<img src="'.$cm->get_icon_url().'" class="activityicon" alt="'.$cm->get_module_type_name().'" /> ';
+            //TODO: $cm->visible..
+            $res = new stdClass;
+            $res->icon = $icon;
+            $res->cmid = $cm->id;
+            $res->name = $cm->get_formatted_name();
+            $res->modname = $cm->modname;
+            $res->instanceid = $cm->instance;
+            $res->resource = $resource;
+            $res->cm = $cm;
+            $sorted[$currentsection]->res[] = $res;
+        }
+
+
+
+        $this->sortedresources = $sorted;
+        return $sorted;
+
     }
 
-    private function fetch_selected_resources($user, $resourceids) {
-        //TODO:
 
+    public function create_zip() {
+        global $DB, $CFG;
+
+        // Zip files and sent them to a user.
+        $tempzip = tempnam($CFG->tempdir.'/', 'downloadcenter');
+        $zipper = new zip_packer();
+        $fs = get_file_storage();
+
+
+        /*
+        // Get file
+        $file = $fs->get_file($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
+            $fileinfo['itemid'], $fileinfo['filepath'], $fileinfo['filename']);
+        */
+// Read contents
+        /*if ($file) {
+            $contents = $file->get_content();
+        } else {
+            // file doesn't exist - do something
+        }
+        die;*/
+        $filelist = array();
+        $filteredresources = $this->filteredresources;
+
+        if (empty($filteredresources)) {
+            return false;
+        }
+
+        foreach ($filteredresources as $topicid => $info) {
+            $basedir = clean_filename($info->title);
+            $filelist[$basedir] = null;
+            foreach ($info->res as $res) {
+                $resdir = $basedir . '/' . clean_filename($res->name);
+                $filelist[$resdir] = null;
+                if ($res->modname == 'resource') {
+                    $context = context_module::instance($res->cm->id);
+                    $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
+                    $file = array_shift($files); //get only the first file - such are the requirements
+                    $filename = $resdir . '/' . $file->get_filename();
+                    $filelist[$filename] = $file;
+                }
+            }
+        }
+
+        if ($zipper->archive_to_pathname($filelist, $tempzip)) {
+            send_temp_file($tempzip, $this->course->shortname . '.zip');
+        } else {
+            debugging("Problems with archiving the files.", DEBUG_DEVELOPER);
+            die;
+        }
     }
 
-    private function create_zip() {
-        //TODO:
+    public function parse_form_data($data) {
+        $data = (array)$data;
+        $filtered = array();
+
+
+        $sortedresources = $this->get_resources_for_user();
+        foreach ($sortedresources as $sectionid => $info) {
+            if (!isset($data['topic' . $sectionid])) {
+                continue;
+            }
+            $filtered[$sectionid] = new stdClass;
+            $filtered[$sectionid]->title = $info->title;
+            $filtered[$sectionid]->res = array();
+            foreach ($info->res as $res) {
+                $name = $res->modname . $res->instanceid;
+                if (!isset($data[$name])) {
+                    continue;
+                }
+                $filtered[$sectionid]->res[] = $res;
+            }
+        }
+
+        $this->filteredresources = $filtered;
     }
 
-    public function download() {
-        //TODO: basic logic
-        $this->fetch_selected_resources..
-        $this->create_zip()
-
-    }
 }

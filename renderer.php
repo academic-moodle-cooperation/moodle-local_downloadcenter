@@ -23,15 +23,11 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
 
-defined('MOODLE_INTERNAL') || die;
 
-$string['pluginname'] = 'Download center plugin';
-$string['downloadcenter:view'] = 'View Download Center';
+class local_downloadcenter_renderer extends plugin_renderer_base {
+    public function render_resource_form($resources) {
 
-$string['navigationlink'] = 'Download Center';
-$string['pagetitle'] = 'Download Center for ';
-
-$string['warningmessage'] = 'WARNING: The Download Center enables to download only visible FILES and FOLDERS!';
-
-$string['createzip'] = 'Create ZIP archive';
+    }
+}
