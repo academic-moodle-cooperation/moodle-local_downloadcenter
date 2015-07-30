@@ -39,15 +39,18 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->setType('courseid', PARAM_INT);
 
         foreach ($resources as $sectionid => $sectioninfo) {
-
-            $mform->addElement('checkbox', 'topic' . $sectionid, null, $sectioninfo->title);
-            $mform->setDefault('topic' . $sectionid, 1);
+            $sectionname = 'topic' . $sectionid;
+            $mform->addElement('html', html_writer::start_tag('div', array('class' => 'block')));
+            $mform->addElement('checkbox', $sectionname, null, $sectioninfo->title);
+            $mform->setDefault($sectionname, 1);
             foreach ($sectioninfo->res as $res) {
                 $title = $res->name . ' ' . $res->icon;
                 $name = $res->modname . $res->instanceid;
                 $mform->addElement('checkbox', $name, null, $title);
                 $mform->setDefault($name, 1);
+                $mform->disabledIf($name, $sectionname);
             }
+            $mform->addElement('html', html_writer::end_tag('div'));
         }
 
         $this->add_action_buttons(true, get_string('createzip', 'local_downloadcenter'));

@@ -157,12 +157,15 @@ class local_downloadcenter_factory {
             foreach ($info->res as $res) {
                 $resdir = $basedir . '/' . clean_filename($res->name);
                 $filelist[$resdir] = null;
+                $context = context_module::instance($res->cm->id);
                 if ($res->modname == 'resource') {
-                    $context = context_module::instance($res->cm->id);
                     $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
                     $file = array_shift($files); //get only the first file - such are the requirements
                     $filename = $resdir . '/' . $file->get_filename();
                     $filelist[$filename] = $file;
+                } else if ($res->modname == 'folder') {
+                    $folder = $fs->get_area_tree($context->id, 'mod_folder', 'content', 0);
+                    $this->add_folder_contents($filelist, $folder, $resdir);
                 }
             }
         }
@@ -172,6 +175,17 @@ class local_downloadcenter_factory {
         } else {
             debugging("Problems with archiving the files.", DEBUG_DEVELOPER);
             die;
+        }
+    }
+
+    private function add_folder_contents(&$filelist, $folder, $path) {
+        if (!empty($folder['subdirs'])) {
+            foreach ($folder['subdirs'] as $foldername => $subfolder) {
+                $this->add_folder_contents($filelist, $subfolder, $path . '/' . $foldername);
+            }
+        }
+        foreach ($folder['files'] as $filename => $file) {
+            $filelist[$path . '/' . $filename] = $file;
         }
     }
 
