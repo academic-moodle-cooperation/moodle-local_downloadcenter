@@ -38,7 +38,7 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->addElement('hidden', 'courseid', $COURSE->id);
         $mform->setType('courseid', PARAM_INT);
 
-        $mform->addElement('html', html_writer::tag('span', get_string('warningmessage', 'local_downloadcenter'), array('class' => 'warningmessage')));
+        $mform->addElement('html', html_writer::tag('div', get_string('warningmessage', 'local_downloadcenter'), array('class' => 'warningmessage')));
         $mform->addElement('static', 'warning', '', ''); //hack to work around fieldsets..
 
         foreach ($resources as $sectionid => $sectioninfo) {

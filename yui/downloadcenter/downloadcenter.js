@@ -1,27 +1,27 @@
 
 
+YUI.add('moodle-local_downloadcenter-downloadcenter', function(Y) {
+
     /**
-     * Adds select all/none links to the top of the backup/restore/import schema page.
+     * Adds select all/none links to the top of the downloadcenter page.
      *
      * @module moodle-local-downloadcenter
      */
-
-// Namespace for the backupc
     M.local_downloadcenter = M.local_downloadcenter || {};
+// Namespace for the downloadcenter
     /**
-     * Adds select all/none links to the top of the backup/restore/import schema page.
+     * Adds select all/none links to the top of the downloadcenter page.
      *
-     * @class M.local_downloadcenter.backupselectall
+     * @class M.local_downloadcenter.downloadselectall
      */
-    M.local_downloadcenter.backupselectall = function(modnames) {
-        console.log(modnames);
+    M.local_downloadcenter.downloadselectall = function(modnames) {
         var formid = null;
 
         var helper = function(e, check, type, mod) {
             e.preventDefault();
             var prefix = '';
             if (typeof mod !== 'undefined') {
-                prefix = 'setting_activity_' + mod + '_';
+                prefix = 'item_' + mod + '_';
             }
 
             var len = type.length;
@@ -51,11 +51,11 @@
                 extra = '';
             }
             return '<div class="' + classname + '">' +
-                '<div class="fitem fitem_fcheckbox backup_selector">' +
+                '<div class="fitem fitem_fcheckbox downloadcenter_selector">' +
                 '<div class="fitemtitle">' + heading + '</div>' +
                 '<div class="felement">' +
-                '<a id="backup-all-' + idtype + '" href="#">' + M.util.get_string('all', 'moodle') + '</a> / ' +
-                '<a id="backup-none-' + idtype + '" href="#">' + M.util.get_string('none', 'moodle') + '</a>' +
+                '<a id="downloadcenter-all-' + idtype + '" href="#">' + M.util.get_string('all', 'moodle') + '</a> / ' +
+                '<a id="downloadcenter-none-' + idtype + '" href="#">' + M.util.get_string('none', 'moodle') + '</a>' +
                 extra +
                 '</div>' +
                 '</div>' +
@@ -76,14 +76,15 @@
 
         // Add global select all/none options.
         var html = html_generator('include_setting section_level', 'included', M.util.get_string('select', 'moodle'),
-            ' (<a id="backup-bytype" href="#">' + M.util.get_string('showtypes', 'backup') + '</a>)');
-        var links = Y.Node.create('<div class="grouped_settings section_level">' + html + '</div>');
-        firstsection.insert(links, 'before');
+            ' (<a id="downloadcenter-bytype" href="#">' + M.util.get_string('showtypes', 'backup') + '</a>)');
+        var links = Y.Node.create('<div class="grouped_settings section_level block">' + html + '</div>');
+        //firstsection.insert(links, 'before');
+        firstsection.prepend(links);
 
         // Add select all/none for each module type.
         var initlinks = function(links, mod) {
-            Y.one('#backup-all-mod_' + mod).on('click', function(e) { helper(e, true, '_included', mod); });
-            Y.one('#backup-none-mod_' + mod).on('click', function(e) { helper(e, false, '_included', mod); });
+            Y.one('#downloadcenter-all-mod_' + mod).on('click', function(e) { helper(e, true, 'item_', mod); });
+            Y.one('#downloadcenter-none-mod_' + mod).on('click', function(e) { helper(e, false, 'item_', mod); });
 
         };
 
@@ -92,15 +93,14 @@
         modlist.hide();
         modlist.currentlyshown = false;
         links.appendChild(modlist);
-        /*for (var mod in modnames) {
+        for (var mod in modnames) {
             // Only include actual values from the list.
             if (!modnames.hasOwnProperty(mod)) {
                 continue;
             }
             html = html_generator('include_setting section_level', 'mod_' + mod, modnames[mod]);
 
-            var modlinks = Y.Node.create(
-                '<div class="grouped_settings section_level">' + html + '</div>');
+            var modlinks = Y.Node.create(html );
             modlist.appendChild(modlinks);
             initlinks(modlinks, mod);
         }
@@ -108,7 +108,7 @@
         // Toggles the display of the hidden module select all/none links.
         var toggletypes = function() {
             // Change text of type toggle link.
-            var link = Y.one('#backup-bytype');
+            var link = Y.one('#downloadcenter-bytype');
             if (modlist.currentlyshown) {
                 link.setHTML(M.util.get_string('showtypes', 'backup'));
             } else {
@@ -138,10 +138,10 @@
                 anim.run();
             }
 
-        };*/
-        Y.one('#backup-bytype').on('click', function() { toggletypes(); });
+        };
+        Y.one('#downloadcenter-bytype').on('click', function() { toggletypes(); });
 
-        Y.one('#backup-all-included').on('click',  function(e) { helper(e, true,  'item_'); });
-        Y.one('#backup-none-included').on('click', function(e) { helper(e, false, 'item_'); });
+        Y.one('#downloadcenter-all-included').on('click',  function(e) { helper(e, true,  'item_'); });
+        Y.one('#downloadcenter-none-included').on('click', function(e) { helper(e, false, 'item_'); });
     };
-
+}, '@VERSION@', {requires: ["node", "event", "node-event-simulate", "anim"]});

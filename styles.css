@@ -1,8 +1,11 @@
+.path-local-downloadcenter form fieldset > div > div.fitem.femptylabel {
+    display: none;
+}
 .path-local-downloadcenter form .itemtitle {
     font-weight: normal;
 }
 .path-local-downloadcenter form .warningmessage {
     font-size: 1.2em;
     font-weight: bold;
-
+    margin-bottom: 10px;
 }
