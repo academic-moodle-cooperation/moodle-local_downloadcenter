@@ -157,7 +157,7 @@ class local_downloadcenter_factory {
         $filteredresources = $this->filteredresources;
 
         if (empty($filteredresources)) {
-            return false;
+           // return false;
         }
 
         foreach ($filteredresources as $topicid => $info) {

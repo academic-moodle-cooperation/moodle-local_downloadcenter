@@ -20,3 +20,20 @@
 .path-local-downloadcenter .mform .block {
     padding-top: 5px;
 }
+
+.block_tree p.tree_item.downloadcenterlink.branch,
+.block p.tree_item.downloadcenterlink.branch,
+.block p.tree_item.downloadcenterlink {
+    background-image: none !important;
+    padding-left: 0;
+}
+.block p.tree_item.downloadcenterlink a{
+    background-image: url("http://localhost/moodle2/theme/image.php?theme=university_clean&component=core&image=t%2Fcollapsed");
+    background-repeat: no-repeat;
+    padding-left: 20px;
+
+}
+
+.path-local-downloadcenter .block p.tree_item.downloadcenterlink a {
+    background-image: url("http://localhost/moodle2/theme/image.php?theme=university_clean&component=core&image=t%2Fcollapsed_empty");
+}

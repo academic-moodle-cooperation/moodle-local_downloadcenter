@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 
 function local_downloadcenter_extends_settings_navigation(settings_navigation $settings_nav, context $context) {
-    global $COURSE, $PAGE;
+    global $COURSE, $PAGE, $OUTPUT;
 
     if ($COURSE->id == SITEID) {
         return;
@@ -44,13 +44,16 @@ function local_downloadcenter_extends_settings_navigation(settings_navigation $s
         $beforenode = 'root';
     }
 
-    $title = get_string('navigationlink', 'local_downloadcenter');
+
     $url = new moodle_url('/local/downloadcenter/index.php', array('courseid' => $COURSE->id));
 
+
+
+    $title = get_string('navigationlink', 'local_downloadcenter');
     if ($PAGE->url->compare($url)) {
-        $pix = new pix_icon('t/collapsed_empty', $title);
+        $pix = $OUTPUT->pix_icon('t/collapsed_empty', $title);
     } else {
-        $pix = new pix_icon('t/collapsed', $title);
+        $pix = $OUTPUT->pix_icon('t/collapsed', $title);
     }
 
     $childnode = navigation_node::create(
@@ -59,14 +62,15 @@ function local_downloadcenter_extends_settings_navigation(settings_navigation $s
         //navigation_node::TYPE_SITE_ADMIN,
         navigation_node::TYPE_CUSTOM,
         'downloadcenter',
-        'downloadcenter',
-        $pix
+        'downloadcenter'
     );
     $node = $settings_nav->add_node($childnode, $beforenode);
     //$node->id = 'downloadcenter';
     $node->nodetype = navigation_node::NODETYPE_LEAF;
     $node->collapse = true;
+    $node->add_class('downloadcenterlink');
 
     $hacknode = $node->add('', null); //yet another retarded hack to work around moodle's strange removal of leaf nodes from the settings navigation
-    $hacknode->display = false;
+    $hacknode->display = false; //we need the empty invisible row, otherwise in lib/navigationlib.php, settings_navigation/initialize(), at the end of the function the empty nodes are removed for some really strange unknown moodle reason.
+
 }
