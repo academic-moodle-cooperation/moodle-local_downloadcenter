@@ -48,6 +48,20 @@ $downloadcenter = new local_downloadcenter_factory($course, $USER);
 
 $userresources = $downloadcenter->get_resources_for_user();
 
+$PAGE->requires->yui_module(array(
+        "node",
+        "event",
+        "node-event-simulate",
+        "anim",
+        'moodle-local_downloadcenter-downloadcenter'),
+    'M.local_downloadcenter.backupselectall',
+    $downloadcenter->get_js_modnames());
+$PAGE->requires->strings_for_js(array('select', 'all', 'none'), 'moodle');
+$PAGE->requires->strings_for_js(array('showtypes', 'hidetypes'), 'backup');
+
+
+
+
 $downloadform = new local_downloadcenter_download_form(null, array('res' => $userresources));
 
 if ($data = $downloadform->get_data()) {

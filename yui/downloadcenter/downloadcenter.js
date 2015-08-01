@@ -1,20 +1,20 @@
-YUI.add('moodle-backup-backupselectall', function (Y, NAME) {
+
 
     /**
      * Adds select all/none links to the top of the backup/restore/import schema page.
      *
-     * @module moodle-backup-backupselectall
+     * @module moodle-local-downloadcenter
      */
 
-// Namespace for the backup
-    M.core_backup = M.core_backup || {};
-
+// Namespace for the backupc
+    M.local_downloadcenter = M.local_downloadcenter || {};
     /**
      * Adds select all/none links to the top of the backup/restore/import schema page.
      *
-     * @class M.core_backup.backupselectall
+     * @class M.local_downloadcenter.backupselectall
      */
-    M.core_backup.backupselectall = function(modnames) {
+    M.local_downloadcenter.backupselectall = function(modnames) {
+        console.log(modnames);
         var formid = null;
 
         var helper = function(e, check, type, mod) {
@@ -27,11 +27,13 @@ YUI.add('moodle-backup-backupselectall', function (Y, NAME) {
             var len = type.length;
             Y.all('input[type="checkbox"]').each(function(checkbox) {
                 var name = checkbox.get('name');
+                console.log(name.substring(0, len));
+
                 // If a prefix has been set, ignore checkboxes which don't have that prefix.
                 if (prefix && name.substring(0, prefix.length) !== prefix) {
                     return;
                 }
-                if (name.substring(name.length - len) === type) {
+                if (name.substring(0, len) === type) {
                     checkbox.set('checked', check);
                 }
             });
@@ -60,7 +62,8 @@ YUI.add('moodle-backup-backupselectall', function (Y, NAME) {
                 '</div>';
         };
 
-        var firstsection = Y.one('fieldset#id_coursesettings .fcontainer.clearfix .grouped_settings.section_level');
+        var firstsection = Y.one('#mform1 fieldset');
+
         if (!firstsection) {
             // This is not a relevant page.
             return;
@@ -69,25 +72,11 @@ YUI.add('moodle-backup-backupselectall', function (Y, NAME) {
             // No checkboxes.
             return;
         }
-
         formid = firstsection.ancestor('form').getAttribute('id');
-
-        var withuserdata = false;
-        Y.all('input[type="checkbox"]').each(function(checkbox) {
-            var name = checkbox.get('name');
-            if (name.substring(name.length - 9) === '_userdata') {
-                withuserdata = '_userdata';
-            } else if (name.substring(name.length - 9) === '_userinfo') {
-                withuserdata = '_userinfo';
-            }
-        });
 
         // Add global select all/none options.
         var html = html_generator('include_setting section_level', 'included', M.util.get_string('select', 'moodle'),
             ' (<a id="backup-bytype" href="#">' + M.util.get_string('showtypes', 'backup') + '</a>)');
-        if (withuserdata) {
-            html += html_generator('normal_setting', 'userdata', M.util.get_string('select', 'moodle'));
-        }
         var links = Y.Node.create('<div class="grouped_settings section_level">' + html + '</div>');
         firstsection.insert(links, 'before');
 
@@ -95,10 +84,7 @@ YUI.add('moodle-backup-backupselectall', function (Y, NAME) {
         var initlinks = function(links, mod) {
             Y.one('#backup-all-mod_' + mod).on('click', function(e) { helper(e, true, '_included', mod); });
             Y.one('#backup-none-mod_' + mod).on('click', function(e) { helper(e, false, '_included', mod); });
-            if (withuserdata) {
-                Y.one('#backup-all-userdata-mod_' + mod).on('click', function(e) { helper(e, true, withuserdata, mod); });
-                Y.one('#backup-none-userdata-mod_' + mod).on('click', function(e) { helper(e, false, withuserdata, mod); });
-            }
+
         };
 
         // For each module type on the course, add hidden select all/none options.
@@ -106,15 +92,13 @@ YUI.add('moodle-backup-backupselectall', function (Y, NAME) {
         modlist.hide();
         modlist.currentlyshown = false;
         links.appendChild(modlist);
-        for (var mod in modnames) {
+        /*for (var mod in modnames) {
             // Only include actual values from the list.
             if (!modnames.hasOwnProperty(mod)) {
                 continue;
             }
             html = html_generator('include_setting section_level', 'mod_' + mod, modnames[mod]);
-            if (withuserdata) {
-                html += html_generator('normal_setting', 'userdata-mod_' + mod, modnames[mod]);
-            }
+
             var modlinks = Y.Node.create(
                 '<div class="grouped_settings section_level">' + html + '</div>');
             modlist.appendChild(modlinks);
@@ -154,16 +138,10 @@ YUI.add('moodle-backup-backupselectall', function (Y, NAME) {
                 anim.run();
             }
 
-        };
+        };*/
         Y.one('#backup-bytype').on('click', function() { toggletypes(); });
 
-        Y.one('#backup-all-included').on('click',  function(e) { helper(e, true,  '_included'); });
-        Y.one('#backup-none-included').on('click', function(e) { helper(e, false, '_included'); });
-        if (withuserdata) {
-            Y.one('#backup-all-userdata').on('click',  function(e) { helper(e, true,  withuserdata); });
-            Y.one('#backup-none-userdata').on('click', function(e) { helper(e, false, withuserdata); });
-        }
+        Y.one('#backup-all-included').on('click',  function(e) { helper(e, true,  'item_'); });
+        Y.one('#backup-none-included').on('click', function(e) { helper(e, false, 'item_'); });
     };
 
-
-}, '@VERSION@', {"requires": ["node", "event", "node-event-simulate", "anim"]});

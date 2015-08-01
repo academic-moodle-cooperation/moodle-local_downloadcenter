@@ -31,6 +31,7 @@ class local_downloadcenter_factory {
     private $sortedresources;
     private $filteredresources;
     private $availableresources = array('resource', 'folder');
+    private $jsnames = array();
 
     public function __construct($course, $user) {
         $this->course = $course;
@@ -101,6 +102,10 @@ class local_downloadcenter_factory {
                 $currentsection = 'default';
             }
 
+            if (!isset($this->jsnames[$cm->modname])) {
+                $this->jsnames[$cm->modname] = get_string('modulenameplural', 'mod_' . $cm->modname);
+            }
+
 
             $icon = '<img src="'.$cm->get_icon_url().'" class="activityicon" alt="'.$cm->get_module_type_name().'" /> ';
             //TODO: $cm->visible..
@@ -120,6 +125,10 @@ class local_downloadcenter_factory {
         $this->sortedresources = $sorted;
         return $sorted;
 
+    }
+
+    public function get_js_modnames() {
+        return array($this->jsnames);
     }
 
 
@@ -196,14 +205,14 @@ class local_downloadcenter_factory {
 
         $sortedresources = $this->get_resources_for_user();
         foreach ($sortedresources as $sectionid => $info) {
-            if (!isset($data['topic' . $sectionid])) {
+            if (!isset($data['item_topic_' . $sectionid])) {
                 continue;
             }
             $filtered[$sectionid] = new stdClass;
             $filtered[$sectionid]->title = $info->title;
             $filtered[$sectionid]->res = array();
             foreach ($info->res as $res) {
-                $name = $res->modname . $res->instanceid;
+                $name = 'item_' . $res->modname . '_' . $res->instanceid;
                 if (!isset($data[$name])) {
                     continue;
                 }

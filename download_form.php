@@ -42,14 +42,14 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->addElement('static', 'warning', '', ''); //hack to work around fieldsets..
 
         foreach ($resources as $sectionid => $sectioninfo) {
-            $sectionname = 'topic' . $sectionid;
+            $sectionname = 'item_topic_' . $sectionid;
             $mform->addElement('html', html_writer::start_tag('div', array('class' => 'block')));
             $mform->addElement('checkbox', $sectionname, $sectioninfo->title, null);
 
             $mform->setDefault($sectionname, 1);
             foreach ($sectioninfo->res as $res) {
                 $title = $res->name . ' ' . $res->icon;
-                $name = $res->modname . $res->instanceid;
+                $name = 'item_' . $res->modname . '_' . $res->instanceid;
                 $title = html_writer::tag('span', $title, array('class' => 'itemtitle'));
                 $mform->addElement('checkbox', $name, $title, null);
                 $mform->setDefault($name, 1);
