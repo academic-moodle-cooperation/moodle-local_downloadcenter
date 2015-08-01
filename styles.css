@@ -9,3 +9,14 @@
     font-weight: bold;
     margin-bottom: 10px;
 }
+.path-local-downloadcenter .include_setting, .path-local-downloadcenter .grouped_settings .normal_setting {
+    display: inline-block;
+}
+
+.path-local-downloadcenter .mform .grouped_settings {
+    overflow: hidden;
+}
+
+.path-local-downloadcenter .grouped_settings.section_level.block {
+    padding-top: 5px;
+}

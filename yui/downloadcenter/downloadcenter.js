@@ -100,7 +100,7 @@ YUI.add('moodle-local_downloadcenter-downloadcenter', function(Y) {
             }
             html = html_generator('include_setting section_level', 'mod_' + mod, modnames[mod]);
 
-            var modlinks = Y.Node.create(html );
+            var modlinks = Y.Node.create('<div class="grouped_settings section_level">' + html + '</div>');
             modlist.appendChild(modlinks);
             initlinks(modlinks, mod);
         }
