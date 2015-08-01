@@ -53,16 +53,20 @@ function local_downloadcenter_extends_settings_navigation(settings_navigation $s
         $pix = new pix_icon('t/collapsed', $title);
     }
 
-
     $childnode = navigation_node::create(
         $title,
         $url,
-        navigation_node::TYPE_SITE_ADMIN,
+        //navigation_node::TYPE_SITE_ADMIN,
+        navigation_node::TYPE_CUSTOM,
         'downloadcenter',
         'downloadcenter',
         $pix
     );
-
     $node = $settings_nav->add_node($childnode, $beforenode);
+    //$node->id = 'downloadcenter';
     $node->nodetype = navigation_node::NODETYPE_LEAF;
+    $node->collapse = true;
+
+    $hacknode = $node->add('', null); //yet another retarded hack to work around moodle's strange removal of leaf nodes from the settings navigation
+    $hacknode->display = false;
 }
