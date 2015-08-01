@@ -34,3 +34,6 @@ $string['pagetitle'] = 'Downloadcenter für ';
 
 
 $string['warningmessage'] = 'ACHTUNG: Im Download Center werden NUR die im Kurs aktuell verfügbaren DATEIEN und VERZEICHNISSE als Download angeboten!';
+
+
+$string['createzip'] = 'ZIP-Archiv erstellen';
