@@ -66,6 +66,11 @@ $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 
+
+// Prepare a progress bar which can display optionally during long-running
+// operations while setting up the UI.
+$slowprogress = new \core\progress\display_if_slow(get_string('preparingui', 'backup'));
+
 $downloadform->display();
 
 echo $OUTPUT->footer();

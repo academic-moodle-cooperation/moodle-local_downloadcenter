@@ -34,19 +34,24 @@ class local_downloadcenter_download_form extends moodleform {
         $mform = $this->_form;
 
         $resources = $this->_customdata['res'];
-
+        //$this->class
         $mform->addElement('hidden', 'courseid', $COURSE->id);
         $mform->setType('courseid', PARAM_INT);
+
+        $mform->addElement('html', html_writer::tag('span', get_string('warningmessage', 'local_downloadcenter'), array('class' => 'warningmessage')));
+        $mform->addElement('static', 'warning', '', ''); //hack to work around fieldsets..
 
         foreach ($resources as $sectionid => $sectioninfo) {
             $sectionname = 'topic' . $sectionid;
             $mform->addElement('html', html_writer::start_tag('div', array('class' => 'block')));
-            $mform->addElement('checkbox', $sectionname, null, $sectioninfo->title);
+            $mform->addElement('checkbox', $sectionname, $sectioninfo->title, null);
+
             $mform->setDefault($sectionname, 1);
             foreach ($sectioninfo->res as $res) {
                 $title = $res->name . ' ' . $res->icon;
                 $name = $res->modname . $res->instanceid;
-                $mform->addElement('checkbox', $name, null, $title);
+                $title = html_writer::tag('span', $title, array('class' => 'itemtitle'));
+                $mform->addElement('checkbox', $name, $title, null);
                 $mform->setDefault($name, 1);
                 $mform->disabledIf($name, $sectionname);
             }
