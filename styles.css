@@ -28,12 +28,12 @@
     padding-left: 0;
 }
 .block p.tree_item.downloadcenterlink a{
-    background-image: url("http://localhost/moodle2/theme/image.php?theme=university_clean&component=core&image=t%2Fcollapsed");
+    background-image: url("[[pix:core|t/collapsed]]");
     background-repeat: no-repeat;
     padding-left: 20px;
 
 }
 
 .path-local-downloadcenter .block p.tree_item.downloadcenterlink a {
-    background-image: url("http://localhost/moodle2/theme/image.php?theme=university_clean&component=core&image=t%2Fcollapsed_empty");
+    background-image: url("[[pix:core|t/collapsed_empty]]");
 }
