@@ -35,3 +35,7 @@ $string['pagetitle'] = 'Download Center for ';
 $string['warningmessage'] = 'WARNING: The Download Center enables to download only visible FILES and FOLDERS!';
 
 $string['createzip'] = 'Create ZIP archive';
+
+$string['zipready'] = 'The ZIP archive has been successfully created.';
+$string['download'] = 'Download';
+$string['zipcreating'] = 'The ZIP archive is being created...';

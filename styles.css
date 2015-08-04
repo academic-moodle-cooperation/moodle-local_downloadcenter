@@ -37,3 +37,14 @@
 .path-local-downloadcenter .block p.tree_item.downloadcenterlink a {
     background-image: url("[[pix:core|t/collapsed_empty]]");
 }
+
+.path-local-downloadcenter .core_progress_display_if_slow {
+    width: 500px;
+}
+
+.path-local-downloadcenter #mform2 #fitem_id_submitbutton {
+    background: none;
+    border: 0;
+    margin: 0;
+    padding: 0;
+}

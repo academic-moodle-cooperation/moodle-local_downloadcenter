@@ -32,6 +32,7 @@ class local_downloadcenter_factory {
     private $filteredresources;
     private $availableresources = array('resource', 'folder');
     private $jsnames = array();
+    private $progress;
 
     public function __construct($course, $user) {
         $this->course = $course;
@@ -131,6 +132,10 @@ class local_downloadcenter_factory {
         return array($this->jsnames);
     }
 
+    public function set_progress(\core\progress\base $progress) {
+        $this->progress = $progress;
+    }
+
 
     public function create_zip() {
         global $DB, $CFG;
@@ -139,7 +144,6 @@ class local_downloadcenter_factory {
         $tempzip = tempnam($CFG->tempdir.'/', 'downloadcenter');
         $zipper = new zip_packer();
         $fs = get_file_storage();
-
 
         /*
         // Get file
@@ -156,9 +160,17 @@ class local_downloadcenter_factory {
         $filelist = array();
         $filteredresources = $this->filteredresources;
 
+
         if (empty($filteredresources)) {
            // return false;
         }
+        $count = $this->count_res($filteredresources);
+        $count += 1;
+
+        $this->progress->start_html();
+        $this->progress->start_progress('filecreationprogress', $count);
+        ob_flush();
+        flush();
 
         foreach ($filteredresources as $topicid => $info) {
             $basedir = clean_filename($info->title);
@@ -176,15 +188,57 @@ class local_downloadcenter_factory {
                     $folder = $fs->get_area_tree($context->id, 'mod_folder', 'content', 0);
                     $this->add_folder_contents($filelist, $folder, $resdir);
                 }
+                //sleep(5); we need this, in order to test the progress bar, otherwise it wont show, cause it's too fast :)
+                $this->progress->increment_progress();
+                ob_flush();
+                flush();
             }
         }
 
         if ($zipper->archive_to_pathname($filelist, $tempzip)) {
-            send_temp_file($tempzip, $this->course->shortname . '.zip');
+            $this->progress->increment_progress();
+            ob_flush();
+            flush();
+            return $this->add_file_to_session($tempzip, clean_filename($this->course->shortname . '.zip'));
+
         } else {
             debugging("Problems with archiving the files.", DEBUG_DEVELOPER);
             die;
         }
+    }
+
+    private function count_res($res) {
+        $count = 0;
+        foreach ($res as $sectioninfo) {
+            $count += count($sectioninfo->res);
+        }
+        return $count;
+    }
+
+    private function add_file_to_session($tempfilename, $realfilename) {
+        global $SESSION;
+        if (!isset($SESSION->local_downloadcenter_filelist)) {
+            $SESSION->local_downloadcenter_filelist = array();
+        }
+        $hash = sha1($tempfilename . $realfilename);
+        $info = new stdClass;
+        $info->tempfilename = $tempfilename;
+        $info->realfilename = $realfilename;
+        $SESSION->local_downloadcenter_filelist[$hash] = $info;
+        return $hash;
+    }
+
+    public function get_file_from_session($hash) {
+        global $SESSION;
+        if (isset($SESSION->local_downloadcenter_filelist)) {
+            if (isset($SESSION->local_downloadcenter_filelist[$hash])) {
+                $info = $SESSION->local_downloadcenter_filelist[$hash];
+                unset($SESSION->local_downloadcenter_filelist[$hash]);
+                send_temp_file($info->tempfilename, $info->realfilename);
+            }
+        }
+        debugging("Problems with getting the files from server.", DEBUG_DEVELOPER);
+        die;
     }
 
     private function add_folder_contents(&$filelist, $folder, $path) {

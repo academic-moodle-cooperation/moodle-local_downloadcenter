@@ -37,3 +37,7 @@ $string['warningmessage'] = 'ACHTUNG: Im Download Center werden NUR die im Kurs 
 
 
 $string['createzip'] = 'ZIP-Archiv erstellen';
+
+$string['zipready'] = 'Das ZIP-Archiv wurde erfolgreich angelegt.';
+$string['download'] = 'Download';
+$string['zipcreating'] = 'ZIP-Archiv wird erstellt...';

@@ -58,28 +58,60 @@ $PAGE->requires->strings_for_js(array('showtypes', 'hidetypes'), 'backup');
 
 
 $downloadform = new local_downloadcenter_download_form(null, array('res' => $userresources));
-
-if ($data = $downloadform->get_data()) {
-    $downloadcenter->parse_form_data($data);
-    $downloadcenter->create_zip();
-    die;
-} else if ($downloadform->is_cancelled()) {
-    redirect(new moodle_url('/course/view.php', array('id' => $course->id)));
-    die;
-}
-
+$downloadfinalform = new local_downloadcenter_download_final_form();
 
 $PAGE->set_title(get_string('navigationlink', 'local_downloadcenter') . ': ' . $course->fullname);
 $PAGE->set_heading($course->fullname);
 
 
-echo $OUTPUT->header();
+if ($data = $downloadform->get_data()) {
 
+    echo $OUTPUT->header();
 
-// Prepare a progress bar which can display optionally during long-running
-// operations while setting up the UI.
-$slowprogress = new \core\progress\display_if_slow(get_string('preparingui', 'backup'));
+    $progress = new \core\progress\display_if_slow(get_string('zipcreating', 'local_downloadcenter'), 3);
+    $downloadcenter->set_progress($progress);
+    ob_flush();
+    flush();
+
+    $downloadcenter->parse_form_data($data);
+    $hash = $downloadcenter->create_zip();
+    $info = new stdClass;
+    $info->filehash = $hash;
+    $downloadfinalform->set_data($info);
+    $downloadform = $downloadfinalform;
+    $progress->end_html();
+    echo $OUTPUT->notification(get_string('zipready', 'local_downloadcenter'), 'notifysuccess');
+
+} else if ($downloadform->is_cancelled()) {
+    redirect(new moodle_url('/course/view.php', array('id' => $course->id)));
+    die;
+} else if ($data = $downloadfinalform->get_data()) {
+    $downloadcenter->get_file_from_session($data->filehash);
+    die;
+} else {
+    echo $OUTPUT->header();
+}
+
 
 $downloadform->display();
 
+
+
+
+
 echo $OUTPUT->footer();
+
+
+
+
+
+
+/*
+ob_flush();
+$i = 0;
+while ($i < 100) {
+    $progress->increment_progress();
+    ob_flush();
+    sleep(1);
+    $i++;
+}*/

@@ -27,7 +27,5 @@ defined('MOODLE_INTERNAL') || die();
 
 
 class local_downloadcenter_renderer extends plugin_renderer_base {
-    public function render_resource_form($resources) {
 
-    }
 }

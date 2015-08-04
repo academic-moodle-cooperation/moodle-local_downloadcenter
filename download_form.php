@@ -62,3 +62,18 @@ class local_downloadcenter_download_form extends moodleform {
 
     }
 }
+
+class local_downloadcenter_download_final_form extends moodleform {
+    public function definition() {
+        global $COURSE;
+        $mform = $this->_form;
+        $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
+        $mform->setDefault('courseid', $COURSE->id);
+
+        $mform->addElement('hidden', 'filehash');
+        $mform->setType('filehash', PARAM_ALPHANUM);
+
+        $this->add_action_buttons(false, get_string('download', 'local_downloadcenter'));
+    }
+}
