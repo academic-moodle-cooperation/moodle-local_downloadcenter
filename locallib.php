@@ -199,7 +199,8 @@ class local_downloadcenter_factory {
             $this->progress->increment_progress();
             ob_flush();
             flush();
-            return $this->add_file_to_session($tempzip, clean_filename($this->course->shortname . '.zip'));
+            $filename = sprintf('%s_%s.zip', $this->course->shortname, userdate(time(), '%Y%m%d_%H%M'));
+            return $this->add_file_to_session($tempzip, clean_filename($filename));
 
         } else {
             debugging("Problems with archiving the files.", DEBUG_DEVELOPER);
