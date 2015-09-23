@@ -27,6 +27,10 @@
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once(__DIR__ . '/download_form.php');
+@ini_set('zlib.output_compression', 'Off');
+@ini_set('output_buffering', 'Off');
+@ini_set('output_handler', '');
+@apache_setenv('no-gzip', 1);
 
 $courseid = required_param('courseid', PARAM_INT);
 
@@ -37,8 +41,6 @@ require_course_login($course);
 $context = context_course::instance($course->id);
 
 require_capability('local/downloadcenter:view', $context);
-
-
 
 $PAGE->set_url(new moodle_url('/local/downloadcenter/index.php', array('courseid' => $course->id)));
 $PAGE->navbar->add(get_string('navigationlink', 'local_downloadcenter'), $PAGE->url);
@@ -54,24 +56,15 @@ $PAGE->requires->yui_module('moodle-local_downloadcenter-downloadcenter',
 $PAGE->requires->strings_for_js(array('select', 'all', 'none'), 'moodle');
 $PAGE->requires->strings_for_js(array('showtypes', 'hidetypes'), 'backup');
 
-
-
-
 $downloadform = new local_downloadcenter_download_form(null, array('res' => $userresources));
 $downloadfinalform = new local_downloadcenter_download_final_form();
 
 $PAGE->set_title(get_string('navigationlink', 'local_downloadcenter') . ': ' . $course->fullname);
 $PAGE->set_heading($course->fullname);
 
-
 if ($data = $downloadform->get_data()) {
-
     echo $OUTPUT->header();
-
-    $progress = new \core\progress\display_if_slow(get_string('zipcreating', 'local_downloadcenter'), 3);
-    $downloadcenter->set_progress($progress);
-    ob_flush();
-    flush();
+    echo html_writer::start_div('', array('id' => 'executionprogress'));
 
     $downloadcenter->parse_form_data($data);
     $hash = $downloadcenter->create_zip();
@@ -79,7 +72,9 @@ if ($data = $downloadform->get_data()) {
     $info->filehash = $hash;
     $downloadfinalform->set_data($info);
     $downloadform = $downloadfinalform;
-    $progress->end_html();
+
+    echo html_writer::end_div();
+    echo html_writer::script('document.getElementById("executionprogress").style.display = "none";');
     echo $OUTPUT->notification(get_string('zipready', 'local_downloadcenter'), 'notifysuccess');
 
 } else if ($downloadform->is_cancelled()) {
@@ -92,26 +87,6 @@ if ($data = $downloadform->get_data()) {
     echo $OUTPUT->header();
 }
 
-
 $downloadform->display();
 
-
-
-
-
 echo $OUTPUT->footer();
-
-
-
-
-
-
-/*
-ob_flush();
-$i = 0;
-while ($i < 100) {
-    $progress->increment_progress();
-    ob_flush();
-    sleep(1);
-    $i++;
-}*/
