@@ -148,7 +148,6 @@ class local_downloadcenter_factory {
            // return false;
         }
 
-        $progress = new \core\progress\display();
 
         foreach ($filteredresources as $topicid => $info) {
             $basedir = clean_filename($info->title);
@@ -166,21 +165,12 @@ class local_downloadcenter_factory {
                     $folder = $fs->get_area_tree($context->id, 'mod_folder', 'content', 0);
                     $this->add_folder_contents($filelist, $folder, $resdir);
                 }
-                //sleep(5); we need this, in order to test the progress bar, otherwise it wont show, cause it's too fast :)
-                //$this->progress->increment_progress();
             }
         }
-        $count = count($filelist) + 1;
-        $progress->start_progress('local_downloadcenter_createzip', $count);
-        echo str_repeat(' ', 1024*64);
-        sleep(2);
-        $progress->increment_progress($count-1);
-        echo str_repeat(' ', 1024*64);
+
         if ($zipper->archive_to_pathname($filelist, $tempzip)) {
             $filename = sprintf('%s_%s.zip', $this->course->shortname, userdate(time(), '%Y%m%d_%H%M'));
-            //$this->progress->increment_progress();
-            $progress->end_html();
-
+            //send_temp_file($tempzip, clean_filename($filename));
             return $this->add_file_to_session($tempzip, clean_filename($filename));
 
         } else {
@@ -252,59 +242,3 @@ class local_downloadcenter_factory {
     }
 
 }
-/*
-require_once($CFG->libdir . '/filestorage/file_progress.php');
-class local_downloadcenter_progress implements file_progress {
-    private $prog;
-    private $started = false;
-    private $count = 1;
-
-    public function __construct($title, $delay = 5) {
-
-        $this->prog = new \core\progress\display_if_slow($title, $delay);
-    }
-
-    public function progress2($progress = self::INDETERMINATE, $max = self::INDETERMINATE) {
-        if ($this->started) {
-            $this->prog->progress($progress);
-            echo time(). ' - ' . $progress . ' - ' . $max . ' <br />';
-            ob_flush();
-            flush();
-        } else {
-            $this->prog->start_progress('filecreationprogress', $max);
-            $this->started = true;
-            ob_flush();
-            flush();
-        }
-    }
-
-    public function progress($progress = file_progress::INDETERMINATE, $max = file_progress::INDETERMINATE) {
-        $reporter = $this->prog;
-
-        // Start tracking progress if necessary.
-        if (!$this->started) {
-            $reporter->start_progress('extract_file_to_dir', ($max == file_progress::INDETERMINATE)
-                ? \core\progress\base::INDETERMINATE : $max);
-            $this->started = true;
-        }
-
-
-        echo time(). ' - ' . $progress . ' - ' . $max . ' - ' . $this->count .  ' <br />';
-        $this->count++;
-
-        // Pass progress through to whatever handles it.
-        $reporter->progress(($progress == file_progress::INDETERMINATE)
-            ? \core\progress\base::INDETERMINATE : $progress);
-
-        ob_flush();
-        flush();
-    }
-
-    public function start_html() {
-        $this->prog->start_html();
-    }
-
-    public function end_html() {
-        $this->prog->end_html();
-    }
-}*/
