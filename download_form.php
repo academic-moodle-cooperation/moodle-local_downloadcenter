@@ -48,8 +48,8 @@ class local_downloadcenter_download_form extends moodleform {
 
             $mform->setDefault($sectionname, 1);
             foreach ($sectioninfo->res as $res) {
-                $title = $res->name . ' ' . $res->icon;
                 $name = 'item_' . $res->modname . '_' . $res->instanceid;
+                $title = html_writer::span($res->name) . ' ' . $res->icon;
                 $title = html_writer::tag('span', $title, array('class' => 'itemtitle'));
                 $mform->addElement('checkbox', $name, $title, null);
                 $mform->setDefault($name, 1);

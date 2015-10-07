@@ -1,9 +1,7 @@
 .path-local-downloadcenter form fieldset > div > div.fitem.femptylabel {
     display: none;
 }
-.path-local-downloadcenter form .itemtitle {
-    font-weight: normal;
-}
+
 .path-local-downloadcenter form .warningmessage {
     font-size: 1.2em;
     font-weight: bold;
@@ -47,4 +45,44 @@
     border: 0;
     margin: 0;
     padding: 0;
+}
+
+
+.path-local-downloadcenter form .itemtitle {
+    font-weight: normal;
+}
+
+.path-local-downloadcenter form .fitemtitle {
+    /*position: relative;*/
+}
+
+.path-local-downloadcenter form .itemtitle span {
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.path-local-downloadcenter form .activityicon{
+    width: 24px;
+    margin-top: -10px;
+}
+
+
+@media(max-width: 1199px) {
+    .path-local-downloadcenter form .fitemtitle {
+        float: none !important;
+    }
+
+    .path-local-downloadcenter form .itemtitle span {
+        max-width: 380px;
+    }
+}
+
+@media(max-width: 499px) {
+    .path-local-downloadcenter form .itemtitle span {
+        max-width: 150px;
+    }
+
 }

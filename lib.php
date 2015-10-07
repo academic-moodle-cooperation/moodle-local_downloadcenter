@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-function local_downloadcenter_extends_settings_navigation(settings_navigation $settings_nav, context $context) {
+function local_downloadcenter_extend_settings_navigation(settings_navigation $settings_nav, context $context) {
     global $COURSE, $PAGE, $OUTPUT;
 
     if ($COURSE->id == SITEID) {
