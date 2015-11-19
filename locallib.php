@@ -53,13 +53,23 @@ class local_downloadcenter_factory {
         $sorted = array();
 
         if ($usesections) {
-            $sections = $DB->get_records('course_sections', array('course' => $this->course->id));
+            $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
+            $sectionsformat = $DB->get_record('course_format_options', array('courseid' => $this->course->id, 'name' => 'numsections'));
+            $max = count($sections);
+            if ($sectionsformat) {
+                $max = $sectionsformat->value;
+            }
+            $i = 0;
             foreach ($sections as $section) {
-                if (!isset($sorted[$section->section])) {
+                if ($i >= $max) {
+                    break;
+                }
+                if (!isset($sorted[$section->section]) && $section->visible) {
                     $sorted[$section->section] = new stdClass;
                     $sorted[$section->section]->title = get_section_name($this->course, $section->section);
                     $sorted[$section->section]->res = array();
                 }
+                $i++;
             }
         } else {
             $sorted['default'] = new stdClass;//TODO: fix here if needed
