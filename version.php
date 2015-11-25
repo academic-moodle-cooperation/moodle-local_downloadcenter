@@ -27,7 +27,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015111900;
+$plugin->version   = 2015112500;
 $plugin->requires  = 2014041100;      // Requires this Moodle version!
 $plugin->release   = 'v2.9';
 $plugin->component = 'local_downloadcenter';    // To check on upgrade, that module sits in correct place.

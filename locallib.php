@@ -85,7 +85,7 @@ class local_downloadcenter_factory {
             if (!$cm->uservisible) {
                 continue;
             }
-            if (!$cm->has_view()) {
+            if (!$cm->has_view() && $cm->modname != 'folder') {
                 // Exclude label and similar
                 continue;
             }
