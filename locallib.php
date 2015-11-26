@@ -51,17 +51,15 @@ class local_downloadcenter_factory {
         $usesections = course_format_uses_sections($this->course->format);
 
         $sorted = array();
-
         if ($usesections) {
             $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
             $sectionsformat = $DB->get_record('course_format_options', array('courseid' => $this->course->id, 'name' => 'numsections'));
             $max = count($sections);
             if ($sectionsformat) {
-                $max = $sectionsformat->value;
+                $max = intval($sectionsformat->value);
             }
-            $i = 0;
             foreach ($sections as $section) {
-                if ($i >= $max) {
+                if (intval($section->section) > $max) {
                     break;
                 }
                 if (!isset($sorted[$section->section]) && $section->visible) {
@@ -69,7 +67,6 @@ class local_downloadcenter_factory {
                     $sorted[$section->section]->title = get_section_name($this->course, $section->section);
                     $sorted[$section->section]->res = array();
                 }
-                $i++;
             }
         } else {
             $sorted['default'] = new stdClass;//TODO: fix here if needed
@@ -97,7 +94,7 @@ class local_downloadcenter_factory {
         foreach ($resources as $modname=>$instances) {
             $resources[$modname] = $DB->get_records_list($modname, 'id', $instances, 'id');
         }
-
+        $available_sections = array_keys($sorted);
         $currentsection = '';
         foreach ($cms as $cm) {
             if (!isset($resources[$cm->modname][$cm->instance])) {
@@ -108,6 +105,9 @@ class local_downloadcenter_factory {
             if ($usesections) {
                 if ($cm->sectionnum !== $currentsection) {
                     $currentsection = $cm->sectionnum;
+                }
+                if (!in_array($currentsection, $available_sections)) {
+                    continue;
                 }
             } else {
                 $currentsection = 'default';
