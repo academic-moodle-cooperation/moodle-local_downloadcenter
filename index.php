@@ -67,6 +67,13 @@ if ($data = $downloadform->get_data()) {
     //echo html_writer::start_div('', array('id' => 'executionprogress'));
     //echo $OUTPUT->heading(get_string('zipcreating', 'local_downloadcenter'));
 
+    $event = \local_downloadcenter\event\zip_downloaded::create(array(
+        'objectid' => $PAGE->course->id,
+        'context' => $PAGE->context
+    ));
+    $event->add_record_snapshot('course', $PAGE->course);
+    $event->trigger();
+
     $downloadcenter->parse_form_data($data);
     $hash = $downloadcenter->create_zip();
     $downloadcenter->get_file_from_session($hash);
@@ -83,10 +90,16 @@ if ($data = $downloadform->get_data()) {
 } else if ($downloadform->is_cancelled()) {
     redirect(new moodle_url('/course/view.php', array('id' => $course->id)));
     die;
-} else if ($data = $downloadfinalform->get_data()) {
+/*} else if ($data = $downloadfinalform->get_data()) {
     $downloadcenter->get_file_from_session($data->filehash);
-    die;
+    die;*/
 } else {
+    $event = \local_downloadcenter\event\plugin_viewed::create(array(
+        'objectid' => $PAGE->course->id,
+        'context' => $PAGE->context
+    ));
+    $event->add_record_snapshot('course', $PAGE->course);
+    $event->trigger();
     echo $OUTPUT->header();
 }
 

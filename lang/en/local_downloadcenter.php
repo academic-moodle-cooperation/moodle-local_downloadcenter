@@ -39,3 +39,5 @@ $string['createzip'] = 'Create ZIP archive';
 $string['zipready'] = 'The ZIP archive has been successfully created.';
 $string['download'] = 'Download';
 $string['zipcreating'] = 'The ZIP archive is being created...';
+$string['eventDOWNLOADEDZIP'] = 'ZIP was downloaded';
+$string['eventVIEWED'] = 'Downloadcenter viewed';
