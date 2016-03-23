@@ -30,7 +30,7 @@ class local_downloadcenter_factory {
     private $user;
     private $sortedresources;
     private $filteredresources;
-    private $availableresources = array('resource', 'folder');
+    private $availableresources = array('resource', 'folder', 'publication');
     private $jsnames = array();
     private $progress;
 
@@ -65,7 +65,7 @@ class local_downloadcenter_factory {
                 if (!isset($sorted[$section->section]) && $section->visible) {
                     $sorted[$section->section] = new stdClass;
                     $sorted[$section->section]->title = get_section_name($this->course, $section->section);
-                    $sorted[$section->section]->res = array();
+                    $sorted[$section->section]->res = array(); //TODO: fix empty names here!!!
                 }
             }
         } else {
@@ -143,7 +143,14 @@ class local_downloadcenter_factory {
     }
 
     public function create_zip() {
-        global $DB, $CFG;
+        global $DB, $CFG, $USER;
+
+        if (file_exists($CFG->dirroot . '/mod/publication/locallib.php')) {
+            require_once($CFG->dirroot . '/mod/publication/locallib.php');
+        } else {
+            define('PUBLICATION_MODE_UPLOAD', 0);
+            define('PUBLICATION_MODE_IMPORT', 1);
+        }
 
         // Zip files and sent them to a user.
         $tempzip = tempnam($CFG->tempdir.'/', 'downloadcenter');
@@ -157,6 +164,10 @@ class local_downloadcenter_factory {
         if (empty($filteredresources)) {
            // return false;
         }
+
+        //needed for mod_publication
+        $ufields = user_picture::fields('u');
+        $useridentityfields = $CFG->showuseridentity != '' ? 'u.'.str_replace(', ', ', u.', $CFG->showuseridentity) . ', ' : '';
 
 
         foreach ($filteredresources as $topicid => $info) {
@@ -174,6 +185,149 @@ class local_downloadcenter_factory {
                 } else if ($res->modname == 'folder') {
                     $folder = $fs->get_area_tree($context->id, 'mod_folder', 'content', 0);
                     $this->add_folder_contents($filelist, $folder, $resdir);
+                } else if ($res->modname == 'publication') {
+
+                    $cm = $res->cm;
+
+                    $conditions = array();
+                    $conditions['publication'] = $res->instanceid;
+
+                    $filesforzipping = array();
+                    $filearea = 'attachment';
+
+                    // Find out current groups mode.
+                    $groupmode = groups_get_activity_groupmode($cm);
+                    $currentgroup = groups_get_activity_group($cm, true);
+
+                    // Get group name for filename.
+                    $groupname = '';
+
+                    // Get all ppl that are allowed to submit assignments.
+                    list($esql, $params) = get_enrolled_sql($context, 'mod/publication:view', $currentgroup);
+
+                    $showall = false;
+
+                    if (has_capability('mod/publication:approve', $context) ||
+                        has_capability('mod/publication:grantextension', $context)) {
+                        $showall = true;
+                    }
+
+                    if ($showall) {
+                        $sql = 'SELECT u.id FROM {user} u '.
+                            'LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
+                            'WHERE u.deleted = 0 AND eu.id=u.id';
+                    } else {
+                        $sql = 'SELECT u.id FROM {user} u '.
+                            'LEFT JOIN ('.$esql.') eu ON eu.id=u.id '.
+                            'LEFT JOIN {publication_file} files ON (u.id = files.userid) '.
+                            'WHERE u.deleted = 0 AND eu.id=u.id '.
+                            'AND files.publication = '. $res->instanceid . ' ';
+
+                        if ($res->resource->mode == PUBLICATION_MODE_UPLOAD) {
+                            // Mode upload.
+                            if ($res->resource->obtainteacherapproval) {
+                                // Need teacher approval.
+
+                                $where = 'files.teacherapproval = 1';
+                            } else {
+                                // No need for teacher approval.
+                                // Teacher only hasnt rejected.
+                                $where = '(files.teacherapproval = 1 OR files.teacherapproval IS NULL)';
+                            }
+                        } else {
+                            // Mode import.
+                            if (!$res->resource->obtainstudentapproval) {
+                                // No need to ask student and teacher has approved.
+                                $where = 'files.teacherapproval = 1';
+                            } else {
+                                // Student and teacher have approved.
+                                $where = 'files.teacherapproval = 1 AND files.studentapproval = 1';
+                            }
+                        }
+
+                        $sql .= 'AND ' . $where . ' ';
+                        $sql .= 'GROUP BY u.id';
+                    }
+
+                    $users = $DB->get_records_sql($sql, $params);
+                    if (!empty($users)) {
+                        $users = array_keys($users);
+                    }
+
+                    // If groupmembersonly used, remove users who are not in any group.
+                    if ($users and !empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
+                        if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
+                            $users = array_intersect($users, array_keys($groupingusers));
+                        }
+                    }
+
+                    $userfields = get_all_user_name_fields();
+                    $userfields['id'] = 'id';
+                    $userfields['username'] = 'username';
+                    $userfields = implode(', ', $userfields);
+
+                    $viewfullnames = has_capability('moodle/site:viewfullnames', $context);
+
+                    // Get all files from each user.
+                    foreach ($users as $uploader) {
+                        $auserid = $uploader;
+
+                        $conditions['userid'] = $uploader;
+                        $records = $DB->get_records('publication_file', $conditions);
+
+                        // Get user firstname/lastname.
+                        $auser = $DB->get_record('user', array('id' => $auserid), $userfields);
+
+                        foreach ($records as $record) {
+
+                            $haspermission = false;
+
+                            if ($res->resource->mode == PUBLICATION_MODE_UPLOAD) {
+                                // Mode upload.
+                                if ($res->resource->obtainteacherapproval) {
+                                    // Need teacher approval.
+                                    if ($record->teacherapproval == 1) {
+                                        // Teacher has approved.
+                                        $haspermission = true;
+                                    }
+                                } else {
+                                    // No need for teacher approval.
+                                    if (is_null($record->teacherapproval) || $record->teacherapproval == 1) {
+                                        // Teacher only hasnt rejected.
+                                        $haspermission = true;
+                                    }
+                                }
+                            } else {
+                                // Mode import.
+                                if (!$res->resource->obtainstudentapproval && $record->teacherapproval == 1) {
+                                    // No need to ask student and teacher has approved.
+                                    $haspermission = true;
+                                } else if ($res->resource->obtainstudentapproval &&
+                                    $record->teacherapproval == 1 &&
+                                    $record->studentapproval == 1) {
+                                    // Student and teacher have approved.
+                                    $haspermission = true;
+                                }
+                            }
+
+                            if (has_capability('mod/publication:approve', $context) || $haspermission) {
+                                // Is teacher or file is public.
+
+                                $file = $fs->get_file_by_id($record->fileid);
+
+                                // Get files new name.
+                                $fileext = strstr($file->get_filename(), '.');
+                                $fileoriginal = str_replace($fileext, '', $file->get_filename());
+                                $fileforzipname = clean_filename(($viewfullnames ? fullname($auser) : '') .
+                                    '_' . $fileoriginal.'_'.$auserid.$fileext);
+                                $fileforzipname = $resdir . '/' . $fileforzipname;
+                                // Save file name to array for zipping.
+                                $filelist[$fileforzipname] = $file;
+                            }
+                        }
+                    } // End of foreach.
+
+
                 }
             }
         }
