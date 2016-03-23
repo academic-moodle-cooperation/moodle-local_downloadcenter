@@ -58,15 +58,33 @@ class local_downloadcenter_factory {
             if ($sectionsformat) {
                 $max = intval($sectionsformat->value);
             }
+            $unnamedsections = array();
+            $namedsections = array();
             foreach ($sections as $section) {
                 if (intval($section->section) > $max) {
                     break;
                 }
                 if (!isset($sorted[$section->section]) && $section->visible) {
                     $sorted[$section->section] = new stdClass;
-                    $sorted[$section->section]->title = get_section_name($this->course, $section->section);
+                    $title = trim(clean_filename(get_section_name($this->course, $section->section)));
+                    $sorted[$section->section]->title = $title;
+                    if (empty($title)) {
+                        $unnamedsections[] = $section->section;
+                    } else {
+                        $namedsections[$title] = true;
+                    }
                     $sorted[$section->section]->res = array(); //TODO: fix empty names here!!!
                 }
+            }
+            foreach ($unnamedsections as $sectionid) {
+                $title = 'Untitled';
+                $i = 1;
+                while (isset($namedsections[$title])) {
+                    $title = 'Untitled ' . strval($i);
+                    $i++;
+                }
+                $namedsections[$title] = true;
+                $sorted[$sectionid]->title = $title;
             }
         } else {
             $sorted['default'] = new stdClass;//TODO: fix here if needed
