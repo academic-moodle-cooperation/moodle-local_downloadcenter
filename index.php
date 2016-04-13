@@ -27,10 +27,6 @@
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once(__DIR__ . '/download_form.php');
-@ini_set('zlib.output_compression', 'Off');
-@ini_set('output_buffering', 'Off');
-@ini_set('output_handler', '');
-@apache_setenv('no-gzip', 1);
 
 $courseid = required_param('courseid', PARAM_INT);
 
