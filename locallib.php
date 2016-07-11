@@ -222,7 +222,6 @@ class local_downloadcenter_factory {
 
                     // Get all ppl that are allowed to submit assignments.
                     list($esql, $params) = get_enrolled_sql($context, 'mod/publication:view', $currentgroup);
-
                     $showall = false;
 
                     if (has_capability('mod/publication:approve', $context) ||
@@ -243,7 +242,12 @@ class local_downloadcenter_factory {
 
                         if ($res->resource->mode == PUBLICATION_MODE_UPLOAD) {
                             // Mode upload.
-                            if ($res->resource->obtainteacherapproval) {
+                            // SN 11.07.2016 - feature #2738:
+                            // in mod/publication/locallib : line 81, publication::__construct() { ...
+                            //      $this->instance->obtainteacherapproval = !$this->obtainteacherapproval
+                            // ..}
+                            // so flag has to be actually inverted
+                            if (!$res->resource->obtainteacherapproval) {
                                 // Need teacher approval.
 
                                 $where = 'files.teacherapproval = 1';
@@ -303,7 +307,8 @@ class local_downloadcenter_factory {
 
                             if ($res->resource->mode == PUBLICATION_MODE_UPLOAD) {
                                 // Mode upload.
-                                if ($res->resource->obtainteacherapproval) {
+                                // SN 11.07.2016 - feature #2738 - check comment above
+                                if (!$res->resource->obtainteacherapproval) {
                                     // Need teacher approval.
                                     if ($record->teacherapproval == 1) {
                                         // Teacher has approved.
