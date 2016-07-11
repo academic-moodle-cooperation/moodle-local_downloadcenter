@@ -268,6 +268,7 @@ class local_downloadcenter_factory {
                     }
 
                     $users = $DB->get_records_sql($sql, $params);
+                    
                     if (!empty($users)) {
                         $users = array_keys($users);
                     }
