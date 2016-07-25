@@ -67,6 +67,7 @@ class local_downloadcenter_factory {
                 if (!isset($sorted[$section->section]) && $section->visible) {
                     $sorted[$section->section] = new stdClass;
                     $title = trim(clean_filename(get_section_name($this->course, $section->section)));
+                    $title = self::shorten_filename($title);
                     $sorted[$section->section]->title = $title;
                     if (empty($title)) {
                         $unnamedsections[] = $section->section;
@@ -190,15 +191,16 @@ class local_downloadcenter_factory {
 
         foreach ($filteredresources as $topicid => $info) {
             $basedir = clean_filename($info->title);
+            $basedir = self::shorten_filename($basedir);
             $filelist[$basedir] = null;
             foreach ($info->res as $res) {
-                $resdir = $basedir . '/' . clean_filename($res->name);
+                $resdir = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
                 $filelist[$resdir] = null;
                 $context = context_module::instance($res->cm->id);
                 if ($res->modname == 'resource') {
                     $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
                     $file = array_shift($files); //get only the first file - such are the requirements
-                    $filename = $resdir . '/' . $file->get_filename();
+                    $filename = $resdir . '/' . self::shorten_filename($file->get_filename());
                     $filelist[$filename] = $file;
                 } else if ($res->modname == 'folder') {
                     $folder = $fs->get_area_tree($context->id, 'mod_folder', 'content', 0);
@@ -344,7 +346,7 @@ class local_downloadcenter_factory {
                                 $fileoriginal = str_replace($fileext, '', $file->get_filename());
                                 $fileforzipname = clean_filename(($viewfullnames ? fullname($auser) : '') .
                                     '_' . $fileoriginal.'_'.$auserid.$fileext);
-                                $fileforzipname = $resdir . '/' . $fileforzipname;
+                                $fileforzipname = $resdir . '/' . self::shorten_filename($fileforzipname);
                                 // Save file name to array for zipping.
                                 $filelist[$fileforzipname] = $file;
                             }
@@ -396,11 +398,12 @@ class local_downloadcenter_factory {
     private function add_folder_contents(&$filelist, $folder, $path) {
         if (!empty($folder['subdirs'])) {
             foreach ($folder['subdirs'] as $foldername => $subfolder) {
+                $foldername = self::shorten_filename($foldername);
                 $this->add_folder_contents($filelist, $subfolder, $path . '/' . $foldername);
             }
         }
         foreach ($folder['files'] as $filename => $file) {
-            $filelist[$path . '/' . $filename] = $file;
+            $filelist[$path . '/' . $filename] = self::shorten_filename($file);
         }
     }
 
@@ -427,6 +430,14 @@ class local_downloadcenter_factory {
         }
 
         $this->filteredresources = $filtered;
+    }
+
+    public static function shorten_filename($filename, $max_length = 64) {
+        if (strlen($filename) <= $max_length) {
+            return $filename;
+        }
+        $limit = round($max_length/2)-1;
+        return substr($filename, 0, $limit) . '___' . substr($filename, (1-$limit));
     }
 
 }
