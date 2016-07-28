@@ -56,7 +56,7 @@
     /*position: relative;*/
 }
 
-.path-local-downloadcenter form .fitemtitle label,
+.path-local-downloadcenter form .block .fitem .fitemtitle label .sectiontitle,
 .path-local-downloadcenter form .itemtitle span {
     max-width: 210px;
     overflow: hidden;

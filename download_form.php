@@ -44,7 +44,8 @@ class local_downloadcenter_download_form extends moodleform {
         foreach ($resources as $sectionid => $sectioninfo) {
             $sectionname = 'item_topic_' . $sectionid;
             $mform->addElement('html', html_writer::start_tag('div', array('class' => 'block')));
-            $mform->addElement('checkbox', $sectionname, $sectioninfo->title, null);
+            $sectiontitle = html_writer::span($sectioninfo->title, 'sectiontitle');
+            $mform->addElement('checkbox', $sectionname, $sectiontitle, null);
 
             $mform->setDefault($sectionname, 1);
             foreach ($sectioninfo->res as $res) {
