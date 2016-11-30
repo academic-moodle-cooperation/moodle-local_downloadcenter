@@ -70,6 +70,10 @@
     margin-top: -10px;
 }
 
+.path-local-downloadcenter .mform .grouped_settings .fitem div.fitemtitle{
+    padding-top: 0;
+}
+
 
 @media(max-width: 1199px) {
     .path-local-downloadcenter form .fitemtitle {

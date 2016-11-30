@@ -30,7 +30,7 @@ class local_downloadcenter_factory {
     private $user;
     private $sortedresources;
     private $filteredresources;
-    private $availableresources = array('resource', 'folder', 'publication');
+    private $availableresources = array('resource', 'folder', 'publication', 'page');
     private $jsnames = array();
     private $progress;
 
@@ -205,7 +205,8 @@ class local_downloadcenter_factory {
                 } else if ($res->modname == 'folder') {
                     $folder = $fs->get_area_tree($context->id, 'mod_folder', 'content', 0);
                     $this->add_folder_contents($filelist, $folder, $resdir);
-                } else if ($res->modname == 'publication') {
+                }
+                else if ($res->modname == 'publication') {
 
                     $cm = $res->cm;
 
@@ -353,6 +354,36 @@ class local_downloadcenter_factory {
                         }
                     } // End of foreach.
 
+                } else if ($res->modname == 'page') {
+                    $fsfiles = $fs->get_area_files($context->id,
+                        'mod_page',
+                        'content');
+                    if (count($fsfiles > 0)) {
+                        foreach ($fsfiles as $file) {
+                            if ($file->get_filesize() == 0) {
+                                continue;
+                            }
+                            $filename = $resdir . '/data' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                            //var_dump($file->get_filepath());
+                            $filelist[$filename] = $file;
+                        }
+                    }
+                    $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
+                    $content = str_replace('@@PLUGINFILE@@', 'data', $res->resource->content);
+                    //$content = format_string($content);
+                    $content = <<<HTML
+<!doctype html>
+<html>
+<head>
+    <title>{$res->name}</title>
+    <meta charset="utf-8">
+</head>
+<body>
+$content
+</body>
+</html>
+HTML;
+                    $filelist[$filename] = array($content); //needs to be array to be saved as file
 
                 }
             }
