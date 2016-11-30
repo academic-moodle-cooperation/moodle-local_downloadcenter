@@ -15,19 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Download center plugin
- *
- * @package       local_downloadcenter
- * @author        Simeon Naydenov (moniNaydenov@gmail.com)
- * @copyright     2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
- * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   local_downloadcenter
+ * @author    Simeon Naydenov
+ * @copyright 2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016072500;
-$plugin->requires  = 2014041100;      // Requires this Moodle version!
-$plugin->release   = 'v3.1.0';
-$plugin->component = 'local_downloadcenter';    // To check on upgrade, that module sits in correct place.
+$plugin->version   = 2016113000;
+$plugin->requires  = 2016052300;
+$plugin->component = 'local_downloadcenter';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = "v3.2.0";
+
