@@ -46,11 +46,7 @@ $downloadcenter = new local_downloadcenter_factory($course, $USER);
 
 $userresources = $downloadcenter->get_resources_for_user();
 
-$PAGE->requires->yui_module('moodle-local_downloadcenter-downloadcenter',
-    'M.local_downloadcenter.downloadselectall',
-    $downloadcenter->get_js_modnames());
-$PAGE->requires->strings_for_js(array('select', 'all', 'none'), 'moodle');
-$PAGE->requires->strings_for_js(array('showtypes', 'hidetypes'), 'backup');
+$PAGE->requires->js_call_amd('local_downloadcenter/modfilter', 'init', $downloadcenter->get_js_modnames());
 
 $downloadform = new local_downloadcenter_download_form(null, array('res' => $userresources));
 $downloadfinalform = new local_downloadcenter_download_final_form();
