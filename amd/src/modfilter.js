@@ -85,35 +85,13 @@ define(['jquery', 'core/str'], function($, Str) {
         var link = $('#downloadcenter-bytype');
         if (currentlyshown) {
             link.text(strings['showtypes']);
-            modlist.hide();
         } else {
             link.text(strings['hidetypes']);
-            modlist.show();
         }
+        modlist.animate({height: 'toggle' }, 500, 'swing');
 
         currentlyshown = !currentlyshown;
 
-        // The link has now been toggled (from show to hide, or vice-versa).
-        // Either hide or show the links.
-        /*var animcfg = { node: modlist, duration: 0.2 },
-            anim;
-        if (modlist.currentlyshown) {
-            // Animate reveal of the module links.
-            modlist.show();
-            animcfg.to = { maxHeight: modlist.get('clientHeight') + 'px' };
-            modlist.setStyle('maxHeight', '0px');
-            anim = new Y.Anim(animcfg);
-            anim.on('end', function() { modlist.setStyle('maxHeight', 'none'); });
-            anim.run();
-        } else {
-            // Animate hide of the module links.
-            animcfg.to = { maxHeight: '0px' };
-            modlist.setStyle('maxHeight', modlist.get('clientHeight') + 'px');
-            anim = new Y.Anim(animcfg);
-            anim.on('end', function() { modlist.hide(); modlist.setStyle('maxHeight', 'none'); });
-            anim.run();
-        }
-        */
     };
 
     var initlinks = function(links, mod) {

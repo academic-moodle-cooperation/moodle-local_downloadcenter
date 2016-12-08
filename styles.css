@@ -74,6 +74,10 @@
     padding-top: 0;
 }
 
+.path-local-downloadcenter #mod_select_links {
+    overflow: hidden;
+}
+
 
 @media(max-width: 1199px) {
     .path-local-downloadcenter form .fitemtitle {
