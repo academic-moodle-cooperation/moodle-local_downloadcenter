@@ -434,7 +434,7 @@ HTML;
             }
         }
         foreach ($folder['files'] as $filename => $file) {
-            $filelist[$path . '/' . $filename] = self::shorten_filename($file);
+            $filelist[$path . '/' . $filename] = self::shorten_filename($file->get_filename());
         }
     }
 
