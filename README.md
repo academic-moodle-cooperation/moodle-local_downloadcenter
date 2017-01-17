@@ -1,23 +1,29 @@
-Downloadcenter Module
-=====================
+Download Center Plugin
+======================
 
 This file is part of the local_downloadcenter plugin for Moodle - <http://moodle.org/>
 
 *Author:*    Simeon Naydenov
+
 *Copyright:* 2014 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
+
 *License:*   [GNU GPL v3 or later](http://www.gnu.org/copyleft/gpl.html)
 
 
 Description
 -----------
 
-TBD
+The Download Center plugin enables all users to download all files, folders as well as all documents
+of student folders of the entire course as a ZIP archive with a clear folder structure.
 
 
 Example
 -------
 
-TBD
+With this module participants of a course can download all relevant course documents (files, folders
+as well as documents of student folders) in one step. Therefore users can save valueable time
+compared to single-downloads of files. One reasonable scenario might be the download of all files
+for a train journey, so all downloaded course files can be accessed offline.
 
 
 Requirements
@@ -29,7 +35,7 @@ The plugin is available for Moodle 3.1+.
 Installation
 ------------
 
-* Copy the module code directly to the TBD directory.
+* Copy the code directly to the local/downloadcenter directory.
 
 * Log into Moodle as administrator.
 
@@ -40,7 +46,7 @@ Installation
 Admin Settings
 --------------
 
-TBD (if any)
+No settings available.
 
 
 Bug Reports / Support
