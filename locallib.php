@@ -464,6 +464,7 @@ HTML;
     }
 
     public static function shorten_filename($filename, $max_length = 64) {
+        $filename = (string)$filename;
         if (strlen($filename) <= $max_length) {
             return $filename;
         }
