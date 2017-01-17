@@ -18,13 +18,14 @@
 .path-local-downloadcenter .mform .block {
     padding-top: 5px;
 }
-
+/*
 .block_tree p.tree_item.downloadcenterlink.branch,
 .block p.tree_item.downloadcenterlink.branch,
 .block p.tree_item.downloadcenterlink {
     background-image: none !important;
     padding-left: 0;
-}
+}*/
+/*
 .block p.tree_item.downloadcenterlink a{
     background-image: url("[[pix:core|t/collapsed]]");
     background-repeat: no-repeat;
@@ -35,6 +36,8 @@
 .path-local-downloadcenter .block p.tree_item.downloadcenterlink a {
     background-image: url("[[pix:core|t/collapsed_empty]]");
 }
+
+*/
 
 .path-local-downloadcenter .core_progress_display_if_slow {
     width: 500px;
