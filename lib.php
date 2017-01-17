@@ -80,54 +80,62 @@ function local_downloadcenter_extend_settings_navigation(settings_navigation $se
 function local_downloadcenter_extend_navigation(global_navigation $nav) {
     global $PAGE, $OUTPUT;
 
+    if ($PAGE->course->id == SITEID) {
+        return;
+    }
 
-    $rootnodes = array($nav->find('courses', navigation_node::TYPE_ROOTNODE),
-                       $nav->find('mycourses', navigation_node::TYPE_ROOTNODE));
+    $context = context_course::instance($PAGE->course->id);
 
+    if (!has_capability('local/downloadcenter:view', $context)) {
+        return;
+    }
 
-    foreach ($rootnodes as $courses) {
-        $coursenodes = $courses->find_all_of_type(navigation_node::TYPE_COURSE);
-        foreach ($coursenodes as $coursenode) {
-            $context = \context_course::instance($coursenode->key);
-            if (!has_capability('local/downloadcenter:view', $context)) {
-                continue;
-            }
+    $rootnodes = array($nav->find('mycourses', navigation_node::TYPE_ROOTNODE),
+                       $nav->find('courses', navigation_node::TYPE_ROOTNODE));
 
-            $beforekey = null;
-            $activitiesnode = $coursenode->find('activitiescategory', navigation_node::TYPE_CATEGORY);
-            if ($activitiesnode == false) {
-                $sections = $coursenode->find_all_of_type(navigation_node::TYPE_SECTION);
-                $firstsection = reset($sections);
-                $beforekey = empty($sections) ? null : $firstsection->key;
-            } else {
-                $beforekey = 'activitiescategory';
-            }
-
-
-            $url = new moodle_url('/local/downloadcenter/index.php', array('courseid' => $coursenode->key));
-
-
-
-            $title = get_string('navigationlink', 'local_downloadcenter');
-
-            $pix = new pix_icon('icon', $title, 'local_downloadcenter');
-
-            $childnode = navigation_node::create(
-                $title,
-                $url,
-                navigation_node::TYPE_CUSTOM,
-                'downloadcenter',
-                'downloadcenter',
-                $pix
-            );
-            $node = $coursenode->add_node($childnode, $beforekey);
-            //$node->id = 'downloadcenter';
-            $node->nodetype = navigation_node::NODETYPE_LEAF;
-            $node->collapse = true;
-            $node->add_class('downloadcenterlink');
-
+    foreach ($rootnodes as $rootnode) {
+        if (empty($rootnode)) {
+            continue;
         }
 
+        $coursenode = $rootnode->find($PAGE->course->id, navigation_node::TYPE_COURSE);
+        if ($coursenode == false) {
+            continue;
+        }
+
+        $beforekey = null;
+        $activitiesnode = $coursenode->find('activitiescategory', navigation_node::TYPE_CATEGORY);
+        if ($activitiesnode == false) {
+            $sections = $coursenode->find_all_of_type(navigation_node::TYPE_SECTION);
+            $firstsection = reset($sections);
+            $beforekey = empty($sections) ? null : $firstsection->key;
+        } else {
+            $beforekey = 'activitiescategory';
+        }
+
+
+        $url = new moodle_url('/local/downloadcenter/index.php', array('courseid' => $PAGE->course->id));
+
+
+
+        $title = get_string('navigationlink', 'local_downloadcenter');
+
+        $pix = new pix_icon('icon', $title, 'local_downloadcenter');
+
+        $childnode = navigation_node::create(
+            $title,
+            $url,
+            navigation_node::TYPE_CUSTOM,
+            'downloadcenter',
+            'downloadcenter',
+            $pix
+        );
+        $node = $coursenode->add_node($childnode, $beforekey);
+        //$node->id = 'downloadcenter';
+        $node->nodetype = navigation_node::NODETYPE_LEAF;
+        $node->collapse = true;
+        $node->add_class('downloadcenterlink');
+        break;
     }
 
 }

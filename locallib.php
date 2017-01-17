@@ -389,7 +389,7 @@ HTML;
             }
         }
 
-        if ($zipper->archive_to_pathname($filelist, $tempzip)) {
+        if (@$zipper->archive_to_pathname($filelist, $tempzip)) {
             $filename = sprintf('%s_%s.zip', $this->course->shortname, userdate(time(), '%Y%m%d_%H%M'));
             //send_temp_file($tempzip, clean_filename($filename));
             return $this->add_file_to_session($tempzip, clean_filename($filename));
@@ -434,7 +434,7 @@ HTML;
             }
         }
         foreach ($folder['files'] as $filename => $file) {
-            $filelist[$path . '/' . $filename] = self::shorten_filename($file->get_filename());
+            $filelist[$path . '/' . self::shorten_filename($filename)] = $file;
         }
     }
 
