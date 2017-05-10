@@ -78,10 +78,11 @@ class local_downloadcenter_factory {
                 }
             }
             foreach ($unnamedsections as $sectionid) {
-                $title = 'Untitled';
+                $untitled = get_string('untitled', 'local_downloadcenter');
+                $title = $untitled;
                 $i = 1;
                 while (isset($namedsections[$title])) {
-                    $title = 'Untitled ' . strval($i);
+                    $title =  $untitled . ' ' . strval($i);
                     $i++;
                 }
                 $namedsections[$title] = true;

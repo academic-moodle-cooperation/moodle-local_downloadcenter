@@ -39,20 +39,20 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->setType('courseid', PARAM_INT);
 
         $mform->addElement('html', html_writer::tag('div', get_string('warningmessage', 'local_downloadcenter'), array('class' => 'warningmessage')));
-        $mform->addElement('static', 'warning', '', ''); //hack to work around fieldsets..
+        //$mform->addElement('static', 'warning', '', ''); //hack to work around fieldsets..
 
         foreach ($resources as $sectionid => $sectioninfo) {
             $sectionname = 'item_topic_' . $sectionid;
-            $mform->addElement('html', html_writer::start_tag('div', array('class' => 'block')));
+            $mform->addElement('html', html_writer::start_tag('div', array('class' => 'card block')));
             $sectiontitle = html_writer::span($sectioninfo->title, 'sectiontitle');
-            $mform->addElement('checkbox', $sectionname, $sectiontitle, null);
+            $mform->addElement('checkbox', $sectionname, $sectiontitle);
 
             $mform->setDefault($sectionname, 1);
             foreach ($sectioninfo->res as $res) {
                 $name = 'item_' . $res->modname . '_' . $res->instanceid;
                 $title = html_writer::span($res->name) . ' ' . $res->icon;
                 $title = html_writer::tag('span', $title, array('class' => 'itemtitle'));
-                $mform->addElement('checkbox', $name, $title, null);
+                $mform->addElement('checkbox', $name, $title);
                 $mform->setDefault($name, 1);
                 $mform->disabledIf($name, $sectionname);
             }
