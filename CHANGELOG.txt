@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+3.3.0 (2017-05-14)
+------------------
+
+* Moodle 3.3 compatible version
+* [CHANGED] "Untitled" course topics - string is not hardcoded any more, now part of lang_strings
+* [FEATURE] Add support for boost theme
+
+
+
 3.2.0 (2017-02-05)
 ------------------
 
