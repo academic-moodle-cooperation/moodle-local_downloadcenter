@@ -26,12 +26,12 @@ define(['jquery', 'core/str'], function($, Str) {
         modnames = modnms;
         /** @access public */
         Str.get_strings([
-                {key: 'all', component: 'moodle'},
-                {key: 'none', component: 'moodle'},
-                {key: 'select', component: 'moodle'},
-                {key: 'showtypes', component: 'backup'},
-                {key: 'hidetypes', component: 'backup'}
-            ]).done(function(strs) {
+            {key: 'all', component: 'moodle'},
+            {key: 'none', component: 'moodle'},
+            {key: 'select', component: 'moodle'},
+            {key: 'showtypes', component: 'backup'},
+            {key: 'hidetypes', component: 'backup'}
+        ]).done(function(strs) {
 
             //init strings.. new moodle super cool way
             strings['all'] = strs[0];
@@ -40,16 +40,17 @@ define(['jquery', 'core/str'], function($, Str) {
             strings['showtypes'] = strs[3];
             strings['hidetypes'] = strs[4];
 
-            var firstsection = $('#mform1 fieldset').first();
+            var firstsection = $('#mform1 .card.block').first();
             formid = firstsection.parent('form').prop('id');
+
             // Add global select all/none options.
-            var html = html_generator('include_setting section_level', 'included', strings['select'],
-            ' (<a id="downloadcenter-bytype" href="#">' + strings['showtypes'] + '</a>)');
+            var html = html_generator('included', strings['select']);
+            html += row_generator('(<a id="downloadcenter-bytype" href="#">' + strings['showtypes'] + '</a>)', '');
             var links = $(document.createElement('div'));
-            links.addClass('grouped_settings section_level block');
+            links.addClass('grouped_settings section_level block card');
             links.html(html);
 
-            links.prependTo(firstsection);
+            links.insertBefore(firstsection);
 
             // For each module type on the course, add hidden select all/none options.
             modlist = $(document.createElement('div'));
@@ -63,7 +64,7 @@ define(['jquery', 'core/str'], function($, Str) {
                     continue;
                 }
 
-                html = html_generator('include_setting section_level', 'mod_' + mod, modnames[mod]);
+                html = html_generator('mod_' + mod, modnames[mod]);
                 var modlinks = $(document.createElement('div'));
                 modlinks.addClass('grouped_settings section_level');
                 modlinks.html(html);
@@ -130,20 +131,20 @@ define(['jquery', 'core/str'], function($, Str) {
         }
     };
 
-    var html_generator = function(classname, idtype, heading, extra) {
-        if (typeof extra === 'undefined') {
-            extra = '';
-        }
-        return '<div class="' + classname + '">' +
-            '<div class="fitem fitem_fcheckbox downloadcenter_selector">' +
-            '<div class="fitemtitle">' + heading + '</div>' +
-            '<div class="felement">' +
-            '<a id="downloadcenter-all-' + idtype + '" href="#">' + strings['all'] + '</a> / ' +
-            '<a id="downloadcenter-none-' + idtype + '" href="#">' + strings['none'] + '</a>' +
-            extra +
+    var html_generator = function(idtype, heading) {
+        var links = '<a id="downloadcenter-all-' + idtype + '" href="#">' + strings['all'] + '</a> / ' +
+            '<a id="downloadcenter-none-' + idtype + '" href="#">' + strings['none'] + '</a>';
+        return row_generator(heading, links);
+    };
+
+    var row_generator = function(heading, content) {
+        return '<div class="form-group row fitem downloadcenter_selector">' +
+            '<div class="col-md-3"></div>' +
+            '<div class="col-md-9">' +
+                '<label><span class="itemtitle">' + heading + '</span></label>' +
+                '<span class="text-nowrap">' + content + '</span>' +
             '</div>' +
-            '</div>' +
-            '</div>';
+        '</div>';
     };
 
 

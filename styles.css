@@ -64,29 +64,53 @@
 
 
 /* boost fixes */
-.path-local-downloadcenter .mform .card .fitem .col-md-9 {
+
+.path-local-downloadcenter #region-main .mform .fitem.downloadcenter_selector .col-md-9 {
+    width: 320px;
+    text-align: right;
+}
+.path-local-downloadcenter #region-main .card-block .mform .fitem .col-md-9 {
     width: 50%;
     text-align: right;
 }
-.path-local-downloadcenter .mform .card .fitem .col-md-3 {
+.path-local-downloadcenter #region-main .card-block .mform .fitem .col-md-3 {
     width: 50%;
     float: right;
 }
 
-.path-local-downloadcenter .mform .card .fitem .col-md-9 .sectiontitle {
+.path-local-downloadcenter #region-main .card-block .mform .fitem .col-md-9 .sectiontitle {
     font-weight: bold;
 }
 
-.path-local-downloadcenter .mform .card .fitem .col-md-9 input[type="checkbox"] {
+.path-local-downloadcenter #region-main .card-block .mform .fitem .col-md-9 input[type="checkbox"] {
     float: right;
     margin-top: 2px;
     margin-left: 10px;
 }
 
 
+/* delete first empty row used in hack */
+.path-local-downloadcenter #region-main .card-block .mform .warningmessage + .fitem {
+    display: none;
+}
+
+
 /* boost fixes end */
 
-@media(max-width: 1229px) {
+.path-local-downloadcenter .mform .row.downloadcenter_selector label {
+    margin-right: 10px;
+}
+
+.path-local-downloadcenter .mform .row.downloadcenter_selector {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+
+@media(max-width: 1475px) {
+/*}
+
+@media(max-width: 1229px) {*/
     .path-local-downloadcenter form .fitemtitle {
         float: none !important;
     }
@@ -97,21 +121,36 @@
 
 
     /* boost fixes */
-    .path-local-downloadcenter .mform .card .fitem .col-md-9 {
-        width: 75%;
+
+    .path-local-downloadcenter #region-main .mform .fitem.downloadcenter_selector .col-md-9 {
+        width: 100%;
+        text-align: left;
+        padding-left: 40px;
     }
-    .path-local-downloadcenter .mform .card .fitem .col-md-3 {
+    .path-local-downloadcenter #region-main .card-block .mform .fitem .col-md-9 {
+        width: 75%;
+        text-align: right;
+        padding-left: 0;
+    }
+    .path-local-downloadcenter #region-main .card-block .mform .fitem .col-md-3 {
         width: 25%;
+    }
+
+}
+
+@media(max-width: 1229px) {
+    .path-local-downloadcenter #region-main .mform .fitem.downloadcenter_selector .col-md-9 {
+        padding-left: 30px;
     }
 }
 
 @media(max-width: 619px) {
 
     /* boost fixes */
-    .path-local-downloadcenter .mform .card .fitem .col-md-9 {
+    .path-local-downloadcenter #region-main .card-block .mform .fitem .col-md-9 {
         width: 100%;
     }
-    .path-local-downloadcenter .mform .card .fitem .col-md-3 {
+    .path-local-downloadcenter #region-main .card-block .mform .fitem .col-md-3 {
         width: 0;
     }
     .path-local-downloadcenter form .itemtitle span {
