@@ -26,11 +26,12 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$string['downloadcenter:view'] = 'Downloadcenter anzeigen';
+$string['downloadcenter:view'] = 'Download Center anzeigen';
+$string['pluginname'] = 'Download Center';
 
 
-$string['navigationlink'] = 'Downloadcenter';
-$string['pagetitle'] = 'Downloadcenter für ';
+$string['navigationlink'] = 'Download Center';
+$string['pagetitle'] = 'Download Center für ';
 
 
 $string['warningmessage'] = 'ACHTUNG: Im Download Center werden NUR die im Kurs aktuell verfügbaren DATEIEN und VERZEICHNISSE als Download angeboten!';
@@ -42,4 +43,4 @@ $string['zipready'] = 'Das ZIP-Archiv wurde erfolgreich angelegt.';
 $string['download'] = 'Download';
 $string['zipcreating'] = 'ZIP-Archiv wird erstellt...';
 $string['eventDOWNLOADEDZIP'] = 'ZIP heruntergeladen';
-$string['eventVIEWED'] = 'Downloadcenter ansehen';
+$string['eventVIEWED'] = 'Download Center ansehen';

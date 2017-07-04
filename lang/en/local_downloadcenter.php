@@ -26,13 +26,13 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$string['pluginname'] = 'Download center plugin';
-$string['downloadcenter:view'] = 'View Download Center';
+$string['pluginname'] = 'Download center';
+$string['downloadcenter:view'] = 'View Download center';
 
-$string['navigationlink'] = 'Download Center';
-$string['pagetitle'] = 'Download Center for ';
+$string['navigationlink'] = 'Download center';
+$string['pagetitle'] = 'Download center for ';
 
-$string['warningmessage'] = 'WARNING: The Download Center enables to download only visible FILES and FOLDERS!';
+$string['warningmessage'] = 'WARNING: The Download center enables to download only visible FILES and FOLDERS!';
 
 $string['createzip'] = 'Create ZIP archive';
 
@@ -40,5 +40,5 @@ $string['zipready'] = 'The ZIP archive has been successfully created.';
 $string['download'] = 'Download';
 $string['zipcreating'] = 'The ZIP archive is being created...';
 $string['eventDOWNLOADEDZIP'] = 'ZIP was downloaded';
-$string['eventVIEWED'] = 'Downloadcenter viewed';
+$string['eventVIEWED'] = 'Download center viewed';
 $string['untitled'] = 'Untitled';
