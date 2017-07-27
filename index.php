@@ -39,7 +39,7 @@ $context = context_course::instance($course->id);
 require_capability('local/downloadcenter:view', $context);
 
 $PAGE->set_url(new moodle_url('/local/downloadcenter/index.php', array('courseid' => $course->id)));
-$PAGE->navbar->add(get_string('navigationlink', 'local_downloadcenter'), $PAGE->url);
+//$PAGE->navbar->add(get_string('navigationlink', 'local_downloadcenter'), $PAGE->url);
 $PAGE->set_pagelayout('incourse');
 
 $downloadcenter = new local_downloadcenter_factory($course, $USER);
