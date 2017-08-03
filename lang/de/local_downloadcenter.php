@@ -43,4 +43,4 @@ $string['zipready'] = 'Das ZIP-Archiv wurde erfolgreich angelegt.';
 $string['download'] = 'Download';
 $string['zipcreating'] = 'ZIP-Archiv wird erstellt...';
 $string['eventDOWNLOADEDZIP'] = 'ZIP heruntergeladen';
-$string['eventVIEWED'] = 'Download Center ansehen';
+$string['eventVIEWED'] = 'Download Center angezeigt';
