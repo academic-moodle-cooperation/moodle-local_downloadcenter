@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+3.4.0 (2017-11-13)
+------------------
+
+* Moodle 3.4 compatible version
+* [FEATURE] improve layout of elements in boost theme
+
+
 3.3.1 (2017-07-10)
 ------------------
 
