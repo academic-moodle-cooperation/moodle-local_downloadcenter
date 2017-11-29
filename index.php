@@ -39,7 +39,7 @@ $context = context_course::instance($course->id);
 require_capability('local/downloadcenter:view', $context);
 
 $PAGE->set_url(new moodle_url('/local/downloadcenter/index.php', array('courseid' => $course->id)));
-//$PAGE->navbar->add(get_string('navigationlink', 'local_downloadcenter'), $PAGE->url);
+
 $PAGE->set_pagelayout('incourse');
 
 $downloadcenter = new local_downloadcenter_factory($course, $USER);
@@ -55,9 +55,6 @@ $PAGE->set_title(get_string('navigationlink', 'local_downloadcenter') . ': ' . $
 $PAGE->set_heading($course->fullname);
 
 if ($data = $downloadform->get_data()) {
-    //echo $OUTPUT->header();
-    //echo html_writer::start_div('', array('id' => 'executionprogress'));
-    //echo $OUTPUT->heading(get_string('zipcreating', 'local_downloadcenter'));
 
     $event = \local_downloadcenter\event\zip_downloaded::create(array(
         'objectid' => $PAGE->course->id,
@@ -70,21 +67,10 @@ if ($data = $downloadform->get_data()) {
     $hash = $downloadcenter->create_zip();
     $downloadcenter->get_file_from_session($hash);
     die;
-    //$info = new stdClass;
-    //$info->filehash = $hash;
-    //$downloadfinalform->set_data($info);
-    //$downloadform = $downloadfinalform;
-
-    //echo html_writer::end_div();
-    //echo html_writer::script('document.getElementById("executionprogress").style.display = "none";');
-    //echo $OUTPUT->notification(get_string('zipready', 'local_downloadcenter'), 'notifysuccess');
 
 } else if ($downloadform->is_cancelled()) {
     redirect(new moodle_url('/course/view.php', array('id' => $course->id)));
     die;
-/*} else if ($data = $downloadfinalform->get_data()) {
-    $downloadcenter->get_file_from_session($data->filehash);
-    die;*/
 } else {
     $event = \local_downloadcenter\event\plugin_viewed::create(array(
         'objectid' => $PAGE->course->id,

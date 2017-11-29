@@ -26,55 +26,10 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-function local_downloadcenter_extend_settings_navigation(settings_navigation $settings_nav, context $context) {
+function local_downloadcenter_extend_settings_navigation(settings_navigation $settingsnav, context $context) {
     global $COURSE, $PAGE, $OUTPUT;
 
-    return; //not used anymore
-
-    if ($COURSE->id == SITEID) {
-        return;
-    }
-
-    if (!has_capability('local/downloadcenter:view', $context)) {
-        return;
-    }
-
-    $beforenode = null;
-    if ($adminnode = $settings_nav->find('siteadministration', navigation_node::TYPE_SITE_ADMIN)) {
-        $beforenode = 'siteadministration';
-    } else if ($adminnode = $settings_nav->find('root', navigation_node::TYPE_SITE_ADMIN)) {
-        $beforenode = 'root';
-    }
-
-
-    $url = new moodle_url('/local/downloadcenter/index.php', array('courseid' => $COURSE->id));
-
-
-
-    $title = get_string('navigationlink', 'local_downloadcenter');
-    if ($PAGE->url->compare($url)) {
-        $pix = $OUTPUT->pix_icon('t/collapsed_empty', $title);
-    } else {
-        $pix = $OUTPUT->pix_icon('t/collapsed', $title);
-    }
-
-    $childnode = navigation_node::create(
-        $title,
-        $url,
-        //navigation_node::TYPE_SITE_ADMIN,
-        navigation_node::TYPE_CUSTOM,
-        'downloadcenter',
-        'downloadcenter'
-    );
-    $node = $settings_nav->add_node($childnode, $beforenode);
-    //$node->id = 'downloadcenter';
-    $node->nodetype = navigation_node::NODETYPE_LEAF;
-    $node->collapse = true;
-    $node->add_class('downloadcenterlink');
-
-    $hacknode = $node->add('', null); //yet another retarded hack to work around moodle's strange removal of leaf nodes from the settings navigation
-    $hacknode->display = false; //we need the empty invisible row, otherwise in lib/navigationlib.php, settings_navigation/initialize(), at the end of the function the empty nodes are removed for some really strange unknown moodle reason.
-
+    return; // Not used anymore!
 }
 
 function local_downloadcenter_extend_navigation(global_navigation $nav) {
@@ -113,10 +68,7 @@ function local_downloadcenter_extend_navigation(global_navigation $nav) {
             $beforekey = 'activitiescategory';
         }
 
-
         $url = new moodle_url('/local/downloadcenter/index.php', array('courseid' => $PAGE->course->id));
-
-
 
         $title = get_string('navigationlink', 'local_downloadcenter');
 
@@ -131,7 +83,6 @@ function local_downloadcenter_extend_navigation(global_navigation $nav) {
             $pix
         );
         $node = $coursenode->add_node($childnode, $beforekey);
-        //$node->id = 'downloadcenter';
         $node->nodetype = navigation_node::NODETYPE_LEAF;
         $node->collapse = true;
         $node->add_class('downloadcenterlink');

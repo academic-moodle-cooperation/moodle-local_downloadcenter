@@ -21,10 +21,9 @@ define(['jquery', 'core/str'], function($, Str) {
      * @alias module:block_overview/helloworld
      */
     var modfilter = function(modnms) {
-        /** @access private */
 
         modnames = modnms;
-        /** @access public */
+
         Str.get_strings([
             {key: 'all', component: 'moodle'},
             {key: 'none', component: 'moodle'},
@@ -33,7 +32,7 @@ define(['jquery', 'core/str'], function($, Str) {
             {key: 'hidetypes', component: 'backup'}
         ]).done(function(strs) {
 
-            //init strings.. new moodle super cool way
+            // Init strings.. new moodle super cool way.
             strings['all'] = strs[0];
             strings['none'] = strs[1];
             strings['select'] = strs[2];
@@ -72,7 +71,7 @@ define(['jquery', 'core/str'], function($, Str) {
                 initlinks(modlinks, mod);
             }
 
-            //attach events to links
+            // Attach events to links!
             $('#downloadcenter-all-included').click(function(e) { helper(e, true,  'item_'); });
             $('#downloadcenter-none-included').click(function(e) { helper(e, false, 'item_'); });
             $('#downloadcenter-bytype').click(function() { toggletypes(); });
@@ -132,22 +131,21 @@ define(['jquery', 'core/str'], function($, Str) {
     };
 
     var html_generator = function(idtype, heading) {
-        var links = '<a id="downloadcenter-all-' + idtype + '" href="#">' + strings['all'] + '</a> / ' +
-            '<a id="downloadcenter-none-' + idtype + '" href="#">' + strings['none'] + '</a>';
+        var links = '<a id="downloadcenter-all-' + idtype + '" href="#">' + strings['all'] + '</a> / ';
+        links += '<a id="downloadcenter-none-' + idtype + '" href="#">' + strings['none'] + '</a>';
         return row_generator(heading, links);
     };
 
     var row_generator = function(heading, content) {
-        return '<div class="form-group row fitem downloadcenter_selector">' +
-            '<div class="col-md-3"></div>' +
-            '<div class="col-md-9">' +
-                '<label><span class="itemtitle">' + heading + '</span></label>' +
-                '<span class="text-nowrap">' + content + '</span>' +
-            '</div>' +
-        '</div>';
+        var ret = '<div class="form-group row fitem downloadcenter_selector">';
+        ret += '<div class="col-md-3"></div>';
+        ret += '<div class="col-md-9">';
+        ret += '<label><span class="itemtitle">' + heading + '</span></label>';
+        ret += '<span class="text-nowrap">' + content + '</span>';
+        ret += '</div>';
+        ret += '</div>';
+        return ret;
     };
-
-
 
     return {
         init: function(modnames) {

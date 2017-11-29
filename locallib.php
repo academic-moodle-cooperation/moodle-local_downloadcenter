@@ -42,7 +42,7 @@ class local_downloadcenter_factory {
     public function get_resources_for_user() {
         global $DB, $CFG;
 
-        //only downloadable resources should be shown
+        // Only downloadable resources should be shown!
         if (!empty($this->sortedresources)) {
             return $this->sortedresources;
         }
@@ -53,7 +53,10 @@ class local_downloadcenter_factory {
         $sorted = array();
         if ($usesections) {
             $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
-            $sectionsformat = $DB->get_record('course_format_options', array('courseid' => $this->course->id, 'name' => 'numsections'));
+            $sectionsformat = $DB->get_record('course_format_options', array(
+                'courseid' => $this->course->id,
+                'name' => 'numsections')
+            );
             $max = count($sections);
             if ($sectionsformat) {
                 $max = intval($sectionsformat->value);
@@ -74,7 +77,7 @@ class local_downloadcenter_factory {
                     } else {
                         $namedsections[$title] = true;
                     }
-                    $sorted[$section->section]->res = array(); //TODO: fix empty names here!!!
+                    $sorted[$section->section]->res = array(); // TODO: fix empty names here!!!
                 }
             }
             foreach ($unnamedsections as $sectionid) {
@@ -82,14 +85,14 @@ class local_downloadcenter_factory {
                 $title = $untitled;
                 $i = 1;
                 while (isset($namedsections[$title])) {
-                    $title =  $untitled . ' ' . strval($i);
+                    $title = $untitled . ' ' . strval($i);
                     $i++;
                 }
                 $namedsections[$title] = true;
                 $sorted[$sectionid]->title = $title;
             }
         } else {
-            $sorted['default'] = new stdClass;//TODO: fix here if needed
+            $sorted['default'] = new stdClass;// TODO: fix here if needed!
             $sorted['default']->title = '0';
             $sorted['default']->res = array();
         }
@@ -103,18 +106,18 @@ class local_downloadcenter_factory {
                 continue;
             }
             if (!$cm->has_view() && $cm->modname != 'folder') {
-                // Exclude label and similar
+                // Exclude label and similar!
                 continue;
             }
             $cms[$cm->id] = $cm;
             $resources[$cm->modname][] = $cm->instance;
         }
 
-        // preload instances
-        foreach ($resources as $modname=>$instances) {
+        // Preload instances!
+        foreach ($resources as $modname => $instances) {
             $resources[$modname] = $DB->get_records_list($modname, 'id', $instances, 'id');
         }
-        $available_sections = array_keys($sorted);
+        $availablesections = array_keys($sorted);
         $currentsection = '';
         foreach ($cms as $cm) {
             if (!isset($resources[$cm->modname][$cm->instance])) {
@@ -126,7 +129,7 @@ class local_downloadcenter_factory {
                 if ($cm->sectionnum !== $currentsection) {
                     $currentsection = $cm->sectionnum;
                 }
-                if (!in_array($currentsection, $available_sections)) {
+                if (!in_array($currentsection, $availablesections)) {
                     continue;
                 }
             } else {
@@ -137,9 +140,8 @@ class local_downloadcenter_factory {
                 $this->jsnames[$cm->modname] = get_string('modulenameplural', 'mod_' . $cm->modname);
             }
 
-
             $icon = '<img src="'.$cm->get_icon_url().'" class="activityicon" alt="'.$cm->get_module_type_name().'" /> ';
-            //TODO: $cm->visible..
+            // TODO: $cm->visible..
             $res = new stdClass;
             $res->icon = $icon;
             $res->cmid = $cm->id;
@@ -151,11 +153,8 @@ class local_downloadcenter_factory {
             $sorted[$currentsection]->res[] = $res;
         }
 
-
-
         $this->sortedresources = $sorted;
         return $sorted;
-
     }
 
     public function get_js_modnames() {
@@ -180,15 +179,9 @@ class local_downloadcenter_factory {
         $filelist = array();
         $filteredresources = $this->filteredresources;
 
-
-        if (empty($filteredresources)) {
-           // return false;
-        }
-
-        //needed for mod_publication
+        // Needed for mod_publication!
         $ufields = user_picture::fields('u');
         $useridentityfields = $CFG->showuseridentity != '' ? 'u.'.str_replace(', ', ', u.', $CFG->showuseridentity) . ', ' : '';
-
 
         foreach ($filteredresources as $topicid => $info) {
             $basedir = clean_filename($info->title);
@@ -200,14 +193,13 @@ class local_downloadcenter_factory {
                 $context = context_module::instance($res->cm->id);
                 if ($res->modname == 'resource') {
                     $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
-                    $file = array_shift($files); //get only the first file - such are the requirements
+                    $file = array_shift($files); // Get only the first file - such are the requirements!
                     $filename = $resdir . '/' . self::shorten_filename($file->get_filename());
                     $filelist[$filename] = $file;
                 } else if ($res->modname == 'folder') {
                     $folder = $fs->get_area_tree($context->id, 'mod_folder', 'content', 0);
                     $this->add_folder_contents($filelist, $folder, $resdir);
-                }
-                else if ($res->modname == 'publication') {
+                } else if ($res->modname == 'publication') {
 
                     $cm = $res->cm;
 
@@ -248,9 +240,9 @@ class local_downloadcenter_factory {
                             // Mode upload.
                             // SN 11.07.2016 - feature #2738:
                             // in mod/publication/locallib : line 81, publication::__construct() { ...
-                            //      $this->instance->obtainteacherapproval = !$this->obtainteacherapproval
+                            //     $this->instance->obtainteacherapproval = !$this->obtainteacherapproval
                             // ..}
-                            // so flag has to be actually inverted
+                            // So flag has to be actually inverted!
                             if (!$res->resource->obtainteacherapproval) {
                                 // Need teacher approval.
 
@@ -276,7 +268,7 @@ class local_downloadcenter_factory {
                     }
 
                     $users = $DB->get_records_sql($sql, $params);
-                    
+
                     if (!empty($users)) {
                         $users = array_keys($users);
                     }
@@ -311,7 +303,7 @@ class local_downloadcenter_factory {
 
                             if ($res->resource->mode == PUBLICATION_MODE_UPLOAD) {
                                 // Mode upload.
-                                // SN 11.07.2016 - feature #2738 - check comment above
+                                // SN 11.07.2016 - feature #2738 - check comment above!
                                 if (!$res->resource->obtainteacherapproval) {
                                     // Need teacher approval.
                                     if ($record->teacherapproval == 1) {
@@ -365,13 +357,11 @@ class local_downloadcenter_factory {
                                 continue;
                             }
                             $filename = $resdir . '/data' . $file->get_filepath() . self::shorten_filename($file->get_filename());
-                            //var_dump($file->get_filepath());
                             $filelist[$filename] = $file;
                         }
                     }
                     $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
                     $content = str_replace('@@PLUGINFILE@@', 'data', $res->resource->content);
-                    //$content = format_string($content);
                     $content = <<<HTML
 <!doctype html>
 <html>
@@ -384,7 +374,7 @@ $content
 </body>
 </html>
 HTML;
-                    $filelist[$filename] = array($content); //needs to be array to be saved as file
+                    $filelist[$filename] = array($content); // Needs to be array to be saved as file.
 
                 }
             }
@@ -392,7 +382,6 @@ HTML;
 
         if (@$zipper->archive_to_pathname($filelist, $tempzip)) {
             $filename = sprintf('%s_%s.zip', $this->course->shortname, userdate(time(), '%Y%m%d_%H%M'));
-            //send_temp_file($tempzip, clean_filename($filename));
             return $this->add_file_to_session($tempzip, clean_filename($filename));
 
         } else {
@@ -443,7 +432,6 @@ HTML;
         $data = (array)$data;
         $filtered = array();
 
-
         $sortedresources = $this->get_resources_for_user();
         foreach ($sortedresources as $sectionid => $info) {
             if (!isset($data['item_topic_' . $sectionid])) {
@@ -464,13 +452,13 @@ HTML;
         $this->filteredresources = $filtered;
     }
 
-    public static function shorten_filename($filename, $max_length = 64) {
+    public static function shorten_filename($filename, $maxlength = 64) {
         $filename = (string)$filename;
-        if (strlen($filename) <= $max_length) {
+        if (strlen($filename) <= $maxlength) {
             return $filename;
         }
-        $limit = round($max_length/2)-1;
-        return substr($filename, 0, $limit) . '___' . substr($filename, (1-$limit));
+        $limit = round($maxlength / 2) - 1;
+        return substr($filename, 0, $limit) . '___' . substr($filename, (1 - $limit));
     }
 
 }

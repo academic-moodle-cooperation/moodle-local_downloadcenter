@@ -36,10 +36,6 @@
     font-weight: normal;
 }
 
-.path-local-downloadcenter form .fitemtitle {
-    /*position: relative;*/
-}
-
 .path-local-downloadcenter form .block .fitem .fitemtitle label .sectiontitle,
 .path-local-downloadcenter form .itemtitle span {
     max-width: 210px;
@@ -61,7 +57,6 @@
 .path-local-downloadcenter #mod_select_links {
     overflow: hidden;
 }
-
 
 /* boost fixes */
 
@@ -133,4 +128,3 @@
 
 
 }
-
