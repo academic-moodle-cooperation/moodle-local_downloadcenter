@@ -32,7 +32,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             {key: 'hidetypes', component: 'backup'}
         ]).done(function(strs) {
 
-            // Init strings.. new moodle super cool way.
+            // Init strings.. new moodle super cool way...
             strings['all'] = strs[0];
             strings['none'] = strs[1];
             strings['select'] = strs[2];
@@ -42,7 +42,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             var firstsection = $('#mform1 .card.block').first();
             formid = firstsection.parent('form').prop('id');
 
-            // Add global select all/none options.
+            // Add global select all/none options...
             var html = html_generator('included', strings['select']);
             html += row_generator('(<a id="downloadcenter-bytype" href="#">' + strings['showtypes'] + '</a>)', '');
             var links = $(document.createElement('div'));
@@ -59,7 +59,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             modlist.hide();
 
             for (var mod in modnames) {
-                // Only include actual values from the list.
+                // Only include actual values from the list..
                 if (!modnames.hasOwnProperty(mod)) {
                     continue;
                 }

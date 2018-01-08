@@ -92,7 +92,7 @@
     font-weight: bold;
 }
 
-/* delete first empty row used in hack */
+/* delete first empty row used in hack :) */
 .path-local-downloadcenter #region-main .card-block .mform .warningmessage + .fitem {
     display: none;
 }
