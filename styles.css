@@ -17,6 +17,7 @@
 
 .path-local-downloadcenter .mform .block {
     padding-top: 5px;
+    padding-left: 1rem;
 }
 
 
@@ -75,10 +76,14 @@
     display: none;
 }
 
-.path-local-downloadcenter #region-main .card-block .card.block {
-    padding-left: 2rem;
-    padding-top: 1rem;
+.path-local-downloadcenter #region-main .card.block:nth-child(2n) {
+    background-color: #f5f5f5;
 }
+
+.path-local-downloadcenter #region-main .card.block.grouped_settings {
+    background-color: #ffffff;
+}
+
 .path-local-downloadcenter #region-main .card-block .card.block .form-group.downloadcenter_selector label span,
 .path-local-downloadcenter #region-main .card-block .card.block .form-group:first-child label span,
 .path-local-downloadcenter #region-main .card-block .card.block .form-group:first-child label,
