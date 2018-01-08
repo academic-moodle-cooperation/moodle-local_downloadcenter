@@ -118,8 +118,8 @@
     .path-local-downloadcenter form .itemtitle span {
         max-width: 100%;
     }
-
 }
+
 @media (max-width: 1475px) {
     .path-local-downloadcenter form .fitemtitle {
         float: none;
