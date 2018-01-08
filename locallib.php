@@ -404,10 +404,12 @@ HTML;
                     $book->intro = str_replace('@@PLUGINFILE@@', 'data', $book->intro);
                     $content = '<a name="top"></a>';
                     $content .= $OUTPUT->heading(format_string($book->name, true, array('context' => $context)), 1);
-                    $content .= '<p class="book_summary">' . format_text($book->intro, $book->introformat, array('noclean' => true, 'context' => $context))  . '</p>';
+                    $content .= '<p class="book_summary">' .
+                        format_text($book->intro, $book->introformat, array('noclean' => true, 'context' => $context))  .
+                        '</p>';
                     list($toc, $titles) = booktool_print_get_toc($chapters, $book, $cm);
                     $content .= $toc;
-                    // Chapters...!
+                    // Chapters!
                     $link1 = $CFG->wwwroot.'/mod/book/view.php?id='.$this->course->id.'&chapterid=';
                     $link2 = $CFG->wwwroot.'/mod/book/view.php?id='.$this->course->id;
                     foreach ($chapters as $ch) {
