@@ -36,6 +36,7 @@
     font-weight: normal;
 }
 
+.path-local-downloadcenter form .block .fitem label .sectiontitle,
 .path-local-downloadcenter form .block .fitem .fitemtitle label .sectiontitle,
 .path-local-downloadcenter form .itemtitle span {
     max-width: 210px;
@@ -44,11 +45,21 @@
     display: inline-block;
     white-space: nowrap;
 }
+.path-local-downloadcenter form .itemtitle span,
+.path-local-downloadcenter form .block .fitem label .sectiontitle {
+    vertical-align: text-bottom;
+}
 
 .path-local-downloadcenter form .activityicon{
     width: 24px;
     margin-top: -10px;
 }
+
+.path-local-downloadcenter form #mod_select_links .activityicon {
+    margin-top: 0;
+    margin-right: 0.5rem;
+}
+
 
 .path-local-downloadcenter .mform .grouped_settings .fitem div.fitemtitle{
     padding-top: 0;
@@ -94,6 +105,16 @@
 }
 
 
+@media(min-width: 1475px) {
+    .path-local-downloadcenter form .fitemtitle {
+        float: none !important;
+    }
+
+    .path-local-downloadcenter form .itemtitle span {
+        max-width: 100%;
+    }
+
+}
 @media(max-width: 1475px) {
     .path-local-downloadcenter form .fitemtitle {
         float: none !important;

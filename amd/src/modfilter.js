@@ -8,7 +8,7 @@
 /**
  * @module local_downloadcenter/modfilter
  */
-define(['jquery', 'core/str'], function($, Str) {
+define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
     var strings = {};
     var modnames;
@@ -54,6 +54,7 @@ define(['jquery', 'core/str'], function($, Str) {
             // For each module type on the course, add hidden select all/none options.
             modlist = $(document.createElement('div'));
             modlist.prop('id', 'mod_select_links');
+            modlist.prop('class', 'm-l-2');
             modlist.appendTo(links);
             modlist.hide();
 
@@ -63,7 +64,8 @@ define(['jquery', 'core/str'], function($, Str) {
                     continue;
                 }
 
-                html = html_generator('mod_' + mod, modnames[mod]);
+                var img = '<img src="' + url.imageUrl('icon', 'mod_' + mod) + '" class="activityicon" />';
+                html = html_generator('mod_' + mod, img + modnames[mod]);
                 var modlinks = $(document.createElement('div'));
                 modlinks.addClass('grouped_settings section_level');
                 modlinks.html(html);

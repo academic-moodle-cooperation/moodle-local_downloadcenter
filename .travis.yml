@@ -2,7 +2,7 @@
 language: php
 
 # This tells Travis CI to use its new architecture.  Everything is better!
-sudo: false
+sudo: required
 
 # This tells Travis CI to cache Composer's cache.  Speeds up build times.
 cache:
@@ -69,7 +69,7 @@ install:
 #    - Copy your plugin into Moodle.
 #    - If your plugin has Behat features, then Behat will be setup.
 #    - If your plugin has unit tests, then PHPUnit will be setup.
-  - moodle-plugin-ci install
+  - moodle-plugin-ci install --no-init
 
 # This lists steps that are run for the purposes of testing.  Any of
 # these steps can be re-ordered or removed to your liking.  And of
