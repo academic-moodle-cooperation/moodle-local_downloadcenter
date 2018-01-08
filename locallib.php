@@ -170,7 +170,7 @@ class local_downloadcenter_factory {
             define('PUBLICATION_MODE_UPLOAD', 0);
             define('PUBLICATION_MODE_IMPORT', 1);
         }
-        
+
         require_once($CFG->dirroot . '/mod/book/tool/print/locallib.php');
 
         // Zip files and sent them to a user.
@@ -407,7 +407,7 @@ HTML;
                     $content .= '<p class="book_summary">' . format_text($book->intro, $book->introformat, array('noclean' => true, 'context' => $context))  . '</p>';
                     list($toc, $titles) = booktool_print_get_toc($chapters, $book, $cm);
                     $content .= $toc;
-                    // chapters
+                    // Chapters...!
                     $link1 = $CFG->wwwroot.'/mod/book/view.php?id='.$this->course->id.'&chapterid=';
                     $link2 = $CFG->wwwroot.'/mod/book/view.php?id='.$this->course->id;
                     foreach ($chapters as $ch) {

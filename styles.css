@@ -7,7 +7,8 @@
     font-weight: bold;
     margin-bottom: 10px;
 }
-.path-local-downloadcenter .include_setting, .path-local-downloadcenter .grouped_settings .normal_setting {
+.path-local-downloadcenter .include_setting,
+.path-local-downloadcenter .grouped_settings .normal_setting {
     display: inline-block;
 }
 
@@ -51,7 +52,7 @@
     vertical-align: text-bottom;
 }
 
-.path-local-downloadcenter form .activityicon{
+.path-local-downloadcenter form .activityicon {
     width: 24px;
     margin-top: -10px;
 }
@@ -62,7 +63,7 @@
 }
 
 
-.path-local-downloadcenter .mform .grouped_settings .fitem div.fitemtitle{
+.path-local-downloadcenter .mform .grouped_settings .fitem div.fitemtitle {
     padding-top: 0;
 }
 
@@ -81,7 +82,7 @@
 }
 
 .path-local-downloadcenter #region-main .card.block.grouped_settings {
-    background-color: #ffffff;
+    background-color: #fff;
 }
 
 .path-local-downloadcenter #region-main .card-block .card.block .form-group.downloadcenter_selector label span,
@@ -91,8 +92,7 @@
     font-weight: bold;
 }
 
-
-    /* delete first empty row used in hack */
+/* delete first empty row used in hack */
 .path-local-downloadcenter #region-main .card-block .mform .warningmessage + .fitem {
     display: none;
 }
@@ -110,9 +110,9 @@
 }
 
 
-@media(min-width: 1475px) {
+@media (min-width: 1475px) {
     .path-local-downloadcenter form .fitemtitle {
-        float: none !important;
+        float: none;
     }
 
     .path-local-downloadcenter form .itemtitle span {
@@ -120,9 +120,9 @@
     }
 
 }
-@media(max-width: 1475px) {
+@media (max-width: 1475px) {
     .path-local-downloadcenter form .fitemtitle {
-        float: none !important;
+        float: none;
     }
 
     .path-local-downloadcenter form .itemtitle span {
@@ -131,14 +131,14 @@
 
 }
 
-@media(max-width: 1229px) {
+@media (max-width: 1229px) {
     .path-local-downloadcenter #region-main .mform .fitem.downloadcenter_selector .col-md-9 {
         padding-left: 30px;
     }
 }
 
 
-@media(max-width: 499px) {
+@media (max-width: 499px) {
     .path-local-downloadcenter form .itemtitle span {
         max-width: 150px;
     }
@@ -147,7 +147,7 @@
 }
 
 
-@media(max-width: 319px) {
+@media (max-width: 319px) {
     .path-local-downloadcenter form .itemtitle span {
         max-width: 100px;
     }
