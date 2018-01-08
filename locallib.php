@@ -170,7 +170,7 @@ class local_downloadcenter_factory {
             define('PUBLICATION_MODE_UPLOAD', 0);
             define('PUBLICATION_MODE_IMPORT', 1);
         }
-        //require_once($CFG->dirroot . '/mod/book/locallib.php');
+        
         require_once($CFG->dirroot . '/mod/book/tool/print/locallib.php');
 
         // Zip files and sent them to a user.
@@ -242,8 +242,8 @@ class local_downloadcenter_factory {
                             // Mode upload.
                             // SN 11.07.2016 - feature #2738:
                             // in mod/publication/locallib : line 81, publication::__construct() { ...
-                            //     $this->instance->obtainteacherapproval = !$this->obtainteacherapproval
-                            // ..}
+                            // .....$this->instance->obtainteacherapproval = !$this->obtainteacherapproval ...
+                            // ..} ...
                             // So flag has to be actually inverted!
                             if (!$res->resource->obtainteacherapproval) {
                                 // Need teacher approval.
@@ -399,12 +399,12 @@ HTML;
                     $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
 
                     // Taken from mod/book/tool/print/index.php!
-                    $allchapters = $DB->get_records('book_chapters', array('bookid'=>$book->id), 'pagenum');
+                    $allchapters = $DB->get_records('book_chapters', array('bookid' => $book->id), 'pagenum');
 
                     $book->intro = str_replace('@@PLUGINFILE@@', 'data', $book->intro);
                     $content = '<a name="top"></a>';
-                    $content .= $OUTPUT->heading(format_string($book->name, true, array('context'=>$context)), 1);
-                    $content .= '<p class="book_summary">' . format_text($book->intro, $book->introformat, array('noclean'=>true, 'context'=>$context))  . '</p>';
+                    $content .= $OUTPUT->heading(format_string($book->name, true, array('context' => $context)), 1);
+                    $content .= '<p class="book_summary">' . format_text($book->intro, $book->introformat, array('noclean' => true, 'context' => $context))  . '</p>';
                     list($toc, $titles) = booktool_print_get_toc($chapters, $book, $cm);
                     $content .= $toc;
                     // chapters
@@ -427,8 +427,7 @@ HTML;
                         $chaptercontent = str_replace($link2, '#top', $chaptercontent);
 
                         $chaptercontent = str_replace('@@PLUGINFILE@@', 'data', $chaptercontent);
-                        //$chaptercontent = file_rewrite_pluginfile_urls($chaptercontent, 'pluginfile.php', $context->id, 'mod_book', 'chapter', $ch->id);
-                        $content .= format_text($chaptercontent, $chapter->contentformat, array('noclean'=>true, 'context'=>$context));
+                        $content .= format_text($chaptercontent, $chapter->contentformat, array('noclean' => true, 'context' => $context));
                         $content .= '</div>';
                         $content .= '<a href="#toc">&uarr; ' . get_string('top', 'mod_book') . '</a>';
                     }
