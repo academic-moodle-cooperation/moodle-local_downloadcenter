@@ -30,7 +30,7 @@ class local_downloadcenter_factory {
     private $user;
     private $sortedresources;
     private $filteredresources;
-    private $availableresources = array('resource', 'folder', 'publication', 'page');
+    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book');
     private $jsnames = array();
     private $progress;
 
@@ -162,7 +162,7 @@ class local_downloadcenter_factory {
     }
 
     public function create_zip() {
-        global $DB, $CFG, $USER;
+        global $DB, $CFG, $USER, $OUTPUT;
 
         if (file_exists($CFG->dirroot . '/mod/publication/locallib.php')) {
             require_once($CFG->dirroot . '/mod/publication/locallib.php');
@@ -170,6 +170,8 @@ class local_downloadcenter_factory {
             define('PUBLICATION_MODE_UPLOAD', 0);
             define('PUBLICATION_MODE_IMPORT', 1);
         }
+        //require_once($CFG->dirroot . '/mod/book/locallib.php');
+        require_once($CFG->dirroot . '/mod/book/tool/print/locallib.php');
 
         // Zip files and sent them to a user.
         $tempzip = tempnam($CFG->tempdir.'/', 'downloadcenter');
@@ -351,7 +353,7 @@ class local_downloadcenter_factory {
                     $fsfiles = $fs->get_area_files($context->id,
                         'mod_page',
                         'content');
-                    if (count($fsfiles > 0)) {
+                    if (count($fsfiles) > 0) {
                         foreach ($fsfiles as $file) {
                             if ($file->get_filesize() == 0) {
                                 continue;
@@ -376,6 +378,73 @@ $content
 HTML;
                     $filelist[$filename] = array($content); // Needs to be array to be saved as file.
 
+                } else if ($res->modname == 'book') {
+                    $book = $res->resource;
+                    $cm = $res->cm;
+                    $chapters = book_preload_chapters($book);
+
+                    $fsfiles = $fs->get_area_files($context->id,
+                        'mod_book',
+                        'chapter');
+                    if (count($fsfiles) > 0) {
+                        foreach ($fsfiles as $file) {
+                            if ($file->get_filesize() == 0) {
+                                continue;
+                            }
+                            $filename = $resdir . '/data' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                            $filelist[$filename] = $file;
+                        }
+                    }
+
+                    $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
+
+                    // Taken from mod/book/tool/print/index.php!
+                    $allchapters = $DB->get_records('book_chapters', array('bookid'=>$book->id), 'pagenum');
+
+                    $book->intro = str_replace('@@PLUGINFILE@@', 'data', $book->intro);
+                    $content = '<a name="top"></a>';
+                    $content .= $OUTPUT->heading(format_string($book->name, true, array('context'=>$context)), 1);
+                    $content .= '<p class="book_summary">' . format_text($book->intro, $book->introformat, array('noclean'=>true, 'context'=>$context))  . '</p>';
+                    list($toc, $titles) = booktool_print_get_toc($chapters, $book, $cm);
+                    $content .= $toc;
+                    // chapters
+                    $link1 = $CFG->wwwroot.'/mod/book/view.php?id='.$this->course->id.'&chapterid=';
+                    $link2 = $CFG->wwwroot.'/mod/book/view.php?id='.$this->course->id;
+                    foreach ($chapters as $ch) {
+                        $chapter = $allchapters[$ch->id];
+                        if ($chapter->hidden) {
+                            continue;
+                        }
+                        $content .= '<div class="book_chapter"><a name="ch'.$ch->id.'"></a>';
+                        if (!$book->customtitles) {
+                            if (!$chapter->subchapter) {
+                                $content .= $OUTPUT->heading($titles[$ch->id]);
+                            } else {
+                                $content .= $OUTPUT->heading($titles[$ch->id], 3);
+                            }
+                        }
+                        $chaptercontent = str_replace($link1, '#ch', $chapter->content);
+                        $chaptercontent = str_replace($link2, '#top', $chaptercontent);
+
+                        $chaptercontent = str_replace('@@PLUGINFILE@@', 'data', $chaptercontent);
+                        //$chaptercontent = file_rewrite_pluginfile_urls($chaptercontent, 'pluginfile.php', $context->id, 'mod_book', 'chapter', $ch->id);
+                        $content .= format_text($chaptercontent, $chapter->contentformat, array('noclean'=>true, 'context'=>$context));
+                        $content .= '</div>';
+                        $content .= '<a href="#toc">&uarr; ' . get_string('top', 'mod_book') . '</a>';
+                    }
+                    $content = <<<HTML
+<!doctype html>
+<html>
+<head>
+    <title>{$res->name}</title>
+    <meta charset="utf-8">
+</head>
+<body>
+$content
+</body>
+</html>
+HTML;
+                    $filelist[$filename] = array($content); // Needs to be array to be saved as file.
                 }
             }
         }
