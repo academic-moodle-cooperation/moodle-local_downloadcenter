@@ -81,7 +81,7 @@ install:
 #    - Copy your plugin into Moodle.
 #    - If your plugin has Behat features, then Behat will be setup.
 #    - If your plugin has unit tests, then PHPUnit will be setup.
-  - moodle-plugin-ci install --no-init
+  - moodle-plugin-ci install
 
 # This lists steps that are run for the purposes of testing.  Any of
 # these steps can be re-ordered or removed to your liking.  And of
