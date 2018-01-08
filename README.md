@@ -1,4 +1,4 @@
-Download Center Plugin
+Download Center Plugin [![Build Status](https://travis-ci.org/academic-moodle-cooperation/moodle-local_downloadcenter.svg?branch=master)](https://travis-ci.org/academic-moodle-cooperation/moodle-local_downloadcenter)
 ======================
 
 This file is part of the local_downloadcenter plugin for Moodle - <http://moodle.org/>
