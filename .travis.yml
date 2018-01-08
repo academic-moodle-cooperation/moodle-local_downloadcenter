@@ -4,10 +4,20 @@ language: php
 # This tells Travis CI to use its new architecture.  Everything is better!
 sudo: required
 
+addons:
+  firefox: "47.0.1"
+  postgresql: "9.3"
+  apt:
+    packages:
+      - oracle-java8-installer
+      - oracle-java8-set-default
+      - chromium-chromedriver
+
 # This tells Travis CI to cache Composer's cache.  Speeds up build times.
 cache:
   directories:
     - $HOME/.composer/cache
+    - $HOME/.npm
 
 # Determines which versions of PHP to test our project against.  Each version listed
 # here will create a separate build and run the tests against that version of PHP.
@@ -51,13 +61,15 @@ before_install:
 # This disables XDebug which should speed up the build.  One reason to remove this
 # line is if you are trying to generate code coverage with PHPUnit.
   - phpenv config-rm xdebug.ini
+  - nvm install 8.9
+  - nvm use 8.9
 # Currently we are inside of the clone of your repository.  We move up two
 # directories to build the project.
   - cd ../..
 # Update Composer.
   - composer selfupdate
 # Install this project into a directory called "ci".
-  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^1
+  - composer create-project -n --no-dev --prefer-dist moodlerooms/moodle-plugin-ci ci ^2
 # Update the $PATH so scripts from this project can be called easily.
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
 
@@ -97,12 +109,13 @@ script:
   - moodle-plugin-ci validate
 # This step runs the PHPUnit tests of your plugin.  If your plugin has PHPUnit tests,
 # then it is highly recommended that you keep this step.
-  - moodle-plugin-ci phpunit --coverage-clover
+# TODO: remove comments if phpunit tests are ready
+  #- moodle-plugin-ci phpunit --coverage-clover
 # This step runs the Behat tests of your plugin.  If your plugin has Behat tests, then
 # it is highly recommended that you keep this step.
-  - moodle-plugin-ci behat
-# Now we view the coverage file!
-  - if [ -e "coverage.xml" ]; then echo "Show PHPUnit code coverage:"; cat coverage.xml; fi
+# TODO: remove comments when behat tests are ready
+  #- moodle-plugin-ci behat --profile default
+  #- moodle-plugin-ci behat --profile chrome
 
 after_script:
 # See: https://github.com/moodlerooms/moodle-plugin-ci/issues/32
