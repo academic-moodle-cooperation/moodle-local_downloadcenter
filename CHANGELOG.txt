@@ -7,6 +7,7 @@ CHANGELOG
 
 * Moodle 3.4 compatible version
 * [FEATURE] improve layout of elements in boost theme
+* [FEATURE] add mod_book to list of downloadable items
 
 
 3.3.1 (2017-07-10)

@@ -5,7 +5,7 @@ This file is part of the local_downloadcenter plugin for Moodle - <http://moodle
 
 *Author:*    Simeon Naydenov
 
-*Copyright:* 2014 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
+*Copyright:* 2018 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
 
 *License:*   [GNU GPL v3 or later](http://www.gnu.org/copyleft/gpl.html)
 
@@ -29,7 +29,7 @@ for a train journey, so all downloaded course files can be accessed offline.
 Requirements
 ------------
 
-The plugin is available for Moodle 3.1+. This version is for Moodle 3.3
+The plugin is available for Moodle 3.1+. This version is for Moodle 3.4
 
 
 Installation
