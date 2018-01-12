@@ -20,8 +20,8 @@ of student folders of the entire course as a ZIP archive with a clear folder str
 Example
 -------
 
-With this module participants of a course can download all relevant course documents (files, folders
-as well as documents of student folders) in one step. Therefore users can save valueable time
+With this module participants of a course can download all relevant course documents (files, folders,
+books, as well as documents of student folders) in one step. Therefore users can save valueable time
 compared to single-downloads of files. One reasonable scenario might be the download of all files
 for a train journey, so all downloaded course files can be accessed offline.
 
