@@ -1,6 +1,8 @@
 CHANGELOG
 =========
 
+3.5.0 (2018-...)
+* [FEATURE] remove german language strings
 
 3.4.0 (2017-11-13)
 ------------------

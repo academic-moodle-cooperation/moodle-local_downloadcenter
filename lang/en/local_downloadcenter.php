@@ -42,3 +42,5 @@ $string['zipcreating'] = 'The ZIP archive is being created...';
 $string['eventDOWNLOADEDZIP'] = 'ZIP was downloaded';
 $string['eventVIEWED'] = 'Download center viewed';
 $string['untitled'] = 'Untitled';
+
+$string['privacy:null_reason'] = 'This plugin does not store or process any personal information. It presents an interface to download all course files which are manipulated from within the course.';
