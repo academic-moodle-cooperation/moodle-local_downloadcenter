@@ -110,13 +110,22 @@
 }
 
 
+.path-local-downloadcenter .mform .row label {
+    width: 100%;
+}
+
+
+.path-local-downloadcenter #region-main .mform .card.block .form-group.row .col-md-9.checkbox {
+    width: 100%;
+}
+
 @media (min-width: 1475px) {
     .path-local-downloadcenter form .fitemtitle {
         float: none;
     }
 
     .path-local-downloadcenter form .itemtitle span {
-        max-width: 100%;
+        max-width: 95%;
     }
 }
 
@@ -126,7 +135,7 @@
     }
 
     .path-local-downloadcenter form .itemtitle span {
-        max-width: 380px;
+        max-width: 90%;
     }
 
 }
@@ -135,12 +144,15 @@
     .path-local-downloadcenter #region-main .mform .fitem.downloadcenter_selector .col-md-9 {
         padding-left: 30px;
     }
+    .path-local-downloadcenter form .itemtitle span {
+        max-width: 85%;
+    }
 }
 
 
 @media (max-width: 499px) {
     .path-local-downloadcenter form .itemtitle span {
-        max-width: 150px;
+        max-width: 78%;
     }
 
 
