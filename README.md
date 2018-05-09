@@ -29,7 +29,7 @@ for a train journey, so all downloaded course files can be accessed offline.
 Requirements
 ------------
 
-The plugin is available for Moodle 3.1+. This version is for Moodle 3.4
+The plugin is available for Moodle 3.1+. This version is for Moodle 3.5
 
 
 Installation
@@ -48,6 +48,10 @@ Admin Settings
 
 No settings available.
 
+Privacy API
+-----------
+
+The plugin fully implements the Moodle Privacy API.
 
 Bug Reports / Support
 ---------------------
