@@ -73,7 +73,7 @@
 
 /* boost fixes */
 
-.path-local-downloadcenter #region-main .card-block .card.block .col-md-3 {
+.path-local-downloadcenter #region-main .card-body .card.block .col-md-3 {
     display: none;
 }
 
@@ -85,15 +85,15 @@
     background-color: #fff;
 }
 
-.path-local-downloadcenter #region-main .card-block .card.block .form-group.downloadcenter_selector label span,
-.path-local-downloadcenter #region-main .card-block .card.block .form-group:first-child label span,
-.path-local-downloadcenter #region-main .card-block .card.block .form-group:first-child label,
-.path-local-downloadcenter #region-main .card-block .card.block .form-group:first-child {
+.path-local-downloadcenter #region-main .card-body .card.block .form-group.downloadcenter_selector label span,
+.path-local-downloadcenter #region-main .card-body .card.block .form-group:first-child label span,
+.path-local-downloadcenter #region-main .card-body .card.block .form-group:first-child label,
+.path-local-downloadcenter #region-main .card-body .card.block .form-group:first-child {
     font-weight: bold;
 }
 
 /* delete first empty row used in hack :) */
-.path-local-downloadcenter #region-main .card-block .mform .warningmessage + .fitem {
+.path-local-downloadcenter #region-main .card-body .mform .warningmessage + .fitem {
     display: none;
 }
 
