@@ -105,8 +105,15 @@
 
 /* boost fixes end */
 
+
+
+.path-local-downloadcenter .mform .row label {
+    width: 100%;
+}
+
 .path-local-downloadcenter .mform .row.downloadcenter_selector label {
     margin-right: 10px;
+    width: auto;
 }
 
 .path-local-downloadcenter .mform .row.downloadcenter_selector {
@@ -114,10 +121,6 @@
     margin-bottom: 0;
 }
 
-
-.path-local-downloadcenter .mform .row label {
-    width: 100%;
-}
 
 
 .path-local-downloadcenter #region-main .mform .card.block .form-group.row .col-md-9.checkbox {
