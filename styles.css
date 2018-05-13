@@ -41,7 +41,7 @@
 .path-local-downloadcenter form .block .fitem label .sectiontitle,
 .path-local-downloadcenter form .block .fitem .fitemtitle label .sectiontitle,
 .path-local-downloadcenter form .itemtitle span {
-    max-width: 210px;
+    max-width: 95%;
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
@@ -121,7 +121,9 @@
 
 
 .path-local-downloadcenter #region-main .mform .card.block .form-group.row .col-md-9.checkbox {
-    width: 100%;
+
+    max-width: 100%;
+    flex: 0 0 100%;
 }
 
 @media (min-width: 1475px) {
