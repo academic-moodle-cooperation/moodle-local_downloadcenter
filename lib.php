@@ -59,9 +59,15 @@ function local_downloadcenter_extend_navigation(global_navigation $nav) {
         $beforekey = null;
         $activitiesnode = $coursenode->find('activitiescategory', navigation_node::TYPE_CATEGORY);
         if ($activitiesnode == false) {
+            $custom = $coursenode->find_all_of_type(navigation_node::TYPE_CUSTOM);
             $sections = $coursenode->find_all_of_type(navigation_node::TYPE_SECTION);
-            $firstsection = reset($sections);
-            $beforekey = empty($sections) ? null : $firstsection->key;
+            if (!empty($custom)) {
+                $first = reset($custom);
+                $beforekey = $first->key;
+            } else if (!empty($sections)) {
+                $first = reset($sections);
+                $beforekey = $first->key;
+            }
         } else {
             $beforekey = 'activitiescategory';
         }
@@ -70,7 +76,11 @@ function local_downloadcenter_extend_navigation(global_navigation $nav) {
 
         $title = get_string('navigationlink', 'local_downloadcenter');
 
-        $pix = new pix_icon('icon', $title, 'local_downloadcenter');
+        if ($PAGE->url->compare(new moodle_url('/local/downloadcenter/index.php'), URL_MATCH_BASE)) {
+            $pix = new pix_icon('icon_white', $title, 'local_downloadcenter');
+        } else {
+            $pix = new pix_icon('icon', $title, 'local_downloadcenter');
+        }
 
         $childnode = navigation_node::create(
             $title,
