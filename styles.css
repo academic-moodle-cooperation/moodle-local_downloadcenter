@@ -105,8 +105,6 @@
 
 /* boost fixes end */
 
-
-
 .path-local-downloadcenter .mform .row label {
     width: 100%;
 }
@@ -120,8 +118,6 @@
     margin-top: 0;
     margin-bottom: 0;
 }
-
-
 
 .path-local-downloadcenter #region-main .mform .card.block .form-group.row .col-md-9.checkbox {
 
@@ -167,7 +163,6 @@
 
 
 }
-
 
 @media (max-width: 319px) {
     .path-local-downloadcenter form .itemtitle span {
