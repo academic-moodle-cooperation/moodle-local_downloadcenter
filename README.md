@@ -29,7 +29,7 @@ for a train journey, so all downloaded course files can be accessed offline.
 Requirements
 ------------
 
-The plugin is available for Moodle 3.1+. This version is for Moodle 3.5
+The plugin is available for Moodle 3.1+. This version is for Moodle 3.5.1
 
 
 Installation

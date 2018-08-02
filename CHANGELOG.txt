@@ -1,7 +1,13 @@
 CHANGELOG
 =========
 
-3.5.0 (2018-05-??)
+3.5.1 (2018-08-02)
+------------------
+* Moodle 3.5.1 compatible version
+* [FEATURE] switch to font-awesome icon
+* [FEATURE] change position of download center in navbar
+
+3.5.0 (2018-05-08)
 ------------------
 * Moodle 3.5 compatible version
 * [FEATURE] Implement Privacy API

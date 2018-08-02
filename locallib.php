@@ -429,7 +429,9 @@ HTML;
                         $chaptercontent = str_replace($link2, '#top', $chaptercontent);
 
                         $chaptercontent = str_replace('@@PLUGINFILE@@', 'data', $chaptercontent);
-                        $content .= format_text($chaptercontent, $chapter->contentformat, array('noclean' => true, 'context' => $context));
+                        $content .= format_text($chaptercontent,
+                                                $chapter->contentformat,
+                                                array('noclean' => true, 'context' => $context));
                         $content .= '</div>';
                         $content .= '<a href="#toc">&uarr; ' . get_string('top', 'mod_book') . '</a>';
                     }

@@ -76,11 +76,7 @@ function local_downloadcenter_extend_navigation(global_navigation $nav) {
 
         $title = get_string('navigationlink', 'local_downloadcenter');
 
-        if ($PAGE->url->compare(new moodle_url('/local/downloadcenter/index.php'), URL_MATCH_BASE)) {
-            $pix = new pix_icon('icon_white', $title, 'local_downloadcenter');
-        } else {
-            $pix = new pix_icon('icon', $title, 'local_downloadcenter');
-        }
+        $pix = new pix_icon('icon', $title, 'local_downloadcenter');
 
         $childnode = navigation_node::create(
             $title,
@@ -97,4 +93,10 @@ function local_downloadcenter_extend_navigation(global_navigation $nav) {
         break;
     }
 
+}
+
+function local_downloadcenter_get_fontawesome_icon_map() {
+    return [
+        'local_downloadcenter:icon' => 'fa-arrow-circle-o-down',
+    ];
 }
