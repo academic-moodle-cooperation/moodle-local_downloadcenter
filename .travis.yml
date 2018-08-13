@@ -2,7 +2,7 @@
 language: php
 
 # This tells Travis CI to use its new architecture.  Everything is better!
-sudo: required
+sudo: false
 
 addons:
   firefox: "47.0.1"
@@ -25,6 +25,7 @@ cache:
 php:
  - 7.0
  - 7.1
+ - 7.2
 
 # This section sets up the environment variables for the build.
 env:
