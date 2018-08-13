@@ -57,19 +57,39 @@ function local_downloadcenter_extend_navigation(global_navigation $nav) {
         }
 
         $beforekey = null;
-        $activitiesnode = $coursenode->find('activitiescategory', navigation_node::TYPE_CATEGORY);
-        if ($activitiesnode == false) {
-            $custom = $coursenode->find_all_of_type(navigation_node::TYPE_CUSTOM);
-            $sections = $coursenode->find_all_of_type(navigation_node::TYPE_SECTION);
-            if (!empty($custom)) {
-                $first = reset($custom);
-                $beforekey = $first->key;
-            } else if (!empty($sections)) {
-                $first = reset($sections);
-                $beforekey = $first->key;
+
+        $gradesnode = $coursenode->find('grades', navigation_node::TYPE_SETTING);
+
+        if ($gradesnode) { // Add the navnode either after grades or after checkmark report
+            $keys = $gradesnode->parent->get_children_key_list();
+            $igrades = array_search('grades', $keys);
+            $icheckmark = array_search('checkmarkreport' . $PAGE->course->id, $keys);
+            if ($icheckmark !== false) {
+                if (isset($keys[$icheckmark + 1])) {
+                    $beforekey = $keys[$icheckmark + 1];
+                }
+            } else if ($igrades !== false) {
+                if (isset($keys[$igrades + 1])) {
+                    $beforekey = $keys[$igrades + 1];
+                }
             }
-        } else {
-            $beforekey = 'activitiescategory';
+        }
+
+        if ($beforekey == null) { // No grades or checkmark report found, fall back to other variants!
+            $activitiesnode = $coursenode->find('activitiescategory', navigation_node::TYPE_CATEGORY);
+            if ($activitiesnode == false) {
+                $custom = $coursenode->find_all_of_type(navigation_node::TYPE_CUSTOM);
+                $sections = $coursenode->find_all_of_type(navigation_node::TYPE_SECTION);
+                if (!empty($custom)) {
+                    $first = reset($custom);
+                    $beforekey = $first->key;
+                } else if (!empty($sections)) {
+                    $first = reset($sections);
+                    $beforekey = $first->key;
+                }
+            } else {
+                $beforekey = 'activitiescategory';
+            }
         }
 
         $url = new moodle_url('/local/downloadcenter/index.php', array('courseid' => $PAGE->course->id));
