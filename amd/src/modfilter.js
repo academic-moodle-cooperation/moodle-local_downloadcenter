@@ -40,7 +40,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             strings['hidetypes'] = strs[4];
 
             var firstsection = $('#mform1 .card.block').first();
-            formid = firstsection.parent('form').prop('id');
+            formid = firstsection.closest('form').prop('id');
 
             // Add global select all/none options...
             var html = html_generator('included', strings['select']);
