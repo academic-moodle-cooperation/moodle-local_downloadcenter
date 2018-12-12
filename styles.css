@@ -90,11 +90,16 @@
     background-color: #fff;
 }
 
-.path-local-downloadcenter #region-main .card-body .card.block .form-group.downloadcenter_selector label span,
-.path-local-downloadcenter #region-main .card-body .card.block .form-group:first-child label span,
-.path-local-downloadcenter #region-main .card-body .card.block .form-group:first-child label,
-.path-local-downloadcenter #region-main .card-body .card.block .form-group:first-child {
+.path-local-downloadcenter #region-main .card.block .form-group.downloadcenter_selector label span,
+.path-local-downloadcenter #region-main .card.block .form-group:first-child label span,
+.path-local-downloadcenter #region-main .card.block .form-group:first-child label,
+.path-local-downloadcenter #region-main .card.block .form-group:first-child {
     font-weight: bold;
+}
+
+.path-local-downloadcenter #region-main .card.block .form-group {
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 /* delete first empty row used in hack :) */

@@ -40,7 +40,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             strings['hidetypes'] = strs[4];
 
             var firstsection = $('#mform1 .card.block').first();
-            formid = firstsection.parent('form').prop('id');
+            formid = firstsection.closest('form').prop('id');
 
             // Add global select all/none options...
             var html = html_generator('included', strings['select']);
@@ -121,6 +121,9 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             }
             if (name.substring(0, len) === type) {
                 checkbox.prop('checked', check);
+            }
+            if (check) {
+                checkbox.closest('.card.block').find('.form-group:first-child input').prop('checked', check);
             }
         });
 
