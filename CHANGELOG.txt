@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-3.6 (2018-12-10)
+3.6.0 (2018-12-10)
 ------------------
 * Moodle 3.6 compatible version
 * [BUG] Fix bug #3 from github. PULL request submitted from Joshua Ebarvia
