@@ -5,6 +5,7 @@ CHANGELOG
 ------------------
 * Moodle 3.6 compatible version
 * [BUG] Fix bug #3 from github. PULL request submitted from Joshua Ebarvia
+* [BUG] Fix github #2 - increase script time limit to allow large archives to be created
 
 3.5.1 (2018-08-02)
 ------------------

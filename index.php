@@ -28,6 +28,10 @@ require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once(__DIR__ . '/download_form.php');
 
+// Raise timelimit as this could take a while for big archives.
+core_php_time_limit::raise();
+raise_memory_limit(MEMORY_HUGE);
+
 $courseid = required_param('courseid', PARAM_INT);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
