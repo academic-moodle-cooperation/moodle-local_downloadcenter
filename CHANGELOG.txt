@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.7.0 (2019-05-20)
+------------------
+* Moodle 3.7 compatible version
+
 3.6.1 (2019-05-07)
 ------------------
 * [BUG] Fix github #2 - increase script time limit to allow large archives to be created
