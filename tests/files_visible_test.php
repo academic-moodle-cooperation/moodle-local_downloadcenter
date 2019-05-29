@@ -1,6 +1,29 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
+/**
+ * Basic downloadcenter PHP Unit tests.
+ *
+ * @author     Simeon Naydenov (moniNaydenov@gmail.com)
+ * @package    local_downloadcenter
+ * @category   phpunit
+ * @copyright  2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die();
 
 /*
  * TODO tests:
@@ -25,7 +48,6 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         $course1 = $this->getDataGenerator()->create_course();
 
-
         $this->getDataGenerator()->enrol_user($student1->id, $course1->id, $studentrole->id);
         $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
 
@@ -37,7 +59,6 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         foreach ($userresources as $resources) {
             $this->assertEmpty($resources->res);
         }
-
 
         $this->setUser($teacher1);
 
@@ -72,8 +93,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         $resources = $this->helper_add_resources_to_course($course1, $teacher1);
 
-
-        // test for student  - must not see not visible resources
+        // Test for student  - must not see not visible resources.
         $downloadcenter = new local_downloadcenter_factory($course1, $student1);
         $userresources = $downloadcenter->get_resources_for_user();
 
@@ -97,13 +117,11 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         $teacher1 = $this->getDataGenerator()->create_user();
         $course1 = $this->getDataGenerator()->create_course();
 
-
         $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
-
 
         $resources = $this->helper_add_resources_to_course($course1, $teacher1);
 
-        // test for teacher - must see all resources
+        // Test for teacher - must see all resources.
 
         $this->setUser($teacher1);
 
@@ -144,7 +162,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         $record->course = $course->id;
         $usercontext = context_user::instance($teacher->id);
 
-        // add 10 files with random visibility
+        // Add 10 files with random visibility.
         $filecount = 10;
         $visiblefilecount = 0;
         $record->section = $filesection;
@@ -155,8 +173,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
             $generator->create_instance($record);
         }
 
-
-        // add 10 folders with random visibility
+        // Add 10 folders with random visibility.
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_folder');
 
         $record->section = $foldersection;
@@ -170,8 +187,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
             $generator->create_instance($record);
         }
 
-
-        // add 10 pages with random visibility
+        // Add 10 pages with random visibility.
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_page');
 
         unset($record->files);
@@ -187,8 +203,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
             $generator->create_instance($record);
         }
 
-
-        // add 10 books with random visibility
+        // Add 10 books with random visibility.
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_book');
 
         unset($record->content);
@@ -204,16 +219,12 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
             $record->contentformat = FORMAT_HTML;
 
             $book = $generator->create_instance($record);
-            // add 5 chapters to each book
+            // Add 5 chapters to each book.
             for ($j = 0; $j < 5; $j++) {
                 $generator->create_chapter(['bookid' => $book->id]);
             }
 
         }
-
-
-
-
 
         $result = new stdClass;
         $result->filecount = $filecount;
@@ -227,7 +238,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         $result->pagecount = $pagecount;
         $result->visiblepagecount = $visiblepagecount;
         $result->pagesection = $pagesection;
-        
+
         $result->bookcount = $bookcount;
         $result->visiblebookcount = $visiblebookcount;
         $result->booksection = $booksection;
