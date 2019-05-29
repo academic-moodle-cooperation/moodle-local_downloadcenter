@@ -10,19 +10,18 @@
  */
 define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
-    var strings = {};
-    var modnames;
-    var formid;
-    var currentlyshown = false;
-    var modlist;
-
     /**
      * @constructor
      * @alias module:block_overview/helloworld
      */
-    var modfilter = function(modnms) {
+    var ModFilter = function(modnames) {
 
-        modnames = modnms;
+        var instance = this;
+        this.modnames = modnames;
+        this.strings = {};
+        this.formid = null;
+        this.currentlyshown = false;
+        this.modlist = null;
 
         Str.get_strings([
             {key: 'all', component: 'moodle'},
@@ -33,18 +32,18 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
         ]).done(function(strs) {
 
             // Init strings.. new moodle super cool way...
-            strings['all'] = strs[0];
-            strings['none'] = strs[1];
-            strings['select'] = strs[2];
-            strings['showtypes'] = strs[3];
-            strings['hidetypes'] = strs[4];
+            instance.strings['all'] = strs[0];
+            instance.strings['none'] = strs[1];
+            instance.strings['select'] = strs[2];
+            instance.strings['showtypes'] = strs[3];
+            instance.strings['hidetypes'] = strs[4];
 
-            var firstsection = $('#mform1 .card.block').first();
-            formid = firstsection.closest('form').prop('id');
+            var firstsection = $('div[role="main"] > form .card.block').first();
+            instance.formid = firstsection.closest('form').prop('id');
 
             // Add global select all/none options...
-            var html = html_generator('included', strings['select']);
-            html += row_generator('(<a id="downloadcenter-bytype" href="#">' + strings['showtypes'] + '</a>)', '');
+            var html = instance.html_generator('included', instance.strings['select']);
+            html += instance.row_generator('(<a id="downloadcenter-bytype" href="#">' + instance.strings['showtypes'] + '</a>)', '');
             var links = $(document.createElement('div'));
             links.addClass('grouped_settings section_level block card');
             links.html(html);
@@ -52,57 +51,58 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             links.insertBefore(firstsection);
 
             // For each module type on the course, add hidden select all/none options.
-            modlist = $(document.createElement('div'));
-            modlist.prop('id', 'mod_select_links');
-            modlist.prop('class', 'm-l-2');
-            modlist.appendTo(links);
-            modlist.hide();
+            instance.modlist = $(document.createElement('div'));
+            instance.modlist.prop('id', 'mod_select_links');
+            instance.modlist.prop('class', 'm-l-2');
+            instance.modlist.appendTo(links);
+            instance.modlist.hide();
 
-            for (var mod in modnames) {
+            for (var mod in instance.modnames) {
                 // Only include actual values from the list..
-                if (!modnames.hasOwnProperty(mod)) {
+                if (!instance.modnames.hasOwnProperty(mod)) {
                     continue;
                 }
 
                 var img = '<img src="' + url.imageUrl('icon', 'mod_' + mod) + '" class="activityicon" />';
-                html = html_generator('mod_' + mod, img + modnames[mod]);
+                html = instance.html_generator('mod_' + mod, img + instance.modnames[mod]);
                 var modlinks = $(document.createElement('div'));
                 modlinks.addClass('grouped_settings section_level');
                 modlinks.html(html);
-                modlinks.appendTo(modlist);
-                initlinks(modlinks, mod);
+                modlinks.appendTo(instance.modlist);
+                instance.initlinks(modlinks, mod);
             }
 
             // Attach events to links!
-            $('#downloadcenter-all-included').click(function(e) { helper(e, true,  'item_'); });
-            $('#downloadcenter-none-included').click(function(e) { helper(e, false, 'item_'); });
-            $('#downloadcenter-bytype').click(function() { toggletypes(); });
+            $('#downloadcenter-all-included').click(function(e) { instance.helper(e, true,  'item_'); });
+            $('#downloadcenter-none-included').click(function(e) { instance.helper(e, false, 'item_'); });
+            $('#downloadcenter-bytype').click(function(e) { e.preventDefault(); instance.toggletypes(); });
         });
 
     };
 
     // Toggles the display of the hidden module select all/none links.
-    var toggletypes = function() {
+    ModFilter.prototype.toggletypes = function() {
         // Change text of type toggle link.
         var link = $('#downloadcenter-bytype');
-        if (currentlyshown) {
-            link.text(strings['showtypes']);
+        if (this.currentlyshown) {
+            link.text(this.strings['showtypes']);
         } else {
-            link.text(strings['hidetypes']);
+            link.text(this.strings['hidetypes']);
         }
-        modlist.animate({height: 'toggle' }, 500, 'swing');
+        this.modlist.animate({height: 'toggle' }, 500, 'swing');
 
-        currentlyshown = !currentlyshown;
-
-    };
-
-    var initlinks = function(links, mod) {
-        $('#downloadcenter-all-mod_' + mod).click(function(e) { helper(e, true, 'item_', mod); });
-        $('#downloadcenter-none-mod_' + mod).click(function(e) { helper(e, false, 'item_', mod); });
+        this.currentlyshown = !this.currentlyshown;
 
     };
 
-    var helper = function(e, check, type, mod) {
+    ModFilter.prototype.initlinks = function(links, mod) {
+        var instance = this;
+        $('#downloadcenter-all-mod_' + mod).click(function(e) { instance.helper(e, true, 'item_', mod); });
+        $('#downloadcenter-none-mod_' + mod).click(function(e) { instance.helper(e, false, 'item_', mod); });
+
+    };
+
+    ModFilter.prototype.helper = function(e, check, type, mod) {
         e.preventDefault();
         var prefix = '';
         if (typeof mod !== 'undefined') {
@@ -130,18 +130,18 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
         // At this point, we really need to persuade the form we are part of to
         // update all of its disabledIf rules. However, as far as I can see,
         // given the way that lib/form/form.js is written, that is impossible.
-        if (formid && M.form) {
-            M.form.updateFormState(formid);
+        if (this.formid && M.form) {
+            M.form.updateFormState(this.formid);
         }
     };
 
-    var html_generator = function(idtype, heading) {
-        var links = '<a id="downloadcenter-all-' + idtype + '" href="#">' + strings['all'] + '</a> / ';
-        links += '<a id="downloadcenter-none-' + idtype + '" href="#">' + strings['none'] + '</a>';
-        return row_generator(heading, links);
+    ModFilter.prototype.html_generator = function(idtype, heading) {
+        var links = '<a id="downloadcenter-all-' + idtype + '" href="#">' + this.strings['all'] + '</a> / ';
+        links += '<a id="downloadcenter-none-' + idtype + '" href="#">' + this.strings['none'] + '</a>';
+        return this.row_generator(heading, links);
     };
 
-    var row_generator = function(heading, content) {
+    ModFilter.prototype.row_generator = function(heading, content) {
         var ret = '<div class="form-group row fitem downloadcenter_selector">';
         ret += '<div class="col-md-3"></div>';
         ret += '<div class="col-md-9">';
@@ -154,7 +154,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
     return {
         init: function(modnames) {
-            return new modfilter(modnames);
+            return new ModFilter(modnames);
         }
     };
 });
