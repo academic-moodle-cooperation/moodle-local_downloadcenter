@@ -45,7 +45,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             var html = instance.html_generator('included', instance.strings['select']);
             html += instance.row_generator(
                 '(<a id="downloadcenter-bytype" href="#">' + instance.strings['showtypes'] + '</a>)',
-                ''); // I hope this looks better than on one line :)! 
+                ''); // I hope this looks better than on one line :)!
             var links = $(document.createElement('div'));
             links.addClass('grouped_settings section_level block card');
             links.html(html);
