@@ -30,7 +30,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             {key: 'showtypes', component: 'backup'},
             {key: 'hidetypes', component: 'backup'}
         ]).done(function(strs) {
-
+            // Some useless comment to trigger grunt watch.....
             // Init strings.. new moodle super cool way...
             instance.strings['all'] = strs[0];
             instance.strings['none'] = strs[1];
