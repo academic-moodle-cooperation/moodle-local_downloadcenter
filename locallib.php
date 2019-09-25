@@ -45,7 +45,7 @@ class local_downloadcenter_factory {
     /**
      * @var array
      */
-    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book');
+    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book', 'lightboxgallery');
     /**
      * @var array
      */
@@ -493,6 +493,19 @@ $content
 </html>
 HTML;
                     $filelist[$filename] = array($content); // Needs to be array to be saved as file.
+                } else if ($res->modname == 'lightboxgallery') {
+
+                    $fs = get_file_storage();
+                    $files = $fs->get_area_files($context->id, 'mod_lightboxgallery', 'gallery_images');
+
+                    foreach ($files as $storedfile) {
+                        if (!$storedfile->is_valid_image()) {
+                            continue;
+                        }
+
+                        $filename = $resdir . '/' . self::shorten_filename($storedfile->get_filename());
+                        $filelist[$filename] = $storedfile;
+                    }
                 }
             }
         }
