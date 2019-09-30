@@ -26,10 +26,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-function local_downloadcenter_extend_settings_navigation(settings_navigation $settingsnav, context $context) {
-    return; // Not used anymore!
-}
-
+/**
+ * @param global_navigation $nav
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
 function local_downloadcenter_extend_navigation(global_navigation $nav) {
     global $PAGE;
 
@@ -115,6 +116,9 @@ function local_downloadcenter_extend_navigation(global_navigation $nav) {
 
 }
 
+/**
+ * @return array
+ */
 function local_downloadcenter_get_fontawesome_icon_map() {
     return [
         'local_downloadcenter:icon' => 'fa-arrow-circle-o-down',

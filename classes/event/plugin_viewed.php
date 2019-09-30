@@ -18,21 +18,39 @@ namespace local_downloadcenter\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Class plugin_viewed
+ * @package local_downloadcenter\event
+ */
 class plugin_viewed extends \core\event\base {
+    /**
+     *
+     */
     protected function init() {
         $this->data['crud'] = 'r'; // C(reate), r(ead), u(pdate), d(elete). Only read is required here!
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'course';
     }
 
+    /**
+     * @return string
+     * @throws \coding_exception
+     */
     public static function get_name() {
         return get_string('eventVIEWED', 'local_downloadcenter');
     }
 
+    /**
+     * @return string
+     */
     public function get_description() {
         return "The user with id {$this->userid} viewed the Downloadcenter for the course with id {$this->objectid}.";
     }
 
+    /**
+     * @return \moodle_url
+     * @throws \moodle_exception
+     */
     public function get_url() {
         return new \moodle_url('/local/downloadcenter/index.php', array('courseid' => $this->objectid));
     }
