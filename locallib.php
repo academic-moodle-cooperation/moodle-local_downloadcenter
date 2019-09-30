@@ -26,19 +26,51 @@
 defined('MOODLE_INTERNAL') || die();
 
 class local_downloadcenter_factory {
+    /**
+     * @var
+     */
     private $course;
+    /**
+     * @var
+     */
     private $user;
+    /**
+     * @var
+     */
     private $sortedresources;
+    /**
+     * @var
+     */
     private $filteredresources;
+    /**
+     * @var array
+     */
     private $availableresources = array('resource', 'folder', 'publication', 'page', 'book');
+    /**
+     * @var array
+     */
     private $jsnames = array();
+    /**
+     * @var
+     */
     private $progress;
 
+    /**
+     * local_downloadcenter_factory constructor.
+     * @param $course
+     * @param $user
+     */
     public function __construct($course, $user) {
         $this->course = $course;
         $this->user = $user;
     }
 
+    /**
+     * @return array
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     public function get_resources_for_user() {
         global $DB, $CFG;
 
@@ -157,10 +189,18 @@ class local_downloadcenter_factory {
         return $sorted;
     }
 
+    /**
+     * @return array
+     */
     public function get_js_modnames() {
         return array($this->jsnames);
     }
 
+    /**
+     * @return string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     public function create_zip() {
         global $DB, $CFG, $USER, $OUTPUT;
 
@@ -462,6 +502,11 @@ HTML;
         }
     }
 
+    /**
+     * @param $tempfilename
+     * @param $realfilename
+     * @return string
+     */
     private function add_file_to_session($tempfilename, $realfilename) {
         global $SESSION;
         if (!isset($SESSION->local_downloadcenter_filelist)) {
@@ -475,6 +520,9 @@ HTML;
         return $hash;
     }
 
+    /**
+     * @param $hash
+     */
     public function get_file_from_session($hash) {
         global $SESSION;
         if (isset($SESSION->local_downloadcenter_filelist)) {
@@ -488,6 +536,11 @@ HTML;
         die;
     }
 
+    /**
+     * @param $filelist
+     * @param $folder
+     * @param $path
+     */
     private function add_folder_contents(&$filelist, $folder, $path) {
         if (!empty($folder['subdirs'])) {
             foreach ($folder['subdirs'] as $foldername => $subfolder) {
@@ -500,6 +553,12 @@ HTML;
         }
     }
 
+    /**
+     * @param $data
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
+     */
     public function parse_form_data($data) {
         $data = (array)$data;
         $filtered = array();
@@ -524,6 +583,11 @@ HTML;
         $this->filteredresources = $filtered;
     }
 
+    /**
+     * @param $filename
+     * @param int $maxlength
+     * @return string
+     */
     public static function shorten_filename($filename, $maxlength = 64) {
         $filename = (string)$filename;
         if (strlen($filename) <= $maxlength) {
