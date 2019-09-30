@@ -1,4 +1,4 @@
-<?php
+    <?php
 // This file is part of local_downloadcenter for Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@ require_once(__DIR__ . '/locallib.php');
 
 class local_downloadcenter_download_form extends moodleform {
     public function definition() {
-        global $DB, $COURSE;
+        global $COURSE;
         $mform = $this->_form;
 
         $resources = $this->_customdata['res'];
