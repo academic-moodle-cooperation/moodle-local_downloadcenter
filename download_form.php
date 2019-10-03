@@ -28,9 +28,15 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/formslib.php');
 require_once(__DIR__ . '/locallib.php');
 
+/**
+ * Class local_downloadcenter_download_form
+ */
 class local_downloadcenter_download_form extends moodleform {
+    /**
+     * @throws coding_exception
+     */
     public function definition() {
-        global $DB, $COURSE;
+        global $COURSE;
         $mform = $this->_form;
 
         $resources = $this->_customdata['res'];
@@ -69,7 +75,13 @@ class local_downloadcenter_download_form extends moodleform {
     }
 }
 
+/**
+ * Class local_downloadcenter_download_final_form
+ */
 class local_downloadcenter_download_final_form extends moodleform {
+    /**
+     * @throws coding_exception
+     */
     public function definition() {
         global $COURSE;
         $mform = $this->_form;
