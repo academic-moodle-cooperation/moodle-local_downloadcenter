@@ -27,6 +27,17 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
+ *
+ * @param settings_navigation $settingsnav
+ * @param context $context
+ * @return null
+ */
+function local_downloadcenter_extend_settings_navigation(settings_navigation $settingsnav, context $context) {
+    return; // Not used anymore!
+}
+
+
+/**
  * @param global_navigation $nav
  * @throws coding_exception
  * @throws moodle_exception
