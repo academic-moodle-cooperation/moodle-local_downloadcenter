@@ -185,7 +185,12 @@ class local_downloadcenter_factory {
         $ufields = user_picture::fields('u');
         $useridentityfields = $CFG->showuseridentity != '' ? 'u.'.str_replace(', ', ', u.', $CFG->showuseridentity) . ', ' : '';
 
+        $excludeempty = get_config('local_downloadcenter', 'exclude_empty_topics');
         foreach ($filteredresources as $topicid => $info) {
+            if ($excludeempty && empty($info->res)) {
+                continue;
+            }
+
             $basedir = clean_filename($info->title);
             $basedir = self::shorten_filename($basedir);
             $filelist[$basedir] = null;

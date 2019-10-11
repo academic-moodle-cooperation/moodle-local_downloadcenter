@@ -32,6 +32,10 @@ $string['downloadcenter:view'] = 'View Download center';
 $string['navigationlink'] = 'Download center';
 $string['pagetitle'] = 'Download center for ';
 
+$string['settings_title'] = 'Download center';
+$string['exclude_empty_topics'] = 'Exclude empty topics';
+$string['exclude_empty_topics_help'] = 'Exclude empty topics from the downloaded zip.';
+
 $string['warningmessage'] = 'WARNING: The Download center enables to download only visible FILES and FOLDERS!';
 
 $string['createzip'] = 'Create ZIP archive';
@@ -44,3 +48,5 @@ $string['eventVIEWED'] = 'Download center viewed';
 $string['untitled'] = 'Untitled';
 
 $string['privacy:null_reason'] = 'This plugin does not store or process any personal information. It presents an interface to download all course files which are manipulated from within the course.';
+
+$string['no_downloadable_content'] = 'No downloadable content';
