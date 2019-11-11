@@ -45,7 +45,7 @@ class local_downloadcenter_factory {
     /**
      * @var array
      */
-    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book', 'lightboxgallery');
+    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book', 'lightboxgallery', 'assign');
     /**
      * @var array
      */
@@ -510,6 +510,15 @@ HTML;
 
                         $filename = $resdir . '/' . self::shorten_filename($storedfile->get_filename());
                         $filelist[$filename] = $storedfile;
+                    }
+                } else if ($res->modname == 'assign') {
+                    $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'introattachment', 0, 'id', false);
+                    foreach ($fsfiles as $file) {
+                        if ($file->get_filesize() == 0) {
+                            continue;
+                        }
+                        $filename = $resdir . '/data' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                        $filelist[$filename] = $file;
                     }
                 }
             }
