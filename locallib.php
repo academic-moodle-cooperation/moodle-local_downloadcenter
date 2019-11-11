@@ -30,7 +30,7 @@ class local_downloadcenter_factory {
     private $user;
     private $sortedresources;
     private $filteredresources;
-    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book');
+    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book', 'assign');
     private $jsnames = array();
     private $progress;
 
@@ -448,6 +448,15 @@ $content
 </html>
 HTML;
                     $filelist[$filename] = array($content); // Needs to be array to be saved as file.
+                } else if ($res->modname == 'assign') {
+                    $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'introattachment', 0, 'id', false);
+                    foreach ($fsfiles as $file) {
+                        if ($file->get_filesize() == 0) {
+                            continue;
+                        }
+                        $filename = $resdir . '/data' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                        $filelist[$filename] = $file;
+                    }
                 }
             }
         }
