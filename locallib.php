@@ -237,6 +237,11 @@ class local_downloadcenter_factory {
                     $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
                     $file = array_shift($files); // Get only the first file - such are the requirements!
                     $filename = $resdir . '/' . self::shorten_filename($file->get_filename());
+                    $extension = mimeinfo_from_type('extension', $file->get_mimetype());
+                    $currentextension = mb_substr($filename, mb_strlen($extension) * -1);
+                    if (strcmp($extension, $currentextension) != 0) {
+                        $filename .= $extension;
+                    }
                     $filelist[$filename] = $file;
                 } else if ($res->modname == 'folder') {
                     $folder = $fs->get_area_tree($context->id, 'mod_folder', 'content', 0);
