@@ -202,7 +202,7 @@ class local_downloadcenter_factory {
      * @throws dml_exception
      */
     public function create_zip() {
-        global $DB, $CFG, $USER, $OUTPUT;
+        global $DB, $CFG, $USER, $OUTPUT, $PAGE;
 
         if (file_exists($CFG->dirroot . '/mod/publication/locallib.php')) {
             require_once($CFG->dirroot . '/mod/publication/locallib.php');
@@ -212,6 +212,8 @@ class local_downloadcenter_factory {
         }
 
         require_once($CFG->dirroot . '/mod/book/tool/print/locallib.php');
+
+        $bookrenderer = $PAGE->get_renderer('booktool_print');
 
         // Zip files and sent them to a user.
         $tempzip = tempnam($CFG->tempdir.'/', 'downloadcenter');
@@ -452,7 +454,8 @@ HTML;
                     $content .= '<p class="book_summary">' .
                         format_text($book->intro, $book->introformat, array('noclean' => true, 'context' => $context))  .
                         '</p>';
-                    list($toc, $titles) = booktool_print_get_toc($chapters, $book, $cm);
+
+                    $toc = $bookrenderer->render_print_book_toc($chapters, $book, $cm);
                     $content .= $toc;
                     // Chapters!
                     $link1 = $CFG->wwwroot.'/mod/book/view.php?id='.$this->course->id.'&chapterid=';
@@ -463,11 +466,12 @@ HTML;
                             continue;
                         }
                         $content .= '<div class="book_chapter"><a name="ch'.$ch->id.'"></a>';
+                        $title = book_get_chapter_title($chapter->id, $chapters, $book, $context);
                         if (!$book->customtitles) {
                             if (!$chapter->subchapter) {
-                                $content .= $OUTPUT->heading($titles[$ch->id]);
+                                $content .= $OUTPUT->heading($title);
                             } else {
-                                $content .= $OUTPUT->heading($titles[$ch->id], 3);
+                                $content .= $OUTPUT->heading($title, 3);
                             }
                         }
                         $chaptercontent = str_replace($link1, '#ch', $chapter->content);
