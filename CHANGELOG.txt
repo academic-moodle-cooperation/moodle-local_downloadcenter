@@ -3,6 +3,7 @@ CHANGELOG
 
 3.8.0 (2019-11-15)
 ------------------
+* Moodle 3.8 compatible version
 * [BUG] fix missing file extension when handling files without an extension set in Moodle
 * [FEATURE] #6026 - add support for mod_lightboxgallery
 
