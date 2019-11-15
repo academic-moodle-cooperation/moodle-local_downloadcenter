@@ -21,15 +21,15 @@ Example
 -------
 
 With this module participants of a course can download all relevant course documents (files, folders,
-books, as well as documents of student folders) in one step. Therefore users can save valueable time
-compared to single-downloads of files. One reasonable scenario might be the download of all files
-for a train journey, so all downloaded course files can be accessed offline.
+books, pages, Lightbox galleries, and documents from student folders) in one step. Therefore users can save valuable time
+compared to single-downloads of files. One use-case of the download center is to download of all files
+before a flight, so all course files can be accessed offline.
 
 
 Requirements
 ------------
 
-The plugin is available for Moodle 3.1+. This version is for Moodle 3.7
+The plugin is available for Moodle 3.1+. This version is for Moodle 3.8
 
 
 Installation
