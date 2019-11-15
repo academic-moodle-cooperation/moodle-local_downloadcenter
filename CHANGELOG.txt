@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.8.0 (2019-11-15)
+------------------
+* [BUG] fix missing file extension when handling files without an extension set in Moodle
+
 3.7.0 (2019-05-20)
 ------------------
 * Moodle 3.7 compatible version
