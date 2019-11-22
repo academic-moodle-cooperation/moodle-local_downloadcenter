@@ -240,8 +240,9 @@ class local_downloadcenter_factory {
                     $file = array_shift($files); // Get only the first file - such are the requirements!
                     $filename = $resdir . '/' . self::shorten_filename($file->get_filename());
                     $extension = mimeinfo_from_type('extension', $file->get_mimetype());
-                    $currentextension = mb_substr($filename, mb_strlen($extension) * -1);
-                    if (strcmp($extension, $currentextension) != 0) {
+
+                    $currentextension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                    if (empty($currentextension)) {
                         $filename .= $extension;
                     }
                     $filelist[$filename] = $file;
@@ -257,7 +258,7 @@ class local_downloadcenter_factory {
 
                     $filesforzipping = array();
                     $filearea = 'attachment';
-
+                    $filename .= $extension;
                     // Find out current groups mode.
                     $groupmode = groups_get_activity_groupmode($cm);
                     $currentgroup = groups_get_activity_group($cm, true);
