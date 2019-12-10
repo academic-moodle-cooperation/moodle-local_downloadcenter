@@ -3,8 +3,12 @@ CHANGELOG
 
 3.8.0 (2019-11-15)
 ------------------
+* [FIXED] fix appending file extension when there is already one
+
+3.8.0 (2019-11-15)
+------------------
 * Moodle 3.8 compatible version
-* [BUG] fix missing file extension when handling files without an extension set in Moodle
+* [FIXED] fix missing file extension when handling files without an extension set in Moodle
 * [FEATURE] #6026 - add support for mod_lightboxgallery
 
 3.7.0 (2019-05-20)
@@ -14,12 +18,12 @@ CHANGELOG
 
 3.6.1 (2019-05-07)
 ------------------
-* [BUG] Fix github #2 - increase script time limit to allow large archives to be created
+* [FIXED] Fix github #2 - increase script time limit to allow large archives to be created
 
 3.6.0 (2018-12-10)
 ------------------
 * Moodle 3.6 compatible version
-* [BUG] Fix bug #3 from github. PULL request submitted from Joshua Ebarvia
+* [FIXED] Fix bug #3 from github. PULL request submitted from Joshua Ebarvia
 
 3.5.1 (2018-08-02)
 ------------------
