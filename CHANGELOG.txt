@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-3.8.0 (2019-12-10)
+3.8.1 (2019-12-10)
 ------------------
 * [FIXED] fix appending file extension when there is already one
 
