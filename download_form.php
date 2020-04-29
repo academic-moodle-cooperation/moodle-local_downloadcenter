@@ -52,7 +52,14 @@ class local_downloadcenter_download_form extends moodleform {
         );
         $mform->addElement('static', 'warning', '', ''); // Hack to work around fieldsets!
 
+        $empty = true;
+        $excludeempty = get_config('local_downloadcenter', 'exclude_empty_topics');
         foreach ($resources as $sectionid => $sectioninfo) {
+            if ($excludeempty && empty($sectioninfo->res)) { // Only display the sections that are not empty.
+                continue;
+            }
+
+            $empty = false;
             $sectionname = 'item_topic_' . $sectionid;
             $mform->addElement('html', html_writer::start_tag('div', array('class' => 'card block')));
             $sectiontitle = html_writer::span($sectioninfo->title, 'sectiontitle');
@@ -70,6 +77,9 @@ class local_downloadcenter_download_form extends moodleform {
             $mform->addElement('html', html_writer::end_tag('div'));
         }
 
+        if ($empty) {
+            $mform->addElement('html', html_writer::tag('h2', get_string('no_downloadable_content', 'local_downloadcenter')));
+        }
         $this->add_action_buttons(true, get_string('createzip', 'local_downloadcenter'));
 
     }
