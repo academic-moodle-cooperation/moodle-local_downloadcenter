@@ -527,10 +527,9 @@ HTML;
                     $assign = new assign($context, null, null);
                     $assignplugins = $assign->get_submission_plugins();
 
-                    //teachers
                     $params = ['assignment' => $res->instanceid];
                     if (!has_capability('mod/assign:viewgrades', $context)) {
-                        //students
+                        // When student, add userid to filters!
                         $params['userid'] = $USER->id;
                     }
                     $submissions = $DB->get_records('assign_submission', $params, 'attemptnumber ASC');
@@ -557,7 +556,7 @@ HTML;
                                 }
                             }
                             // To be used eventually for online text submissions!
-    /*
+                            /*
                             $editorfields = $assignplugin->get_editor_fields();
                             foreach ($editorfields as $name => $description) {
                                 $editorfieldinfo = array(
@@ -578,10 +577,6 @@ HTML;
                             }*/
                         }
                     }
-
-
-
-
                 }
             }
         }
