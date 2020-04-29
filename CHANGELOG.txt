@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+3.9.0 (2020-05-xx)
+------------------
+* [FEATURE] implement support for assign - download introduction files and submissions
+
 3.8.1 (2019-12-10)
 ------------------
 * [FIXED] fix appending file extension when there is already one
