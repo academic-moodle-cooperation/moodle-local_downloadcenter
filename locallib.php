@@ -45,7 +45,7 @@ class local_downloadcenter_factory {
     /**
      * @var array
      */
-    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book', 'lightboxgallery');
+    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book', 'lightboxgallery', 'assign');
     /**
      * @var array
      */
@@ -405,7 +405,6 @@ class local_downloadcenter_factory {
                             }
                         }
                     } // End of foreach.
-
                 } else if ($res->modname == 'page') {
                     $fsfiles = $fs->get_area_files($context->id,
                         'mod_page',
@@ -519,6 +518,73 @@ HTML;
 
                         $filename = $resdir . '/' . self::shorten_filename($storedfile->get_filename());
                         $filelist[$filename] = $storedfile;
+                    }
+                } else if ($res->modname == 'assign') {
+                    require_once($CFG->dirroot . '/mod/assign/locallib.php');
+                    require_once($CFG->dirroot . '/mod/assign/externallib.php');
+
+                    $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'introattachment', 0, 'id', false);
+                    foreach ($fsfiles as $file) {
+                        if ($file->get_filesize() == 0) {
+                            continue;
+                        }
+                        $filename = $resdir . '/intro' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                        $filelist[$filename] = $file;
+                    }
+
+                    $submissionsstr = get_string('gradeitem:submissions', 'assign');
+                    $assign = new assign($context, null, null);
+                    $assignplugins = $assign->get_submission_plugins();
+
+                    $params = ['assignment' => $res->instanceid];
+                    if (!has_capability('mod/assign:viewgrades', $context)) {
+                        // When student, add userid to filters!
+                        $params['userid'] = $USER->id;
+                    }
+                    $submissions = $DB->get_records('assign_submission', $params, 'attemptnumber ASC');
+                    foreach ($submissions as $submission) {
+                        $user = $DB->get_record('user', ['id' => $submission->userid]);
+                        $fullname = $resdir.  '/' . $submissionsstr . '/' . self::shorten_filename(fullname($user));
+                        foreach ($assignplugins as $assignplugin) {
+                            if (!$assignplugin->is_enabled() or !$assignplugin->is_visible()) {
+                                continue;
+                            }
+
+                            // Subtype is 'assignsubmission', type is currently 'file' or 'onlinetext'.
+                            $component = $assignplugin->get_subtype().'_'.$assignplugin->get_type();
+
+                            $fileareas = $assignplugin->get_file_areas();
+
+                            foreach ($fileareas as $filearea => $name) {
+                                if ($areafiles = $fs->get_area_files($context->id, $component, $filearea, $submission->id, 'itemid, filepath, filename', false)) {
+                                    foreach ($areafiles as $file) {
+
+                                        $filename = $fullname . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                                        $filelist[$filename] = $file;
+                                    }
+                                }
+                            }
+                            // To be used eventually for online text submissions!
+                            /*
+                            $editorfields = $assignplugin->get_editor_fields();
+                            foreach ($editorfields as $name => $description) {
+                                $editorfieldinfo = array(
+                                    'name' => $name,
+                                    'description' => $description,
+                                    'text' => $assignplugin->get_editor_text($name, $item->id),
+                                    'format' => $assignplugin->get_editor_format($name, $item->id)
+                                );
+
+                                // Now format the text.
+                                foreach ($fileareas as $filearea => $name) {
+                                    list($editorfieldinfo['text'], $editorfieldinfo['format']) = external_format_text(
+                                        $editorfieldinfo['text'], $editorfieldinfo['format'], $assign->get_context()->id,
+                                        $component, $filearea, $item->id);
+                                }
+
+                                $plugin['editorfields'][] = $editorfieldinfo;
+                            }*/
+                        }
                     }
                 }
             }

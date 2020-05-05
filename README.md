@@ -20,7 +20,7 @@ of student folders of the entire course as a ZIP archive with a clear folder str
 Example
 -------
 
-With this module participants of a course can download all relevant course documents (files, folders,
+With this module participants of a course can download all relevant course documents (files, folders, assignments,
 books, pages, Lightbox galleries, and documents from student folders) in one step. Therefore users can save valuable time
 compared to single-downloads of files. One use-case of the download center is to download of all files
 before a flight, so all course files can be accessed offline.
