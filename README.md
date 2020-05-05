@@ -45,8 +45,7 @@ Installation
 
 Admin Settings
 --------------
-
-No settings available.
+* Exclude empty topics - empty topics (without any downloadable files) should be present in the zip archive. 
 
 Privacy API
 -----------

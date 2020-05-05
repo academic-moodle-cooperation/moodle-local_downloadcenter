@@ -211,7 +211,11 @@ class local_downloadcenter_factory {
             define('PUBLICATION_MODE_IMPORT', 1);
         }
 
-        require_once($CFG->dirroot . '/mod/book/tool/print/locallib.php');
+        $modbookmissing = true;
+        if (file_exists($CFG->dirroot . '/mod/book/tool/print/locallib.php')) {
+            require_once($CFG->dirroot . '/mod/book/tool/print/locallib.php');
+            $modbookmissing = false;
+        }
 
         $bookrenderer = $PAGE->get_renderer('booktool_print');
 
@@ -227,7 +231,12 @@ class local_downloadcenter_factory {
         $ufields = user_picture::fields('u');
         $useridentityfields = $CFG->showuseridentity != '' ? 'u.'.str_replace(', ', ', u.', $CFG->showuseridentity) . ', ' : '';
 
+        $excludeempty = get_config('local_downloadcenter', 'exclude_empty_topics');
         foreach ($filteredresources as $topicid => $info) {
+            if ($excludeempty && empty($info->res)) {
+                continue;
+            }
+
             $basedir = clean_filename($info->title);
             $basedir = self::shorten_filename($basedir);
             $filelist[$basedir] = null;
@@ -425,7 +434,7 @@ $content
 HTML;
                     $filelist[$filename] = array($content); // Needs to be array to be saved as file.
 
-                } else if ($res->modname == 'book') {
+                } else if ($res->modname == 'book' && !$modbookmissing) {
                     $book = $res->resource;
                     $cm = $res->cm;
                     $chapters = book_preload_chapters($book);
