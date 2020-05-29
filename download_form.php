@@ -72,7 +72,6 @@ class local_downloadcenter_download_form extends moodleform {
                 $title = html_writer::tag('span', $title, array('class' => 'itemtitle'));
                 $mform->addElement('checkbox', $name, $title);
                 $mform->setDefault($name, 1);
-                $mform->disabledIf($name, $sectionname);
             }
             $mform->addElement('html', html_writer::end_tag('div'));
         }

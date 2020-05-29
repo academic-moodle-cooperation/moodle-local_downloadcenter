@@ -30,7 +30,6 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             {key: 'showtypes', component: 'backup'},
             {key: 'hidetypes', component: 'backup'}
         ]).done(function(strs) {
-            // Some useless comment to trigger grunt watch.....
             // Init strings.. new moodle super cool way...
             instance.strings['all'] = strs[0];
             instance.strings['none'] = strs[1];
@@ -78,8 +77,36 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             $('#downloadcenter-all-included').click(function(e) { instance.helper(e, true,  'item_'); });
             $('#downloadcenter-none-included').click(function(e) { instance.helper(e, false, 'item_'); });
             $('#downloadcenter-bytype').click(function(e) { e.preventDefault(); instance.toggletypes(); });
+            // Attach event to checkboxes!
+            $('input.form-check-input').click(function() { instance.checkboxhandler($(this)); instance.updateFormState(); });
         });
 
+    };
+
+    ModFilter.prototype.checkboxhandler = function($checkbox) {
+        var prefix = 'item_topic';
+        var shortprefix = 'item_';
+        var name = $checkbox.prop('name');
+        var checked = $checkbox.prop('checked');
+        if (name.substring(0, shortprefix.length) === shortprefix) {
+            var $parent = $checkbox.parentsUntil('form', '.card');
+            if (name.substring(0, prefix.length) === prefix) {
+                $parent.find('input.form-check-input').prop('checked', checked);
+            } else {
+                if (checked) {
+                    $parent.find('input.form-check-input[name^="item_topic"]').prop('checked', true);
+                }
+            }
+        }
+    };
+
+    ModFilter.prototype.updateFormState = function() {
+        // At this point, we really need to persuade the form we are part of to
+        // update all of its disabledIf rules. However, as far as I can see,
+        // given the way that lib/form/form.js is written, that is impossible.
+        if (this.formid && M.form && M.form.updateFormState) {
+            M.form.updateFormState(this.formid);
+        }
     };
 
     // Toggles the display of the hidden module select all/none links.
@@ -129,12 +156,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             }
         });
 
-        // At this point, we really need to persuade the form we are part of to
-        // update all of its disabledIf rules. However, as far as I can see,
-        // given the way that lib/form/form.js is written, that is impossible.
-        if (this.formid && M.form) {
-            M.form.updateFormState(this.formid);
-        }
+        this.updateFormState();
     };
 
     ModFilter.prototype.html_generator = function(idtype, heading) {
