@@ -532,6 +532,32 @@ HTML;
                         $filelist[$filename] = $file;
                     }
 
+                    $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'intro', 0, 'id', false);
+                    foreach ($fsfiles as $file) {
+                        if ($file->get_filesize() == 0) {
+                            continue;
+                        }
+                        $filename = $resdir . '/intro/files' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                        $filelist[$filename] = $file;
+                    }
+
+                    $introtitle = get_string('description') . ' ' . $res->name;
+
+                    $introcontent = str_replace('@@PLUGINFILE@@', 'files', $res->resource->intro);
+                    $introcontent = <<<HTML
+<!doctype html>
+<html>
+<head>
+    <title>$introtitle</title>
+    <meta charset="utf-8">
+</head>
+<body>
+$introcontent
+</body>
+</html>
+HTML;
+                    $filelist[$resdir . '/intro/intro.html'] = [$introcontent];
+
                     $submissionsstr = get_string('gradeitem:submissions', 'assign');
                     $assign = new assign($context, null, null);
                     $assignplugins = $assign->get_submission_plugins();
