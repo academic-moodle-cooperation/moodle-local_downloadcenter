@@ -544,18 +544,7 @@ HTML;
                     $introtitle = get_string('description') . ' ' . $res->name;
 
                     $introcontent = str_replace('@@PLUGINFILE@@', 'files', $res->resource->intro);
-                    $introcontent = <<<HTML
-<!doctype html>
-<html>
-<head>
-    <title>$introtitle</title>
-    <meta charset="utf-8">
-</head>
-<body>
-$introcontent
-</body>
-</html>
-HTML;
+                    $introcontent = self::convert_content_to_html_doc($introtitle, $introcontent);
                     $filelist[$resdir . '/intro/intro.html'] = [$introcontent];
 
                     $submissionsstr = get_string('gradeitem:submissions', 'assign');
@@ -571,6 +560,7 @@ HTML;
                     foreach ($submissions as $submission) {
                         $user = $DB->get_record('user', ['id' => $submission->userid]);
                         $fullname = $resdir.  '/' . $submissionsstr . '/' . self::shorten_filename(fullname($user));
+                        // Submission!
                         foreach ($assignplugins as $assignplugin) {
                             if (!$assignplugin->is_enabled() or !$assignplugin->is_visible()) {
                                 continue;
@@ -578,9 +568,7 @@ HTML;
 
                             // Subtype is 'assignsubmission', type is currently 'file' or 'onlinetext'.
                             $component = $assignplugin->get_subtype().'_'.$assignplugin->get_type();
-
                             $fileareas = $assignplugin->get_file_areas();
-
                             foreach ($fileareas as $filearea => $name) {
                                 if ($areafiles = $fs->get_area_files($context->id, $component, $filearea, $submission->id, 'itemid, filepath, filename', false)) {
                                     foreach ($areafiles as $file) {
@@ -590,27 +578,20 @@ HTML;
                                     }
                                 }
                             }
-                            // To be used eventually for online text submissions!
-                            /*
-                            $editorfields = $assignplugin->get_editor_fields();
-                            foreach ($editorfields as $name => $description) {
-                                $editorfieldinfo = array(
-                                    'name' => $name,
-                                    'description' => $description,
-                                    'text' => $assignplugin->get_editor_text($name, $item->id),
-                                    'format' => $assignplugin->get_editor_format($name, $item->id)
-                                );
-
-                                // Now format the text.
-                                foreach ($fileareas as $filearea => $name) {
-                                    list($editorfieldinfo['text'], $editorfieldinfo['format']) = external_format_text(
-                                        $editorfieldinfo['text'], $editorfieldinfo['format'], $assign->get_context()->id,
-                                        $component, $filearea, $item->id);
+                            if ($assignplugin->get_type() == 'onlinetext') {
+                                $onlinetext = $assignplugin->get_editor_text('onlinetext', $submission->id);
+                                $onlinetext = str_replace('@@PLUGINFILE@@/', '', $onlinetext);
+                                if (mb_strlen(trim($onlinetext)) > 0) {
+                                    $onlinetext = self::convert_content_to_html_doc($assignplugin->get_name(), $onlinetext);
+                                    $filename = $fullname . $file->get_filepath() . self::shorten_filename($assignplugin->get_name() . '.html');
+                                    $filelist[$filename] = [$onlinetext];
                                 }
-
-                                $plugin['editorfields'][] = $editorfieldinfo;
-                            }*/
+                            }
                         }
+
+                        // Feedback!
+                        
+
                     }
                 }
             }
@@ -719,6 +700,21 @@ HTML;
         }
         $limit = round($maxlength / 2) - 1;
         return substr($filename, 0, $limit) . '___' . substr($filename, (1 - $limit));
+    }
+
+    public static function convert_content_to_html_doc($title, $content) {
+        return <<<HTML
+<!doctype html>
+<html>
+<head>
+    <title>$title</title>
+    <meta charset="utf-8">
+</head>
+<body>
+$content
+</body>
+</html>
+HTML;
     }
 
 }
