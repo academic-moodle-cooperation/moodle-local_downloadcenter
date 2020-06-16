@@ -577,9 +577,6 @@ class local_downloadcenter_factory {
                                 if (!$feedbackplugin->is_enabled() or !$feedbackplugin->is_visible()) {
                                     continue;
                                 }
-
-                                //var_dump($feedbackplugin->get_name());
-                               // var_dump($feedbackplugin->get_type());
                                 $component = $feedbackplugin->get_subtype().'_'.$feedbackplugin->get_type();
                                 $fileareas = $feedbackplugin->get_file_areas();
                                 foreach ($fileareas as $filearea => $name) {
@@ -605,7 +602,6 @@ class local_downloadcenter_factory {
                             }
                         }
                     }
-                    //die;
                 }
             }
         }
