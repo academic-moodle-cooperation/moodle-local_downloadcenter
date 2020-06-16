@@ -420,18 +420,7 @@ class local_downloadcenter_factory {
                     }
                     $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
                     $content = str_replace('@@PLUGINFILE@@', 'data', $res->resource->content);
-                    $content = <<<HTML
-<!doctype html>
-<html>
-<head>
-    <title>{$res->name}</title>
-    <meta charset="utf-8">
-</head>
-<body>
-$content
-</body>
-</html>
-HTML;
+                    $content = self::convert_content_to_html_doc($res->name, $content);
                     $filelist[$filename] = array($content); // Needs to be array to be saved as file.
 
                 } else if ($res->modname == 'book' && !$modbookmissing) {
@@ -493,18 +482,7 @@ HTML;
                         $content .= '</div>';
                         $content .= '<a href="#toc">&uarr; ' . get_string('top', 'mod_book') . '</a>';
                     }
-                    $content = <<<HTML
-<!doctype html>
-<html>
-<head>
-    <title>{$res->name}</title>
-    <meta charset="utf-8">
-</head>
-<body>
-$content
-</body>
-</html>
-HTML;
+                    $content = self::convert_content_to_html_doc($res->name, $content);
                     $filelist[$filename] = array($content); // Needs to be array to be saved as file.
                 } else if ($res->modname == 'lightboxgallery') {
 
@@ -550,6 +528,7 @@ HTML;
                     $submissionsstr = get_string('gradeitem:submissions', 'assign');
                     $assign = new assign($context, null, null);
                     $assignplugins = $assign->get_submission_plugins();
+                    $feedbackplugins = $assign->get_feedback_plugins();
 
                     $params = ['assignment' => $res->instanceid];
                     if (!has_capability('mod/assign:viewgrades', $context)) {
@@ -572,7 +551,6 @@ HTML;
                             foreach ($fileareas as $filearea => $name) {
                                 if ($areafiles = $fs->get_area_files($context->id, $component, $filearea, $submission->id, 'itemid, filepath, filename', false)) {
                                     foreach ($areafiles as $file) {
-
                                         $filename = $fullname . $file->get_filepath() . self::shorten_filename($file->get_filename());
                                         $filelist[$filename] = $file;
                                     }
@@ -590,9 +568,44 @@ HTML;
                         }
 
                         // Feedback!
-                        
+                        $feedback = $assign->get_assign_feedback_status_renderable($user);
+                        // The feedback for our latest submission.
+                        if ($feedback && $feedback->grade) {
+                            $fullname .= '/' . get_string('feedback', 'grades');
 
+                            foreach ($feedbackplugins as $feedbackplugin) {
+                                if (!$feedbackplugin->is_enabled() or !$feedbackplugin->is_visible()) {
+                                    continue;
+                                }
+
+                                //var_dump($feedbackplugin->get_name());
+                               // var_dump($feedbackplugin->get_type());
+                                $component = $feedbackplugin->get_subtype().'_'.$feedbackplugin->get_type();
+                                $fileareas = $feedbackplugin->get_file_areas();
+                                foreach ($fileareas as $filearea => $name) {
+
+                                    if ($areafiles = $fs->get_area_files($context->id, $component, $filearea, $feedback->grade->id, 'itemid, filepath, filename', false)) {
+                                        foreach ($areafiles as $file) {
+
+                                            $filename = $fullname . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                                            $filelist[$filename] = $file;
+                                        }
+                                    }
+                                }
+
+                                if ($feedbackplugin->get_type() == 'comments') {
+                                    $comments = $feedbackplugin->get_editor_text('comments', $feedback->grade->id);
+                                    $comments = str_replace('@@PLUGINFILE@@/', '', $comments);
+                                    if (mb_strlen(trim($comments)) > 0) {
+                                        $comments = self::convert_content_to_html_doc($feedbackplugin->get_name(), $comments);
+                                        $filename = $fullname . $file->get_filepath() . self::shorten_filename($feedbackplugin->get_name() . '.html');
+                                        $filelist[$filename] = [$comments];
+                                    }
+                                }
+                            }
+                        }
                     }
+                    //die;
                 }
             }
         }
