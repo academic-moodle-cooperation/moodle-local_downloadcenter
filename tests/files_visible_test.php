@@ -20,7 +20,7 @@
  * @author     Simeon Naydenov (moniNaydenov@gmail.com)
  * @package    local_downloadcenter
  * @category   phpunit
- * @copyright  2019 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright  2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();

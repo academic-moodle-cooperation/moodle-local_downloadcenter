@@ -1,8 +1,9 @@
 CHANGELOG
 =========
 
-3.9.0 (2020-05-xx)
+3.9.0 (2020-06-16)
 ------------------
+* Moodle 3.9 compatible version
 * [FEATURE] implement support for assign - download introduction files, submissions, and feedback
 * [FEATURE] add setting to control whether empty topics are excluded (github pull request #12)
 

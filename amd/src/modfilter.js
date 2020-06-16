@@ -1,7 +1,7 @@
 /*
  * @package     local_downloadcenter
  * @author      Simeon Naydenov (moniNaydenov@gmail.com)
- * @copyright   2016 AMC
+ * @copyright   2020 AMC
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
