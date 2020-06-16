@@ -3,7 +3,7 @@ CHANGELOG
 
 3.9.0 (2020-05-xx)
 ------------------
-* [FEATURE] implement support for assign - download introduction files and submissions
+* [FEATURE] implement support for assign - download introduction files, submissions, and feedback
 * [FEATURE] add setting to control whether empty topics are excluded (github pull request #12)
 
 3.8.1 (2019-12-10)

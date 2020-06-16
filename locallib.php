@@ -420,18 +420,7 @@ class local_downloadcenter_factory {
                     }
                     $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
                     $content = str_replace('@@PLUGINFILE@@', 'data', $res->resource->content);
-                    $content = <<<HTML
-<!doctype html>
-<html>
-<head>
-    <title>{$res->name}</title>
-    <meta charset="utf-8">
-</head>
-<body>
-$content
-</body>
-</html>
-HTML;
+                    $content = self::convert_content_to_html_doc($res->name, $content);
                     $filelist[$filename] = array($content); // Needs to be array to be saved as file.
 
                 } else if ($res->modname == 'book' && !$modbookmissing) {
@@ -493,18 +482,7 @@ HTML;
                         $content .= '</div>';
                         $content .= '<a href="#toc">&uarr; ' . get_string('top', 'mod_book') . '</a>';
                     }
-                    $content = <<<HTML
-<!doctype html>
-<html>
-<head>
-    <title>{$res->name}</title>
-    <meta charset="utf-8">
-</head>
-<body>
-$content
-</body>
-</html>
-HTML;
+                    $content = self::convert_content_to_html_doc($res->name, $content);
                     $filelist[$filename] = array($content); // Needs to be array to be saved as file.
                 } else if ($res->modname == 'lightboxgallery') {
 
@@ -532,9 +510,25 @@ HTML;
                         $filelist[$filename] = $file;
                     }
 
+                    $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'intro', 0, 'id', false);
+                    foreach ($fsfiles as $file) {
+                        if ($file->get_filesize() == 0) {
+                            continue;
+                        }
+                        $filename = $resdir . '/intro/files' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                        $filelist[$filename] = $file;
+                    }
+
+                    $introtitle = get_string('description') . ' ' . $res->name;
+
+                    $introcontent = str_replace('@@PLUGINFILE@@', 'files', $res->resource->intro);
+                    $introcontent = self::convert_content_to_html_doc($introtitle, $introcontent);
+                    $filelist[$resdir . '/intro/intro.html'] = [$introcontent];
+
                     $submissionsstr = get_string('gradeitem:submissions', 'assign');
                     $assign = new assign($context, null, null);
                     $assignplugins = $assign->get_submission_plugins();
+                    $feedbackplugins = $assign->get_feedback_plugins();
 
                     $params = ['assignment' => $res->instanceid];
                     if (!has_capability('mod/assign:viewgrades', $context)) {
@@ -545,6 +539,7 @@ HTML;
                     foreach ($submissions as $submission) {
                         $user = $DB->get_record('user', ['id' => $submission->userid]);
                         $fullname = $resdir.  '/' . $submissionsstr . '/' . self::shorten_filename(fullname($user));
+                        // Submission!
                         foreach ($assignplugins as $assignplugin) {
                             if (!$assignplugin->is_enabled() or !$assignplugin->is_visible()) {
                                 continue;
@@ -552,38 +547,59 @@ HTML;
 
                             // Subtype is 'assignsubmission', type is currently 'file' or 'onlinetext'.
                             $component = $assignplugin->get_subtype().'_'.$assignplugin->get_type();
-
                             $fileareas = $assignplugin->get_file_areas();
-
                             foreach ($fileareas as $filearea => $name) {
                                 if ($areafiles = $fs->get_area_files($context->id, $component, $filearea, $submission->id, 'itemid, filepath, filename', false)) {
                                     foreach ($areafiles as $file) {
-
                                         $filename = $fullname . $file->get_filepath() . self::shorten_filename($file->get_filename());
                                         $filelist[$filename] = $file;
                                     }
                                 }
                             }
-                            // To be used eventually for online text submissions!
-                            /*
-                            $editorfields = $assignplugin->get_editor_fields();
-                            foreach ($editorfields as $name => $description) {
-                                $editorfieldinfo = array(
-                                    'name' => $name,
-                                    'description' => $description,
-                                    'text' => $assignplugin->get_editor_text($name, $item->id),
-                                    'format' => $assignplugin->get_editor_format($name, $item->id)
-                                );
+                            if ($assignplugin->get_type() == 'onlinetext') {
+                                $onlinetext = $assignplugin->get_editor_text('onlinetext', $submission->id);
+                                $onlinetext = str_replace('@@PLUGINFILE@@/', '', $onlinetext);
+                                if (mb_strlen(trim($onlinetext)) > 0) {
+                                    $onlinetext = self::convert_content_to_html_doc($assignplugin->get_name(), $onlinetext);
+                                    $filename = $fullname . $file->get_filepath() . self::shorten_filename($assignplugin->get_name() . '.html');
+                                    $filelist[$filename] = [$onlinetext];
+                                }
+                            }
+                        }
 
-                                // Now format the text.
+                        // Feedback!
+                        $feedback = $assign->get_assign_feedback_status_renderable($user);
+                        // The feedback for our latest submission.
+                        if ($feedback && $feedback->grade) {
+                            $fullname .= '/' . get_string('feedback', 'grades');
+
+                            foreach ($feedbackplugins as $feedbackplugin) {
+                                if (!$feedbackplugin->is_enabled() or !$feedbackplugin->is_visible()) {
+                                    continue;
+                                }
+                                $component = $feedbackplugin->get_subtype().'_'.$feedbackplugin->get_type();
+                                $fileareas = $feedbackplugin->get_file_areas();
                                 foreach ($fileareas as $filearea => $name) {
-                                    list($editorfieldinfo['text'], $editorfieldinfo['format']) = external_format_text(
-                                        $editorfieldinfo['text'], $editorfieldinfo['format'], $assign->get_context()->id,
-                                        $component, $filearea, $item->id);
+
+                                    if ($areafiles = $fs->get_area_files($context->id, $component, $filearea, $feedback->grade->id, 'itemid, filepath, filename', false)) {
+                                        foreach ($areafiles as $file) {
+
+                                            $filename = $fullname . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                                            $filelist[$filename] = $file;
+                                        }
+                                    }
                                 }
 
-                                $plugin['editorfields'][] = $editorfieldinfo;
-                            }*/
+                                if ($feedbackplugin->get_type() == 'comments') {
+                                    $comments = $feedbackplugin->get_editor_text('comments', $feedback->grade->id);
+                                    $comments = str_replace('@@PLUGINFILE@@/', '', $comments);
+                                    if (mb_strlen(trim($comments)) > 0) {
+                                        $comments = self::convert_content_to_html_doc($feedbackplugin->get_name(), $comments);
+                                        $filename = $fullname . $file->get_filepath() . self::shorten_filename($feedbackplugin->get_name() . '.html');
+                                        $filelist[$filename] = [$comments];
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -693,6 +709,21 @@ HTML;
         }
         $limit = round($maxlength / 2) - 1;
         return substr($filename, 0, $limit) . '___' . substr($filename, (1 - $limit));
+    }
+
+    public static function convert_content_to_html_doc($title, $content) {
+        return <<<HTML
+<!doctype html>
+<html>
+<head>
+    <title>$title</title>
+    <meta charset="utf-8">
+</head>
+<body>
+$content
+</body>
+</html>
+HTML;
     }
 
 }
