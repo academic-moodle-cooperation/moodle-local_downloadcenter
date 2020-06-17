@@ -17,7 +17,7 @@
 /**
  * @package   local_downloadcenter
  * @author    Simeon Naydenov
- * @copyright 2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2019111501;
-$plugin->requires  = 2019111200;
+$plugin->version   = 2020061600;
+$plugin->requires  = 2020061500;
 $plugin->component = 'local_downloadcenter';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "v3.8.1";
+$plugin->maturity  = MATURITY_ALPHA;
+$plugin->release   = "v3.9.0";
 
