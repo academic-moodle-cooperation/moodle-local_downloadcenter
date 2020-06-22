@@ -267,7 +267,6 @@ class local_downloadcenter_factory {
 
                     $filesforzipping = array();
                     $filearea = 'attachment';
-                    $filename .= $extension;
                     // Find out current groups mode.
                     $groupmode = groups_get_activity_groupmode($cm);
                     $currentgroup = groups_get_activity_group($cm, true);
