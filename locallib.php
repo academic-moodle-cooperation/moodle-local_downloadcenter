@@ -101,7 +101,7 @@ class local_downloadcenter_factory {
                 }
                 if (!isset($sorted[$section->section]) && $section->visible) {
                     $sorted[$section->section] = new stdClass;
-                    $title = trim(clean_filename(get_section_name($this->course, $section->section)));
+                    $title = trim(get_section_name($this->course, $section->section));
                     $title = self::shorten_filename($title);
                     $sorted[$section->section]->title = $title;
                     if (empty($title)) {
@@ -237,6 +237,7 @@ class local_downloadcenter_factory {
                 continue;
             }
 
+            $info->title = html_entity_decode($info->title);
             $basedir = clean_filename($info->title);
             $basedir = self::shorten_filename($basedir);
             $filelist[$basedir] = null;
