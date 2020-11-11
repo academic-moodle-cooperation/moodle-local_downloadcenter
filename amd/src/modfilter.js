@@ -12,7 +12,6 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
     /**
      * @constructor
-     * @alias module:block_overview/helloworld
      */
     var ModFilter = function(modnames) {
 
