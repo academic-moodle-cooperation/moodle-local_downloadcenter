@@ -242,6 +242,7 @@ class local_downloadcenter_factory {
             $basedir = self::shorten_filename($basedir);
             $filelist[$basedir] = null;
             foreach ($info->res as $res) {
+                $res->name = html_entity_decode($res->name);
                 $resdir = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
                 $filelist[$resdir] = null;
                 $context = context_module::instance($res->cm->id);
