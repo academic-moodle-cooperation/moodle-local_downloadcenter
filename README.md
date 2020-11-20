@@ -29,7 +29,7 @@ before a flight, so all course files can be accessed offline.
 Requirements
 ------------
 
-The plugin is available for Moodle 3.1+. This version is for Moodle 3.9
+The plugin is available for Moodle 3.1+. This version is for Moodle 3.10
 
 
 Installation
