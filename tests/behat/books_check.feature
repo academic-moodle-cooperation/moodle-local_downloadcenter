@@ -1,5 +1,5 @@
 @local @local_downloadcenter @amc
-Feature: Check Book in Download Center
+Feature: Within a moodle instance a student should be able to see books in Download Center
 
   Background:
     Given the following "users" exist:
@@ -13,10 +13,7 @@ Feature: Check Book in Download Center
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
-    And the following "activities" exist:
-      | activity | name                 | intro                   | course | idnumber | assignsubmission_onlinetext_enabled |
-      | assign   | Test assignment name | Submit your online text | C1     | assign1  | 1                                   |
-
+   
   Scenario: Check Book in Download Center
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
