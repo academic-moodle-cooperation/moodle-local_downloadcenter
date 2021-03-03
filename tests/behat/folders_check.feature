@@ -1,5 +1,5 @@
 @local @local_downloadcenter @_file_upload
-Feature: Check Folder in Download Center
+Feature: Within a moodle instance a student should be able to see folders in Download Center.
 
   Background:
     Given the following "users" exist:
@@ -13,9 +13,7 @@ Feature: Check Folder in Download Center
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
-    And the following "activities" exist:
-      | activity | name                 | intro                   | course | idnumber | assignsubmission_onlinetext_enabled |
-      | assign   | Test assignment name | Submit your online text | C1     | assign1  | 1                                   |
+    
 
   @javascript
   Scenario: Check Folder in Download Center
