@@ -13,7 +13,6 @@ Feature: Within a moodle instance a student should be able to see books in Downl
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
-   
   Scenario: Check Book in Download Center
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
