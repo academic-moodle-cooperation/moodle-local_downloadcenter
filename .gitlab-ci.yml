@@ -13,10 +13,10 @@ variables:
   COMPOSER_HOME: "$CI_PROJECT_DIR/.composer/cache"
 
 before_script:
-  # Wait until database is ready
-  - timeout 3m bash -c 'echo -e "DB...\c"; until </dev/tcp/127.0.0.1/3306; do echo -e ".\c"; sleep 1; done; echo "ok";' 2> /dev/null
-  - cd ../..
-  - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-user=root --db-pass=superrootpass --db-host=127.0.0.1
+    # Wait until database is ready
+    - timeout 3m bash -c 'echo -e "DB...\c"; until </dev/tcp/127.0.0.1/3306; do echo -e ".\c"; sleep 1; done; echo "ok";' 2> /dev/null
+    - cd ../..
+    - moodle-plugin-ci install --moodle="moodle-upstream-core" --db-user=root --db-pass=superrootpass --db-host=127.0.0.1
   services:
     - mariadb:10.4-bionic
     - docker:dind
