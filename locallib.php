@@ -502,7 +502,8 @@ class local_downloadcenter_factory {
                     require_once($CFG->dirroot . '/mod/assign/locallib.php');
                     require_once($CFG->dirroot . '/mod/assign/externallib.php');
 
-                    if ($res->resource->alwaysshowdescription) {
+
+                    if ($res->resource->allowsubmissionsfromdate < time() || $res->resource->alwaysshowdescription) {
                         $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'introattachment', 0, 'id', false);
                         foreach ($fsfiles as $file) {
                             if ($file->get_filesize() == 0) {
