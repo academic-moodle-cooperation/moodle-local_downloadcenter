@@ -13,8 +13,6 @@ Feature: Within a moodle instance a student should be able to see folders in Dow
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
-    
-
   @javascript
   Scenario: Check Folder in Download Center
     Given I log in as "admin"
