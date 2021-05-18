@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+
+3.11.0 (2021-05-18)
+------------------
+* Moodle 3.11 compatible version
+
+
 3.10.1 (2021-05-07)
 -------------------
 * [FIXED] prevent downloading intro files and content for assign when description not visible
