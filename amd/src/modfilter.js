@@ -13,10 +13,6 @@
  */
 define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
-    /**
-     * @param array modnames contains a list of all the modules
-     * @constructor creates an instance
-     */
     var ModFilter = function(modnames) {
 
         var instance = this;
