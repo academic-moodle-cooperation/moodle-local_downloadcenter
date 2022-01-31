@@ -47,7 +47,7 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->addElement('html',
             html_writer::tag('div',
                 get_string('warningmessage', 'local_downloadcenter'),
-                array('class' => 'warningmessage')
+                array('class' => 'alert alert-info alert-block')
             )
         );
         $mform->addElement('static', 'warning', '', ''); // Hack to work around fieldsets!
@@ -61,7 +61,7 @@ class local_downloadcenter_download_form extends moodleform {
 
             $empty = false;
             $sectionname = 'item_topic_' . $sectionid;
-            $mform->addElement('html', html_writer::start_tag('div', array('class' => 'card block')));
+            $mform->addElement('html', html_writer::start_tag('div', array('class' => 'card block mb-3')));
             $sectiontitle = html_writer::span($sectioninfo->title, 'sectiontitle');
             $mform->addElement('checkbox', $sectionname, $sectiontitle);
 
