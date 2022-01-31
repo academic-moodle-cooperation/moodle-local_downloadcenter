@@ -85,6 +85,8 @@ if ($data = $downloadform->get_data()) {
     echo $OUTPUT->header();
 }
 
+echo $OUTPUT->heading(get_string('navigationlink', 'local_downloadcenter'), 1);
+
 $downloadform->display();
 
 echo $OUTPUT->footer();
