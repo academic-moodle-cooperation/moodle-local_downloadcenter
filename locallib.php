@@ -179,7 +179,7 @@ class local_downloadcenter_factory {
 
             $cmcontext = context_module::instance($cm->id);
             if ($cm->modname == 'glossary') {
-                if( !has_capability('mod/glossary:manageentries', $cmcontext) && !$resource->allowprintview) {
+                if ( !has_capability('mod/glossary:manageentries', $cmcontext) && !$resource->allowprintview) {
                     continue;
                 }
             }
@@ -645,7 +645,7 @@ class local_downloadcenter_factory {
                         }
                     }
                 } else if ($res->modname == 'glossary') {
-                    $hook = 'ALL'; //setting up default values as taken from mod/glossary/print.php
+                    $hook = 'ALL'; // Setting up default values as taken from mod/glossary/print.php!
                     $pivotkey = 'concept';
                     $fullpivot = false;
                     $currentpivot = '';
@@ -663,7 +663,7 @@ class local_downloadcenter_factory {
                     $coursename = get_string("course") . ': <span class="strong">' . format_string($course->fullname) . ' ('. format_string($course->shortname) . ')</span>';
                     echo html_writer::tag('div', $coursename, array('class' => 'coursename'));
 
-                    $modname = get_string("modulename","glossary") . ': <span class="strong">' . format_string($glossary->name, true) . '</span>';
+                    $modname = get_string("modulename", "glossary") . ': <span class="strong">' . format_string($glossary->name, true) . '</span>';
                     echo html_writer::tag('div', $modname, array('class' => 'modname'));
 
                     list($allentries, $count) = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, 0);
@@ -684,10 +684,7 @@ class local_downloadcenter_factory {
                                 $currentpivot = $upperpivot;
                                 echo html_writer::tag('div', clean_text($pivottoshow), array('class' => 'mdl-align strong'));
                             }
-
-
                             glossary_print_entry($course, $cm, $glossary, $entry, $mode, $hook, 1, $displayformat, true);
-                           // $content .= ob_get_contents();
                         }
                         // The all entries value may be a recordset or an array.
                         if ($allentries instanceof moodle_recordset) {
@@ -707,7 +704,7 @@ class local_downloadcenter_factory {
                     $filelist[$filename] = [$content];
                     $filelist[$resdir . '/css/styles.css'] = $CFG->dirroot . '/mod/glossary/styles.css';
 
-                    // handle attachments
+                    // Handle attachments.
                     $fsfiles = $fs->get_area_files($context->id,
                         'mod_glossary',
                         'attachment');
@@ -720,7 +717,7 @@ class local_downloadcenter_factory {
                             $filelist[$filename] = $file;
                         }
                     }
-                    // handle entries
+                    // Handle entries.
                     $fsfiles = $fs->get_area_files($context->id,
                         'mod_glossary',
                         'entry');
