@@ -45,7 +45,16 @@ class local_downloadcenter_factory {
     /**
      * @var array
      */
-    private $availableresources = array('resource', 'folder', 'publication', 'page', 'book', 'lightboxgallery', 'assign');
+    private $availableresources = [
+        'resource',
+        'folder',
+        'publication',
+        'page',
+        'book',
+        'lightboxgallery',
+        'assign',
+        'glossary'
+    ];
     /**
      * @var array
      */
@@ -168,6 +177,13 @@ class local_downloadcenter_factory {
                 $currentsection = 'default';
             }
 
+            $cmcontext = context_module::instance($cm->id);
+            if ($cm->modname == 'glossary') {
+                if ( !has_capability('mod/glossary:manageentries', $cmcontext) && !$resource->allowprintview) {
+                    continue;
+                }
+            }
+
             if (!isset($this->jsnames[$cm->modname])) {
                 $this->jsnames[$cm->modname] = get_string('modulenameplural', 'mod_' . $cm->modname);
             }
@@ -182,6 +198,7 @@ class local_downloadcenter_factory {
             $res->instanceid = $cm->instance;
             $res->resource = $resource;
             $res->cm = $cm;
+            $res->context = $cmcontext;
             $sorted[$currentsection]->res[] = $res;
         }
 
@@ -202,7 +219,7 @@ class local_downloadcenter_factory {
      * @throws dml_exception
      */
     public function create_zip() {
-        global $DB, $CFG, $USER, $OUTPUT, $PAGE;
+        global $DB, $CFG, $USER, $OUTPUT, $PAGE, $SITE;
 
         if (file_exists($CFG->dirroot . '/mod/publication/locallib.php')) {
             require_once($CFG->dirroot . '/mod/publication/locallib.php');
@@ -228,7 +245,8 @@ class local_downloadcenter_factory {
         $filteredresources = $this->filteredresources;
 
         // Needed for mod_publication!
-        $ufields = user_picture::fields('u');
+        $userfields = \core_user\fields::for_userpic();
+        $ufields = $userfields->get_sql('u', false, '', 'id', false)->selects;
         $useridentityfields = $CFG->showuseridentity != '' ? 'u.'.str_replace(', ', ', u.', $CFG->showuseridentity) . ', ' : '';
 
         $excludeempty = get_config('local_downloadcenter', 'exclude_empty_topics');
@@ -245,7 +263,7 @@ class local_downloadcenter_factory {
                 $res->name = html_entity_decode($res->name);
                 $resdir = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
                 $filelist[$resdir] = null;
-                $context = context_module::instance($res->cm->id);
+                $context = $res->context;
                 if ($res->modname == 'resource') {
                     $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
                     $file = array_shift($files); // Get only the first file - such are the requirements!
@@ -626,6 +644,92 @@ class local_downloadcenter_factory {
                             }
                         }
                     }
+                } else if ($res->modname == 'glossary') {
+                    $hook = 'ALL'; // Setting up default values as taken from mod/glossary/print.php!
+                    $pivotkey = 'concept';
+                    $fullpivot = false;
+                    $currentpivot = '';
+                    $mode = '';
+                    $fmtoptions = ['context' => $context];
+                    $glossary = $res->resource;
+                    $displayformat = $glossary->displayformat;
+                    $course = $this->course;
+                    $cm = $res->cm;
+                    $content = '';
+                    ob_start();
+                    $sitename = get_string("site") . ': <span class="strong">' . format_string($SITE->fullname) . '</span>';
+                    echo html_writer::tag('div', $sitename, array('class' => 'sitename'));
+
+                    $coursename = get_string("course") . ': <span class="strong">' . format_string($course->fullname) . ' ('. format_string($course->shortname) . ')</span>';
+                    echo html_writer::tag('div', $coursename, array('class' => 'coursename'));
+
+                    $modname = get_string("modulename", "glossary") . ': <span class="strong">' . format_string($glossary->name, true) . '</span>';
+                    echo html_writer::tag('div', $modname, array('class' => 'modname'));
+
+                    list($allentries, $count) = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, 0);
+                    if ( $allentries ) {
+                        foreach ($allentries as $entry) {
+                            $pivot = $entry->{$pivotkey};
+                            $upperpivot = core_text::strtoupper($pivot);
+                            $pivottoshow = core_text::strtoupper(format_string($pivot, true, $fmtoptions));
+
+                            // Reduce pivot to 1cc if necessary.
+                            if (!$fullpivot) {
+                                $upperpivot = core_text::substr($upperpivot, 0, 1);
+                                $pivottoshow = core_text::substr($pivottoshow, 0, 1);
+                            }
+
+                            // If there's a group break.
+                            if ($currentpivot != $upperpivot) {
+                                $currentpivot = $upperpivot;
+                                echo html_writer::tag('div', clean_text($pivottoshow), array('class' => 'mdl-align strong'));
+                            }
+                            glossary_print_entry($course, $cm, $glossary, $entry, $mode, $hook, 1, $displayformat, true);
+                        }
+                        // The all entries value may be a recordset or an array.
+                        if ($allentries instanceof moodle_recordset) {
+                            $allentries->close();
+                        }
+                    }
+                    $content .= ob_get_contents();
+                    ob_end_clean();
+
+                    $fileurl = $CFG->wwwroot . '/pluginfile.php/' . $context->id . '/mod_glossary/';
+                    $content = str_replace($fileurl, 'data/', $content);
+                    $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
+                    $linkrel = '<link href="css/styles.css" rel="stylesheet">';
+                    $linkrel .= '<style> .img-fluid { max-width: 100%; height: auto;}</style>';
+                    $content = '<div class="path-mod-glossary" id="#page-mod-glossary-print">' . $content . '</div>';
+                    $content = self::convert_content_to_html_doc($res->name, $content, $linkrel);
+                    $filelist[$filename] = [$content];
+                    $filelist[$resdir . '/css/styles.css'] = $CFG->dirroot . '/mod/glossary/styles.css';
+
+                    // Handle attachments.
+                    $fsfiles = $fs->get_area_files($context->id,
+                        'mod_glossary',
+                        'attachment');
+                    if (count($fsfiles) > 0) {
+                        foreach ($fsfiles as $file) {
+                            if ($file->get_filesize() == 0) {
+                                continue;
+                            }
+                            $filename = $resdir . '/data/attachment/' . $file->get_itemid() . '/' . $file->get_filename();
+                            $filelist[$filename] = $file;
+                        }
+                    }
+                    // Handle entries.
+                    $fsfiles = $fs->get_area_files($context->id,
+                        'mod_glossary',
+                        'entry');
+                    if (count($fsfiles) > 0) {
+                        foreach ($fsfiles as $file) {
+                            if ($file->get_filesize() == 0) {
+                                continue;
+                            }
+                            $filename = $resdir . '/data/entry/' . $file->get_itemid() . '/' . $file->get_filename();
+                            $filelist[$filename] = $file;
+                        }
+                    }
                 }
             }
         }
@@ -735,13 +839,14 @@ class local_downloadcenter_factory {
         return substr($filename, 0, $limit) . '___' . substr($filename, (1 - $limit));
     }
 
-    public static function convert_content_to_html_doc($title, $content) {
+    public static function convert_content_to_html_doc($title, $content, $additionalhead = '') {
         return <<<HTML
 <!doctype html>
 <html>
 <head>
     <title>$title</title>
     <meta charset="utf-8">
+    $additionalhead
 </head>
 <body>
 $content
