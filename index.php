@@ -53,7 +53,6 @@ $userresources = $downloadcenter->get_resources_for_user();
 $PAGE->requires->js_call_amd('local_downloadcenter/modfilter', 'init', $downloadcenter->get_js_modnames());
 
 $downloadform = new local_downloadcenter_download_form(null, array('res' => $userresources));
-$downloadfinalform = new local_downloadcenter_download_final_form();
 
 $PAGE->set_title(get_string('navigationlink', 'local_downloadcenter') . ': ' . $course->fullname);
 $PAGE->set_heading($course->fullname);
@@ -69,9 +68,6 @@ if ($data = $downloadform->get_data()) {
 
     $downloadcenter->parse_form_data($data);
     $hash = $downloadcenter->create_zip();
-    $downloadcenter->get_file_from_session($hash);
-    die;
-
 } else if ($downloadform->is_cancelled()) {
     redirect(new moodle_url('/course/view.php', array('id' => $course->id)));
     die;
