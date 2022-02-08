@@ -237,8 +237,6 @@ class local_downloadcenter_factory {
         $bookrenderer = $PAGE->get_renderer('booktool_print');
 
         // Zip files and sent them to a user.
-        $tempzip = tempnam($CFG->tempdir.'/', 'downloadcenter');
-        $zipper = new zip_packer();
         $fs = get_file_storage();
 
         $filelist = array();
@@ -734,47 +732,28 @@ class local_downloadcenter_factory {
             }
         }
 
-        if (@$zipper->archive_to_pathname($filelist, $tempzip)) {
-            $filename = sprintf('%s_%s.zip', $this->course->shortname, userdate(time(), '%Y%m%d_%H%M'));
-            return $this->add_file_to_session($tempzip, clean_filename($filename));
+        \core\session\manager::write_close();
 
-        } else {
-            debugging("Problems with archiving the files.", DEBUG_DEVELOPER);
-            die;
-        }
-    }
+        $filename = sprintf('%s_%s.zip', $this->course->shortname, userdate(time(), '%Y%m%d_%H%M'));
 
-    /**
-     * @param $tempfilename
-     * @param $realfilename
-     * @return string
-     */
-    private function add_file_to_session($tempfilename, $realfilename) {
-        global $SESSION;
-        if (!isset($SESSION->local_downloadcenter_filelist)) {
-            $SESSION->local_downloadcenter_filelist = array();
-        }
-        $hash = sha1($tempfilename . $realfilename);
-        $info = new stdClass;
-        $info->tempfilename = $tempfilename;
-        $info->realfilename = $realfilename;
-        $SESSION->local_downloadcenter_filelist[$hash] = $info;
-        return $hash;
-    }
+        $zipwriter = \core_files\archive_writer::get_stream_writer($filename, \core_files\archive_writer::ZIP_WRITER);
 
-    /**
-     * @param $hash
-     */
-    public function get_file_from_session($hash) {
-        global $SESSION;
-        if (isset($SESSION->local_downloadcenter_filelist)) {
-            if (isset($SESSION->local_downloadcenter_filelist[$hash])) {
-                $info = $SESSION->local_downloadcenter_filelist[$hash];
-                unset($SESSION->local_downloadcenter_filelist[$hash]);
-                send_temp_file($info->tempfilename, $info->realfilename);
+        // Stream the files into the zip.
+        foreach ($filelist as $pathinzip => $file) {
+            if ($file instanceof \stored_file) {
+                // Most of cases are \stored_file.
+                $zipwriter->add_file_from_stored_file($pathinzip, $file);
+            } else if (is_array($file)) {
+                // Save $file as contents, from onlinetext subplugin.
+                $content = reset($file);
+                $zipwriter->add_file_from_string($pathinzip, $content);
+            } else if (is_string($file)) {
+                $zipwriter->add_file_from_filepath($pathinzip, $file);
             }
         }
-        debugging("Problems with getting the files from server.", DEBUG_DEVELOPER);
+
+        // Finish the archive.
+        $zipwriter->finish();
         die;
     }
 
