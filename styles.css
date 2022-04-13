@@ -53,8 +53,9 @@
 }
 
 .path-local-downloadcenter form .activityicon {
-    width: 24px;
-    margin-top: -10px;
+    width: 16px;
+    height: 16px;
+    margin-top: -7px;
 }
 
 .path-local-downloadcenter form #mod_select_links .activityicon {

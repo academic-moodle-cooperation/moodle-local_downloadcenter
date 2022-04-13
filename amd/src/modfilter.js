@@ -1,8 +1,11 @@
-/*
- * @package     local_downloadcenter
- * @author      Simeon Naydenov (moniNaydenov@gmail.com)
- * @copyright   2020 AMC
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+/**
+ * Handles filtering of items
+ *
+ * @module        local_downloadcenter/modfilter
+ * @package
+ * @author        Simeon Naydenov (moniNaydenov@gmail.com)
+ * @copyright     2022 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
@@ -10,9 +13,6 @@
  */
 define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
-    /**
-     * @constructor
-     */
     var ModFilter = function(modnames) {
 
         var instance = this;

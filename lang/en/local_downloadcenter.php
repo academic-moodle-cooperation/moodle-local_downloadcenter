@@ -36,7 +36,7 @@ $string['settings_title'] = 'Download center';
 $string['exclude_empty_topics'] = 'Exclude empty topics';
 $string['exclude_empty_topics_help'] = 'Exclude empty topics from the downloaded zip.';
 
-$string['warningmessage'] = 'NOTE: Download center only enables you to download visible FILES and FOLDERS!';
+$string['warningmessage'] = '<b>NOTE:</b> Download center only enables you to download visible files and folders!';
 
 $string['createzip'] = 'Create ZIP archive';
 
