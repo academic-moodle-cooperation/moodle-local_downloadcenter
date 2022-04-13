@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 
+4.0.0 (2022-04-12)
+------------------
+* Moodle 4.0 compatible version
+
+
 3.11.1 (2022-02-09)
 ------------------
 * [FEATURE] #7120 - implement download as stream zip
