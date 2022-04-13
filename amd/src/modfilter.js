@@ -2,7 +2,6 @@
  * Handles filtering of items
  *
  * @module        local_downloadcenter/modfilter
- * @package
  * @author        Simeon Naydenov (moniNaydenov@gmail.com)
  * @copyright     2022 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
