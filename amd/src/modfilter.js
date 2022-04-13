@@ -1,5 +1,5 @@
 /**
- * Handles filtering of items
+ * Handles filtering of items on page
  *
  * @module        local_downloadcenter/modfilter
  * @author        Simeon Naydenov (moniNaydenov@gmail.com)
