@@ -25,7 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
  *
  * @param settings_navigation $settingsnav
@@ -36,95 +35,56 @@ function local_downloadcenter_extend_settings_navigation(settings_navigation $se
     return; // Not used anymore!
 }
 
+/**
+ * @param navigation_node $parentnode Node where the new link is inserted
+ * @param stdClass $course current course
+ * @param context_course $context current course context
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
+function local_downloadcenter_extend_navigation_course(navigation_node $parentnode, stdClass $course, context_course $context) {
+    if (!has_capability('local/downloadcenter:view', $context)) {
+        return;
+    }
 
+    // Find appropriate key where our link should come. Probably won't work, but at least try.
+    $keys = [
+        'questionbank' => navigation_node::TYPE_CONTAINER,
+        'unenrolself' => navigation_node::TYPE_SETTING,
+        'fitlermanagement' => navigation_node::TYPE_SETTING
+    ];
+    $beforekey = null;
+    foreach ($keys as $key => $type) {
+        if ($foundnode = $parentnode->find($key, $type)) {
+            $beforekey = $key;
+            break;
+        }
+    }
+
+    $url = new moodle_url('/local/downloadcenter/index.php', array('courseid' => $course->id));
+    $title = get_string('navigationlink', 'local_downloadcenter');
+    $pix = new pix_icon('icon', $title, 'local_downloadcenter');
+    $childnode = navigation_node::create(
+        $title,
+        $url,
+        navigation_node::TYPE_SETTING,
+        'downloadcenter',
+        'downloadcenter',
+        $pix
+    );
+
+    $node = $parentnode->add_node($childnode, $beforekey);
+    $node->nodetype = navigation_node::TYPE_SETTING;
+    $node->collapse = true;
+    $node->add_class('downloadcenterlink');
+}
 /**
  * @param global_navigation $nav
  * @throws coding_exception
  * @throws moodle_exception
  */
 function local_downloadcenter_extend_navigation(global_navigation $nav) {
-    global $PAGE;
-
-    if ($PAGE->course->id == SITEID) {
-        return;
-    }
-
-    $context = context_course::instance($PAGE->course->id);
-
-    if (!has_capability('local/downloadcenter:view', $context)) {
-        return;
-    }
-
-    $rootnodes = array($nav->find('mycourses', navigation_node::TYPE_ROOTNODE),
-                       $nav->find('courses', navigation_node::TYPE_ROOTNODE));
-
-    foreach ($rootnodes as $rootnode) {
-        if (empty($rootnode)) {
-            continue;
-        }
-
-        $coursenode = $rootnode->find($PAGE->course->id, navigation_node::TYPE_COURSE);
-        if ($coursenode == false) {
-            continue;
-        }
-
-        $beforekey = null;
-
-        $gradesnode = $coursenode->find('grades', navigation_node::TYPE_SETTING);
-
-        if ($gradesnode) { // Add the navnode either after grades or after checkmark report
-            $keys = $gradesnode->parent->get_children_key_list();
-            $igrades = array_search('grades', $keys);
-            $icheckmark = array_search('checkmarkreport' . $PAGE->course->id, $keys);
-            if ($icheckmark !== false) {
-                if (isset($keys[$icheckmark + 1])) {
-                    $beforekey = $keys[$icheckmark + 1];
-                }
-            } else if ($igrades !== false) {
-                if (isset($keys[$igrades + 1])) {
-                    $beforekey = $keys[$igrades + 1];
-                }
-            }
-        }
-
-        if ($beforekey == null) { // No grades or checkmark report found, fall back to other variants!
-            $activitiesnode = $coursenode->find('activitiescategory', navigation_node::TYPE_CATEGORY);
-            if ($activitiesnode == false) {
-                $custom = $coursenode->find_all_of_type(navigation_node::TYPE_CUSTOM);
-                $sections = $coursenode->find_all_of_type(navigation_node::TYPE_SECTION);
-                if (!empty($custom)) {
-                    $first = reset($custom);
-                    $beforekey = $first->key;
-                } else if (!empty($sections)) {
-                    $first = reset($sections);
-                    $beforekey = $first->key;
-                }
-            } else {
-                $beforekey = 'activitiescategory';
-            }
-        }
-
-        $url = new moodle_url('/local/downloadcenter/index.php', array('courseid' => $PAGE->course->id));
-
-        $title = get_string('navigationlink', 'local_downloadcenter');
-
-        $pix = new pix_icon('icon', $title, 'local_downloadcenter');
-
-        $childnode = navigation_node::create(
-            $title,
-            $url,
-            navigation_node::TYPE_CUSTOM,
-            'downloadcenter',
-            'downloadcenter',
-            $pix
-        );
-        $node = $coursenode->add_node($childnode, $beforekey);
-        $node->nodetype = navigation_node::NODETYPE_LEAF;
-        $node->collapse = true;
-        $node->add_class('downloadcenterlink');
-        break;
-    }
-
+    return; // Not used anymore!
 }
 
 /**
