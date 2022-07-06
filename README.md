@@ -21,7 +21,7 @@ Example
 -------
 
 With this module participants of a course can download all relevant course documents (files, folders, assignments,
-books, pages, Lightbox galleries, and documents from student folders) in one step. Therefore users can save valuable time
+books, pages, Lightbox galleries, documents from student folders, glossaries, and Etherpad lite pads) in one step. Therefore users can save valuable time
 compared to single-downloads of files. One use-case of the download center is to download of all files
 before a flight, so all course files can be accessed offline.
 
