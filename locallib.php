@@ -735,10 +735,34 @@ class local_downloadcenter_factory {
                     $domain = $etherpadconfig->url;
                     $padid = $res->resource->uri;
                     $etherpadclient = new \mod_etherpadlite\client($etherpadconfig->apikey, $domain.'api');
-                    $htmlcontent = $etherpadclient->get_html($padid);
-                    $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
-                    $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
-                    $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                    // Handle groups here.
+                    $groupmode = groups_get_activity_groupmode($res->cm);
+                    if ($groupmode) {
+                        if ($groupmode == VISIBLEGROUPS || has_capability('moodle/course:managegroups', $res->context)) {
+                            $htmlcontent = $etherpadclient->get_html($padid);
+                            if (!empty($htmlcontent)) {
+                                $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
+                                $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . get_string('allparticipants'). '.html');
+                                $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                            }
+                        }
+                        $allgroups = groups_get_activity_allowed_groups($res->cm);
+                        foreach ($allgroups as $group) {
+                            $htmlcontent = $etherpadclient->get_html($padid . $group->id);
+                            if (!empty($htmlcontent)) {
+                                $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
+                                $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . $group->name . '.html');
+                                $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                            }
+                        }
+                    } else {
+                        $htmlcontent = $etherpadclient->get_html($padid);
+                        if (!empty($htmlcontent)) {
+                            $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
+                            $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
+                            $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                        }
+                    }
                 }
             }
         }
