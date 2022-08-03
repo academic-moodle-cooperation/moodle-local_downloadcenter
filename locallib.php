@@ -53,7 +53,8 @@ class local_downloadcenter_factory {
         'book',
         'lightboxgallery',
         'assign',
-        'glossary'
+        'glossary',
+        'etherpadlite'
     ];
     /**
      * @var array
@@ -728,6 +729,40 @@ class local_downloadcenter_factory {
                             $filelist[$filename] = $file;
                         }
                     }
+                } else if ($res->modname == 'etherpadlite') {
+                    require_once($CFG->dirroot . '/mod/etherpadlite/lib.php');
+                    $etherpadconfig = get_config('etherpadlite');
+                    $domain = $etherpadconfig->url;
+                    $padid = $res->resource->uri;
+                    $etherpadclient = new \mod_etherpadlite\client($etherpadconfig->apikey, $domain.'api');
+                    // Handle groups here.
+                    $groupmode = groups_get_activity_groupmode($res->cm);
+                    if ($groupmode) {
+                        if ($groupmode == VISIBLEGROUPS || has_capability('moodle/course:managegroups', $res->context)) {
+                            $htmlcontent = $etherpadclient->get_html($padid);
+                            if (!empty($htmlcontent)) {
+                                $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
+                                $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . get_string('allparticipants'). '.html');
+                                $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                            }
+                        }
+                        $allgroups = groups_get_activity_allowed_groups($res->cm);
+                        foreach ($allgroups as $group) {
+                            $htmlcontent = $etherpadclient->get_html($padid . $group->id);
+                            if (!empty($htmlcontent)) {
+                                $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
+                                $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . $group->name . '.html');
+                                $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                            }
+                        }
+                    } else {
+                        $htmlcontent = $etherpadclient->get_html($padid);
+                        if (!empty($htmlcontent)) {
+                            $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
+                            $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
+                            $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                        }
+                    }
                 }
             }
         }
@@ -832,6 +867,46 @@ $content
 </body>
 </html>
 HTML;
+    }
+
+    public static function append_etherpadlite_css($htmlcontent) {
+        $csscontent = <<<CSS
+<style>
+ol {
+  counter-reset: item;
+}
+
+ol > li {
+  counter-increment: item;
+}
+
+ol ol > li {
+  display: block;
+}
+
+ol > li {
+  display: block;
+}
+
+ol > li:before {
+  content: counters(item, ".") ". ";
+}
+
+ol ol > li:before {
+  content: counters(item, ".") ". ";
+  margin-left: -20px;
+}
+
+ul.indent {
+  list-style-type: none;
+}
+
+
+</style>
+</body>
+CSS;
+        return str_replace('</body>', $csscontent, $htmlcontent);
+
     }
 
 }
