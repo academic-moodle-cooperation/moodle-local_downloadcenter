@@ -2,6 +2,10 @@ CHANGELOG
 =========
 
 
+3.11.2 (2022-08-02)
+------------------
+* [FEATURE] #7077 - add Etherpad Lite support
+
 3.11.1 (2022-02-09)
 ------------------
 * [FEATURE] #7120 - implement download as stream zip
