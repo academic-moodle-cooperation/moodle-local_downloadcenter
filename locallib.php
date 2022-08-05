@@ -742,7 +742,7 @@ class local_downloadcenter_factory {
                             $htmlcontent = $etherpadclient->get_html($padid);
                             if (!empty($htmlcontent)) {
                                 $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
-                                $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . get_string('allparticipants'). '.html');
+                                $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . get_string('allparticipants') . '.html');
                                 $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
                             }
                         }
@@ -846,6 +846,7 @@ class local_downloadcenter_factory {
      */
     public static function shorten_filename($filename, $maxlength = 64) {
         $filename = (string)$filename;
+        $filename = str_replace('/', '_', $filename);
         if (strlen($filename) <= $maxlength) {
             return $filename;
         }
