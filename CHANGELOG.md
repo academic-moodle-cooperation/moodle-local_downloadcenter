@@ -5,7 +5,7 @@ CHANGELOG
 4.1.0 (2022-12-07)
 ------------------
 
-* [FEATURE] #7342 - update for Moodle 4.1.0
+* Moodle 4.1 compatible version
 
 
 4.0.0 (2022-04-12)
