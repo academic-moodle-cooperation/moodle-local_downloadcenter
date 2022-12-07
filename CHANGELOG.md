@@ -4,74 +4,98 @@ CHANGELOG
 
 4.1.0 (2022-12-07)
 ------------------
+
 * [FEATURE] #7342 - update for Moodle 4.1.0
+
 
 4.0.0 (2022-04-12)
 ------------------
+
 * Moodle 4.0 compatible version
 
 
 3.11.1 (2022-02-09)
 ------------------
+
 * [FEATURE] #7120 - implement download as stream zip
 * [FEAUTRE] #7092 - implement mod-glossary support
 * [FEATURE] #7010 - improve downloadcenter design
 
+
 3.11.0 (2021-05-18)
 ------------------
+
 * Moodle 3.11 compatible version
 
 
 3.10.1 (2021-05-07)
 -------------------
+
 * [FIXED] prevent downloading intro files and content for assign when description not visible
+
 
 3.10.0 (2020-11-11)
 ------------------
+
 * Moodle 3.10 compatible version
 * [FIXED] Fix github #23 - incorrectly handle & in topic name
 
 3.9.0 (2020-06-16)
 ------------------
+
 * Moodle 3.9 compatible version
 * [FEATURE] implement support for assign - download introduction files, submissions, and feedback
 * [FEATURE] add setting to control whether empty topics are excluded (github pull request #12)
 
+
 3.8.1 (2019-12-10)
 ------------------
+
 * [FIXED] fix appending file extension when there is already one
+
 
 3.8.0 (2019-11-15)
 ------------------
+
 * Moodle 3.8 compatible version
 * [FIXED] fix missing file extension when handling files without an extension set in Moodle
 * [FEATURE] #6026 - add support for mod_lightboxgallery
 
 3.7.0 (2019-05-20)
 ------------------
+
 * Moodle 3.7 compatible version
 * Fix github #8 - make automatic tests pass! PULL request submitted from Matt Davidson
 
+
 3.6.1 (2019-05-07)
 ------------------
+
 * [FIXED] Fix github #2 - increase script time limit to allow large archives to be created
+
 
 3.6.0 (2018-12-10)
 ------------------
+
 * Moodle 3.6 compatible version
 * [FIXED] Fix bug #3 from github. PULL request submitted from Joshua Ebarvia
 
+
 3.5.1 (2018-08-02)
 ------------------
+
 * Moodle 3.5.1 compatible version
 * [FEATURE] switch to font-awesome icon
 * [FEATURE] change position of download center in navbar
 
+
 3.5.0 (2018-05-08)
 ------------------
+
 * Moodle 3.5 compatible version
 * [FEATURE] Implement Privacy API
 * [FEATURE] remove german language strings
+
 
 3.4.0 (2017-11-13)
 ------------------
