@@ -1,4 +1,4 @@
-Download Center Plugin [![Build Status](https://travis-ci.org/academic-moodle-cooperation/moodle-local_downloadcenter.svg?branch=master)](https://travis-ci.org/academic-moodle-cooperation/moodle-local_downloadcenter)
+Download Center Plugin 
 ======================
 
 This file is part of the local_downloadcenter plugin for Moodle - <http://moodle.org/>
@@ -26,31 +26,35 @@ compared to single-downloads of files. One use-case of the download center is to
 before a flight, so all course files can be accessed offline.
 
 
-Requirements
-------------
-
-The plugin is available for Moodle 3.1+. 
-
-
 Installation
 ------------
 
 * Copy the code directly to the local/downloadcenter directory.
-
 * Log into Moodle as administrator.
-
 * Open the administration area (http://your-moodle-site/admin) to start the installation
   automatically.
 
 
 Admin Settings
 --------------
+
 * Exclude empty topics - empty topics (without any downloadable files) should be present in the zip archive. 
+
+
+Documentation
+--------------
+
+You can find a cheat sheet for the plugin on the [AMC
+website](http://www.academic-moodle-cooperation.org/en/module/grade-distribution/) and a video
+tutorial in german only in the [AMC YouTube
+Channel](https://www.youtube.com/c/AMCAcademicMoodleCooperation).
+
 
 Privacy API
 -----------
 
 The plugin fully implements the Moodle Privacy API.
+
 
 Bug Reports / Support
 ---------------------
