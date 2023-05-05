@@ -45,6 +45,7 @@ require_capability('local/downloadcenter:view', $context);
 $PAGE->set_url(new moodle_url('/local/downloadcenter/index.php', array('courseid' => $course->id)));
 
 $PAGE->set_pagelayout('incourse');
+$PAGE->add_body_class('limitedwidth');
 
 $downloadcenter = new local_downloadcenter_factory($course, $USER);
 

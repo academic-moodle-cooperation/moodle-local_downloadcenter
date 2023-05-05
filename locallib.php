@@ -357,7 +357,10 @@ class local_downloadcenter_factory {
                         }
                     }
 
-                    $userfields = get_all_user_name_fields();
+                    $userfields = [];
+                    foreach (\core_user\fields::get_name_fields() as $field) {
+                        $alternatenames[$field] = $field;
+                    }
                     $userfields['id'] = 'id';
                     $userfields['username'] = 'username';
                     $userfields = implode(', ', $userfields);
