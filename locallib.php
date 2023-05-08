@@ -359,7 +359,7 @@ class local_downloadcenter_factory {
 
                     $userfields = [];
                     foreach (\core_user\fields::get_name_fields() as $field) {
-                        $alternatenames[$field] = $field;
+                        $userfields[$field] = $field;
                     }
                     $userfields['id'] = 'id';
                     $userfields['username'] = 'username';
@@ -418,8 +418,8 @@ class local_downloadcenter_factory {
                                 // Get files new name.
                                 $fileext = strstr($file->get_filename(), '.');
                                 $fileoriginal = str_replace($fileext, '', $file->get_filename());
-                                $fileforzipname = clean_filename(($viewfullnames ? fullname($auser) : '') .
-                                    '_' . $fileoriginal.'_'.$auserid.$fileext);
+                                $fileforzipname = clean_filename(($viewfullnames ? (fullname($auser) . '_') : '') .
+                                    $fileoriginal.'_' . $auserid . $fileext);
                                 $fileforzipname = $resdir . '/' . self::shorten_filename($fileforzipname);
                                 // Save file name to array for zipping.
                                 $filelist[$fileforzipname] = $file;
