@@ -737,7 +737,7 @@ class local_downloadcenter_factory {
                     $etherpadconfig = get_config('etherpadlite');
                     $domain = $etherpadconfig->url;
                     $padid = $res->resource->uri;
-                    $etherpadclient = new \mod_etherpadlite\client($etherpadconfig->apikey, $domain.'api');
+                    $etherpadclient = \mod_etherpadlite\api\client::get_instance($etherpadconfig->apikey, $domain); // If not working, try $domain.'api' instead.
                     // Handle groups here.
                     $groupmode = groups_get_activity_groupmode($res->cm);
                     if ($groupmode) {
