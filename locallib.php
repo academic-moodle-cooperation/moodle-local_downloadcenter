@@ -42,6 +42,7 @@ class local_downloadcenter_factory {
      * @var
      */
     private $filteredresources;
+    private $_downloadoptions;
     /**
      * @var array
      */
@@ -59,7 +60,7 @@ class local_downloadcenter_factory {
     /**
      * @var array
      */
-    private $jsnames = array();
+    private $jsnames = [];
     /**
      * @var
      */
@@ -73,6 +74,10 @@ class local_downloadcenter_factory {
     public function __construct($course, $user) {
         $this->course = $course;
         $this->user = $user;
+        $this->_downloadoptions = [
+            'filesinfolders' => false,
+            'addnumbering' => false
+        ];
     }
 
     /**
@@ -92,19 +97,13 @@ class local_downloadcenter_factory {
         $modinfo = get_fast_modinfo($this->course);
         $usesections = course_format_uses_sections($this->course->format);
 
-        $sorted = array();
+        $sorted = [];
         if ($usesections) {
             $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
-            $sectionsformat = $DB->get_record('course_format_options', array(
-                    'courseid' => $this->course->id,
-                    'name' => 'numsections')
-            );
-            $max = count($sections);
-            if ($sectionsformat) {
-                $max = intval($sectionsformat->value);
-            }
-            $unnamedsections = array();
-            $namedsections = array();
+            // Thanks to https://github.com/marinaglancy for the fix!
+            $max = course_get_format($this->course)->get_format_options()['numsections'] ?? count($sections);
+            $unnamedsections = [];
+            $namedsections = [];
             foreach ($sections as $section) {
                 if (intval($section->section) > $max) {
                     break;
@@ -119,7 +118,7 @@ class local_downloadcenter_factory {
                     } else {
                         $namedsections[$title] = true;
                     }
-                    $sorted[$section->section]->res = array(); // TODO: fix empty names here!!!
+                    $sorted[$section->section]->res = []; // TODO: fix empty names here!!!
                 }
             }
             foreach ($unnamedsections as $sectionid) {
@@ -136,10 +135,10 @@ class local_downloadcenter_factory {
         } else {
             $sorted['default'] = new stdClass;// TODO: fix here if needed!
             $sorted['default']->title = '0';
-            $sorted['default']->res = array();
+            $sorted['default']->res = [];
         }
-        $cms = array();
-        $resources = array();
+        $cms = [];
+        $resources = [];
         foreach ($modinfo->cms as $cm) {
             if (!in_array($cm->modname, $this->availableresources)) {
                 continue;
@@ -240,7 +239,7 @@ class local_downloadcenter_factory {
         // Zip files and sent them to a user.
         $fs = get_file_storage();
 
-        $filelist = array();
+        $filelist = [];
         $filteredresources = $this->filteredresources;
 
         // Needed for mod_publication!
@@ -248,25 +247,40 @@ class local_downloadcenter_factory {
         $ufields = $userfields->get_sql('u', false, '', 'id', false)->selects;
         $useridentityfields = $CFG->showuseridentity != '' ? 'u.'.str_replace(', ', ', u.', $CFG->showuseridentity) . ', ' : '';
 
-        $excludeempty = get_config('local_downloadcenter', 'exclude_empty_topics');
+        $topicprefixid = 1;
+        $topicscount = count($filteredresources);
+        $topicprefixformat = '%0' . strlen($topicscount) . 'd';
+        $filesinfolders = $this->_downloadoptions['filesinfolders'];
+        $addnumbering = $this->_downloadoptions['addnumbering'];
         foreach ($filteredresources as $topicid => $info) {
-            if ($excludeempty && empty($info->res)) {
-                continue;
-            }
-
             $info->title = html_entity_decode($info->title);
             $basedir = clean_filename($info->title);
+            if ($addnumbering) {
+                $basedir = sprintf($topicprefixformat, $topicprefixid) . '_' . $basedir;
+            }
+            $topicprefixid++;
             $basedir = self::shorten_filename($basedir);
             $filelist[$basedir] = null;
+            $resprefixid = 1;
+            $rescount = count($info->res);
+            $resprefixformat = '%0' . strlen($rescount) . 'd';
             foreach ($info->res as $res) {
                 $res->name = html_entity_decode($res->name);
+                if ($addnumbering) {
+                    $res->name = sprintf($resprefixformat, $resprefixid) . '_' . $res->name;
+                }
                 $resdir = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
                 $filelist[$resdir] = null;
                 $context = $res->context;
                 if ($res->modname == 'resource') {
                     $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
                     $file = array_shift($files); // Get only the first file - such are the requirements!
-                    $filename = $resdir . '/' . self::shorten_filename($file->get_filename());
+                    if ($filesinfolders) {
+                        $filename = $resdir . '/' . self::shorten_filename($file->get_filename());
+                    } else {
+                        $filename = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
+                        unset($filelist[$resdir]);
+                    }
                     $extension = mimeinfo_from_type('extension', $file->get_mimetype());
 
                     $currentextension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
@@ -281,10 +295,10 @@ class local_downloadcenter_factory {
 
                     $cm = $res->cm;
 
-                    $conditions = array();
+                    $conditions = [];
                     $conditions['publication'] = $res->instanceid;
 
-                    $filesforzipping = array();
+                    $filesforzipping = [];
                     $filearea = 'attachment';
                     // Find out current groups mode.
                     $groupmode = groups_get_activity_groupmode($cm);
@@ -439,7 +453,12 @@ class local_downloadcenter_factory {
                             $filelist[$filename] = $file;
                         }
                     }
-                    $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
+                    if (count($fsfiles) == 0 && !$filesinfolders) {
+                        unset($filelist[$resdir]);
+                        $filename = $basedir . '/' . self::shorten_filename($res->name . '.html');
+                    } else {
+                        $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
+                    }
                     $content = str_replace('@@PLUGINFILE@@', 'data', $res->resource->content);
                     $content = self::convert_content_to_html_doc($res->name, $content);
                     $filelist[$filename] = array($content); // Needs to be array to be saved as file.
@@ -461,8 +480,12 @@ class local_downloadcenter_factory {
                             $filelist[$filename] = $file;
                         }
                     }
-
-                    $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
+                    if (count($fsfiles) == 0 && !$filesinfolders) {
+                        unset($filelist[$resdir]);
+                        $filename = $basedir . '/' . self::shorten_filename($res->name . '.html');
+                    } else {
+                        $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
+                    }
 
                     // Taken from mod/book/tool/print/index.php!
                     $allchapters = $DB->get_records('book_chapters', array('bookid' => $book->id), 'pagenum');
@@ -767,6 +790,8 @@ class local_downloadcenter_factory {
                         }
                     }
                 }
+
+                $resprefixid++;
             }
         }
 
@@ -820,16 +845,18 @@ class local_downloadcenter_factory {
      */
     public function parse_form_data($data) {
         $data = (array)$data;
-        $filtered = array();
+        $filtered = [];
 
         $sortedresources = $this->get_resources_for_user();
+        $excludeempty = get_config('local_downloadcenter', 'exclude_empty_topics');
+
         foreach ($sortedresources as $sectionid => $info) {
             if (!isset($data['item_topic_' . $sectionid])) {
                 continue;
             }
             $filtered[$sectionid] = new stdClass;
             $filtered[$sectionid]->title = $info->title;
-            $filtered[$sectionid]->res = array();
+            $filtered[$sectionid]->res = [];
             foreach ($info->res as $res) {
                 $name = 'item_' . $res->modname . '_' . $res->instanceid;
                 if (!isset($data[$name])) {
@@ -837,9 +864,14 @@ class local_downloadcenter_factory {
                 }
                 $filtered[$sectionid]->res[] = $res;
             }
+            if ($excludeempty && empty($filtered[$sectionid]->res)) {
+                unset($filtered[$sectionid]);
+            }
         }
 
         $this->filteredresources = $filtered;
+        $this->_downloadoptions['filesinfolders'] = isset($data['filesinfolders']);
+        $this->_downloadoptions['addnumbering'] = isset($data['addnumbering']);
     }
 
     /**

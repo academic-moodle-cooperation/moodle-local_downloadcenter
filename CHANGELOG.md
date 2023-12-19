@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+
+4.3.0 (2023-12-18)
+------------------
+* Moodle 4.3 compatible version
+* [FIXED] #7772 - [github #30] fix reading course format options - numsections, thanks to https://github.com/marinaglancy for the fix
+* [FEATURE] #7770 - Add a setting to control whether to put single files into subdirectories
+* [FEATURE] #7769 - Add a setting to control whether to number the files' and folders' names 
+
+
 4.2.1 (2023-06-22)
 ------------------
 * [FIXED] #7618 - fix download of Etherpad files
