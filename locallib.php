@@ -55,7 +55,7 @@ class local_downloadcenter_factory {
         'lightboxgallery',
         'assign',
         'glossary',
-        'etherpadlite'
+        'etherpadlite',
     ];
     /**
      * @var array
@@ -76,7 +76,7 @@ class local_downloadcenter_factory {
         $this->user = $user;
         $this->_downloadoptions = [
             'filesinfolders' => false,
-            'addnumbering' => false
+            'addnumbering' => false,
         ];
     }
 
@@ -365,7 +365,7 @@ class local_downloadcenter_factory {
                     }
 
                     // If groupmembersonly used, remove users who are not in any group.
-                    if ($users and !empty($CFG->enablegroupmembersonly) and $cm->groupmembersonly) {
+                    if ($users && !empty($CFG->enablegroupmembersonly) && $cm->groupmembersonly) {
                         if ($groupingusers = groups_get_grouping_members($cm->groupingid, 'u.id', 'u.id')) {
                             $users = array_intersect($users, array_keys($groupingusers));
                         }
@@ -601,7 +601,7 @@ class local_downloadcenter_factory {
 
                         // Submission!
                         foreach ($assignplugins as $assignplugin) {
-                            if (!$assignplugin->is_enabled() or !$assignplugin->is_visible()) {
+                            if (!$assignplugin->is_enabled() || !$assignplugin->is_visible()) {
                                 continue;
                             }
 
@@ -641,7 +641,7 @@ class local_downloadcenter_factory {
                             $fullname .= '/' . get_string('feedback', 'grades');
 
                             foreach ($feedbackplugins as $feedbackplugin) {
-                                if (!$feedbackplugin->is_enabled() or !$feedbackplugin->is_visible()) {
+                                if (!$feedbackplugin->is_enabled() || !$feedbackplugin->is_visible()) {
                                     continue;
                                 }
                                 $component = $feedbackplugin->get_subtype().'_'.$feedbackplugin->get_type();

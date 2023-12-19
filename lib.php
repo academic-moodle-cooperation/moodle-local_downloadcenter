@@ -51,7 +51,7 @@ function local_downloadcenter_extend_navigation_course(navigation_node $parentno
     $keys = [
         'questionbank' => navigation_node::TYPE_CONTAINER,
         'unenrolself' => navigation_node::TYPE_SETTING,
-        'fitlermanagement' => navigation_node::TYPE_SETTING
+        'fitlermanagement' => navigation_node::TYPE_SETTING,
     ];
     $beforekey = null;
     foreach ($keys as $key => $type) {
