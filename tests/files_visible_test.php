@@ -141,7 +141,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         // Add actual file there.
         $filerecord = array('component' => 'user', 'filearea' => 'draft',
                             'contextid' => $context->id, 'itemid' => $fileid,
-                            'filename' => $filename, 'filepath' => '/');
+                            'filename' => $filename, 'filepath' => '/', );
         $fs = get_file_storage();
         $fs->create_file_from_string($filerecord, $filecontent);
 

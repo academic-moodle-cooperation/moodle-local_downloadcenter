@@ -50,3 +50,9 @@ $string['untitled'] = 'Untitled';
 $string['privacy:null_reason'] = 'This plugin does not store or process any personal information. It presents an interface to download all course files which are manipulated from within the course.';
 
 $string['no_downloadable_content'] = 'No downloadable content';
+
+    $string['downloadoptions'] = 'Download options';
+$string['downloadoptions:filesinfolders'] = 'Put single files into subdirectories';
+$string['downloadoptions:filesinfolders_help'] = 'If enabled, single files will be placed into their own subdirectories.';
+$string['downloadoptions:addnumbering'] = 'Add numbering to files and folders';
+$string['downloadoptions:addnumbering_help'] = 'If enabled, course sections, files, and folders will be numbered in the order they appear in the course.';

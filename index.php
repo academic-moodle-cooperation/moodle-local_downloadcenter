@@ -66,7 +66,7 @@ if ($data = $downloadform->get_data()) {
 
     $event = \local_downloadcenter\event\zip_downloaded::create(array(
         'objectid' => $PAGE->course->id,
-        'context' => $PAGE->context
+        'context' => $PAGE->context,
     ));
     $event->add_record_snapshot('course', $PAGE->course);
     $event->trigger();
@@ -79,7 +79,7 @@ if ($data = $downloadform->get_data()) {
 } else {
     $event = \local_downloadcenter\event\plugin_viewed::create(array(
         'objectid' => $PAGE->course->id,
-        'context' => $PAGE->context
+        'context' => $PAGE->context,
     ));
     $event->add_record_snapshot('course', $PAGE->course);
     $event->trigger();
