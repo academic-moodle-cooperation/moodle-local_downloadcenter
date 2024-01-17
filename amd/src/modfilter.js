@@ -12,9 +12,9 @@
  */
 define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
-    var ModFilter = function(modnames) {
+    const ModFilter = function(modnames) {
 
-        var instance = this;
+        const instance = this;
         this.modnames = modnames;
         this.strings = {};
         this.formid = null;
@@ -35,17 +35,17 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             instance.strings['showtypes'] = strs[3];
             instance.strings['hidetypes'] = strs[4];
 
-            var firstsection = $('div[role="main"] > form .card.block').first();
+            const firstsection = $('div[role="main"] > form .card.block').first();
             instance.formid = firstsection.closest('form').prop('id');
 
             // Add global select all/none options...
-            var html = instance.html_generator('included', instance.strings['select']);
-            html += instance.row_generator(
-                '(<a id="downloadcenter-bytype" href="#">' + instance.strings['showtypes'] + '</a>)',
-                ''); // I hope this looks better than on one line :)!
-            var links = $(document.createElement('div'));
+            const showTypeOptionsLink = '<span class="font-weight-bold ml-3 text-nowrap">' +
+                '(<a id="downloadcenter-bytype" href="#">' + instance.strings['showtypes'] + '</a>)' + '</span>';
+            let html = instance.html_generator('included', instance.strings['select']);
+            let links = $(document.createElement('div'));
             links.addClass('grouped_settings section_level block card');
             links.html(html);
+            links.find('.downloadcenter_selector .col-md-9').append(showTypeOptionsLink);
 
             links.insertBefore(firstsection);
 
@@ -56,15 +56,15 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             instance.modlist.appendTo(links);
             instance.modlist.hide();
 
-            for (var mod in instance.modnames) {
+            for (let mod in instance.modnames) {
                 // Only include actual values from the list..
                 if (!instance.modnames.hasOwnProperty(mod)) {
                     continue;
                 }
 
-                var img = '<img src="' + url.imageUrl('icon', 'mod_' + mod) + '" class="activityicon" />';
+                const img = '<img src="' + url.imageUrl('icon', 'mod_' + mod) + '" class="activityicon" />';
                 html = instance.html_generator('mod_' + mod, img + instance.modnames[mod]);
-                var modlinks = $(document.createElement('div'));
+                const modlinks = $(document.createElement('div'));
                 modlinks.addClass('grouped_settings section_level');
                 modlinks.html(html);
                 modlinks.appendTo(instance.modlist);
@@ -82,12 +82,12 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
     };
 
     ModFilter.prototype.checkboxhandler = function($checkbox) {
-        var prefix = 'item_topic';
-        var shortprefix = 'item_';
-        var name = $checkbox.prop('name');
-        var checked = $checkbox.prop('checked');
+        const prefix = 'item_topic';
+        const shortprefix = 'item_';
+        const name = $checkbox.prop('name');
+        const checked = $checkbox.prop('checked');
         if (name.substring(0, shortprefix.length) === shortprefix) {
-            var $parent = $checkbox.parentsUntil('form', '.card');
+            const $parent = $checkbox.parentsUntil('form', '.card');
             if (name.substring(0, prefix.length) === prefix) {
                 $parent.find('input.form-check-input').prop('checked', checked);
             } else {
@@ -110,7 +110,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
     // Toggles the display of the hidden module select all/none links.
     ModFilter.prototype.toggletypes = function() {
         // Change text of type toggle link.
-        var link = $('#downloadcenter-bytype');
+        const link = $('#downloadcenter-bytype');
         if (this.currentlyshown) {
             link.text(this.strings['showtypes']);
         } else {
@@ -123,7 +123,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
     };
 
     ModFilter.prototype.initlinks = function(links, mod) {
-        var instance = this;
+        const instance = this;
         $('#downloadcenter-all-mod_' + mod).click(function(e) { instance.helper(e, true, 'item_', mod); });
         $('#downloadcenter-none-mod_' + mod).click(function(e) { instance.helper(e, false, 'item_', mod); });
 
@@ -131,16 +131,16 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
     ModFilter.prototype.helper = function(e, check, type, mod) {
         e.preventDefault();
-        var prefix = '';
+        let prefix = '';
         if (typeof mod !== 'undefined') {
             prefix = 'item_' + mod + '_';
         }
 
-        var len = type.length;
+        const len = type.length;
 
         $('input[type="checkbox"]').each(function(i, checkbox) {
             checkbox = $(checkbox);
-            var name = checkbox.prop('name');
+            const name = checkbox.prop('name');
 
             // If a prefix has been set, ignore checkboxes which don't have that prefix.
             if (prefix && name.substring(0, prefix.length) !== prefix) {
@@ -158,13 +158,13 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
     };
 
     ModFilter.prototype.html_generator = function(idtype, heading) {
-        var links = '<a id="downloadcenter-all-' + idtype + '" href="#">' + this.strings['all'] + '</a> / ';
+        let links = '<a id="downloadcenter-all-' + idtype + '" href="#">' + this.strings['all'] + '</a> / ';
         links += '<a id="downloadcenter-none-' + idtype + '" href="#">' + this.strings['none'] + '</a>';
         return this.row_generator(heading, links);
     };
 
     ModFilter.prototype.row_generator = function(heading, content) {
-        var ret = '<div class="form-group row fitem downloadcenter_selector">';
+        let ret = '<div class="form-group row fitem downloadcenter_selector">';
         ret += '<div class="col-md-3"></div>';
         ret += '<div class="col-md-9">';
         ret += '<label><span class="itemtitle">' + heading + '</span></label>';

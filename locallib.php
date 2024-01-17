@@ -75,7 +75,7 @@ class local_downloadcenter_factory {
         $this->course = $course;
         $this->user = $user;
         $this->_downloadoptions = [
-            'filesinfolders' => false,
+            'filesrealnames' => false,
             'addnumbering' => false,
         ];
     }
@@ -250,7 +250,7 @@ class local_downloadcenter_factory {
         $topicprefixid = 1;
         $topicscount = count($filteredresources);
         $topicprefixformat = '%0' . strlen($topicscount) . 'd';
-        $filesinfolders = $this->_downloadoptions['filesinfolders'];
+        $filesrealnames = $this->_downloadoptions['filesrealnames'];
         $addnumbering = $this->_downloadoptions['addnumbering'];
         foreach ($filteredresources as $topicid => $info) {
             $info->title = html_entity_decode($info->title);
@@ -275,19 +275,27 @@ class local_downloadcenter_factory {
                 if ($res->modname == 'resource') {
                     $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
                     $file = array_shift($files); // Get only the first file - such are the requirements!
-                    if ($filesinfolders) {
-                        $filename = $resdir . '/' . self::shorten_filename($file->get_filename());
+
+                    if ($filesrealnames) {
+                        $filename = $basedir . '/' . self::shorten_filename($file->get_filename());
                     } else {
                         $filename = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
-                        unset($filelist[$resdir]);
                     }
+                    unset($filelist[$resdir]);
+
                     $extension = mimeinfo_from_type('extension', $file->get_mimetype());
 
                     $currentextension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-                    if (empty($currentextension)) {
-                        $filename .= $extension;
+                    if (!empty($currentextension)) {
+                        $filename = mb_substr($filename, 0, -mb_strlen($currentextension) - 1);
                     }
-                    $filelist[$filename] = $file;
+                    $fullfilename = $filename . $extension;
+                    $filei = 1;
+                    while (isset($filelist[$fullfilename]) && $filei < 200) {
+                        $fullfilename = $filename . '_' . $filei . $extension;
+                        $filei++;
+                    }
+                    $filelist[$fullfilename] = $file;
                 } else if ($res->modname == 'folder') {
                     $folder = $fs->get_area_tree($context->id, 'mod_folder', 'content', 0);
                     $this->add_folder_contents($filelist, $folder, $resdir);
@@ -453,7 +461,7 @@ class local_downloadcenter_factory {
                             $filelist[$filename] = $file;
                         }
                     }
-                    if (count($fsfiles) == 0 && !$filesinfolders) {
+                    if (count($fsfiles) == 0) {
                         unset($filelist[$resdir]);
                         $filename = $basedir . '/' . self::shorten_filename($res->name . '.html');
                     } else {
@@ -480,7 +488,7 @@ class local_downloadcenter_factory {
                             $filelist[$filename] = $file;
                         }
                     }
-                    if (count($fsfiles) == 0 && !$filesinfolders) {
+                    if (count($fsfiles) == 0) {
                         unset($filelist[$resdir]);
                         $filename = $basedir . '/' . self::shorten_filename($res->name . '.html');
                     } else {
@@ -870,7 +878,7 @@ class local_downloadcenter_factory {
         }
 
         $this->filteredresources = $filtered;
-        $this->_downloadoptions['filesinfolders'] = isset($data['filesinfolders']);
+        $this->_downloadoptions['filesrealnames'] = isset($data['filesrealnames']);
         $this->_downloadoptions['addnumbering'] = isset($data['addnumbering']);
     }
 
