@@ -158,9 +158,6 @@
 }
 
 @media (max-width: 1229px) {
-   /* .path-local-downloadcenter #region-main .mform .fitem.downloadcenter_selector .col-md-9 {
-        padding-left: 30px;
-    }*/
     .path-local-downloadcenter form .itemtitle span {
         max-width: 85%;
     }

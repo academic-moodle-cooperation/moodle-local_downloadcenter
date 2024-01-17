@@ -277,7 +277,11 @@ class local_downloadcenter_factory {
                     $file = array_shift($files); // Get only the first file - such are the requirements!
 
                     if ($filesrealnames) {
-                        $filename = $basedir . '/' . self::shorten_filename($file->get_filename());
+                        $realfilename = $file->get_filename();
+                        if ($addnumbering) {
+                            $realfilename = sprintf($resprefixformat, $resprefixid) . '_' . $realfilename;
+                        }
+                        $filename = $basedir . '/' . self::shorten_filename($realfilename);
                     } else {
                         $filename = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
                     }
