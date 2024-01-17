@@ -129,8 +129,9 @@
     margin-bottom: 0;
 }
 
+.path-local-downloadcenter #region-main .mform #id_downloadoptionscontainer .form-group.row .col-md-9.checkbox,
+.path-local-downloadcenter #region-main .mform .card.block.grouped_settings .form-group.row .col-md-9,
 .path-local-downloadcenter #region-main .mform .card.block .form-group.row .col-md-9.checkbox {
-
     max-width: 100%;
     flex: 0 0 100%;
 }
@@ -157,9 +158,6 @@
 }
 
 @media (max-width: 1229px) {
-    .path-local-downloadcenter #region-main .mform .fitem.downloadcenter_selector .col-md-9 {
-        padding-left: 30px;
-    }
     .path-local-downloadcenter form .itemtitle span {
         max-width: 85%;
     }
@@ -180,4 +178,9 @@
     }
 
 
+}
+
+.path-local-downloadcenter form #id_downloadoptionscontainer {
+    padding-left: 1rem;
+    padding-right: 1rem;
 }

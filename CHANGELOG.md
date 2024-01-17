@@ -6,7 +6,7 @@ CHANGELOG
 ------------------
 * Moodle 4.3 compatible version
 * [FIXED] #7772 - [github #30] fix reading course format options - numsections, thanks to https://github.com/marinaglancy for the fix
-* [FEATURE] #7770 - Add a setting to control whether to put single files into subdirectories
+* [FEATURE] #7770 - Single files are not put into subdirectories anymore. Add a setting to control whether file resources use the original filename or the course content name
 * [FEATURE] #7769 - Add a setting to control whether to number the files' and folders' names 
 
 

@@ -51,8 +51,8 @@ $string['privacy:null_reason'] = 'This plugin does not store or process any pers
 
 $string['no_downloadable_content'] = 'No downloadable content';
 
-    $string['downloadoptions'] = 'Download options';
-$string['downloadoptions:filesinfolders'] = 'Put single files into subdirectories';
-$string['downloadoptions:filesinfolders_help'] = 'If enabled, single files will be placed into their own subdirectories.';
+$string['downloadoptions'] = 'Download options';
+$string['downloadoptions:filesrealnames'] = 'Download files with original file name instead of course content name';
+$string['downloadoptions:filesrealnames_help'] = 'If enabled, file resources will be downloaded with their original file name instead of the course name in the course.';
 $string['downloadoptions:addnumbering'] = 'Add numbering to files and folders';
 $string['downloadoptions:addnumbering_help'] = 'If enabled, course sections, files, and folders will be numbered in the order they appear in the course.';
