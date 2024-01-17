@@ -38,7 +38,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             const firstsection = $('div[role="main"] > form .card.block').first();
             instance.formid = firstsection.closest('form').prop('id');
 
-            // Add global select all/none options...
+            // Add global select all/none options.
             const showTypeOptionsLink = '<span class="font-weight-bold ml-3 text-nowrap">' +
                 '(<a id="downloadcenter-bytype" href="#">' + instance.strings['showtypes'] + '</a>)' + '</span>';
             let html = instance.html_generator('included', instance.strings['select']);
