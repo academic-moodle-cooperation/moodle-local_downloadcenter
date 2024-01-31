@@ -1,11 +1,11 @@
-Download Center Plugin 
+Download Center 
 ======================
 
 This file is part of the local_downloadcenter plugin for Moodle - <http://moodle.org/>
 
 *Author:*    Simeon Naydenov
 
-*Copyright:* 2022 [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
+*Copyright:* [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
 
 *License:*   [GNU GPL v3 or later](http://www.gnu.org/copyleft/gpl.html)
 
@@ -13,17 +13,17 @@ This file is part of the local_downloadcenter plugin for Moodle - <http://moodle
 Description
 -----------
 
-The Download Center plugin enables all users to download all files, folders as well as all documents
-of student folders of the entire course as a ZIP archive with a clear folder structure.
+The Download Center enables teachers and students to download the content of selected activities and materials from a course as a ZIP archive.
 
 
-Example
+Usage
 -------
 
-With this module participants of a course can download all relevant course documents (files, folders, assignments,
-books, pages, Lightbox galleries, documents from student folders, glossaries, and Etherpad lite pads) in one step. Therefore users can save valuable time
-compared to single-downloads of files. One use-case of the download center is to download of all files
-before a flight, so all course files can be accessed offline.
+Teachers make documents available in a Moodle course during the semester. In addition, various activities and materials are used to make the course more active. 
+At any time during or at the end of the course, students can easily save published content locally for personal use and use it for example offline to prepare for an exam. 
+Teachers can download and archive this content in the same way, with hidden content also available for selection by the teacher. In addition, all submissions of an assignment can also be downloaded in a compact form including feedback.
+
+Note: Currently, the course contents assignment, book, file, glossary, page, folder, ligthbox gallery, Etherpad Lite and student folder are available for selection in the Download Center.
 
 
 Installation
@@ -35,25 +35,16 @@ Installation
   automatically.
 
 
-Admin Settings
+Privacy API
 --------------
 
-* Exclude empty topics - empty topics (without any downloadable files) should be present in the zip archive. 
+The plugin fully implements the Moodle Privacy API.
 
 
 Documentation
 --------------
 
-You can find a cheat sheet for the plugin on the [AMC
-website](http://www.academic-moodle-cooperation.org/en/module/grade-distribution/) and a video
-tutorial in german only in the [AMC YouTube
-Channel](https://www.youtube.com/c/AMCAcademicMoodleCooperation).
-
-
-Privacy API
------------
-
-The plugin fully implements the Moodle Privacy API.
+You can find a documentation for the plugin on the [AMC website](https://academic-moodle-cooperation.org/local_downloadcenter/)
 
 
 Bug Reports / Support
