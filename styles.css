@@ -1,3 +1,5 @@
+.path-local-downloadcenter .mform .card.block  .row.fitem .col-md-3.col-form-label,
+.path-local-downloadcenter .mform  #id_downloadoptionscontainer .row.fitem .col-md-3.col-form-label,
 .path-local-downloadcenter form fieldset > div > div.fitem.femptylabel {
     display: none;
 }

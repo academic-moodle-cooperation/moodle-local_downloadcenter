@@ -25,9 +25,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2023121800;
-$plugin->requires  = 2023100900;
+$plugin->version   = 2024042400;
+$plugin->requires  = 2022112800;
 $plugin->component = 'local_downloadcenter';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "v4.3.0";
+$plugin->release   = "v4.4.0";
 

@@ -150,7 +150,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
                 checkbox.prop('checked', check);
             }
             if (check) {
-                checkbox.closest('.card.block').find('.form-group:first-child input').prop('checked', check);
+                checkbox.closest('.card.block').find('.fitem:first-child input[type="checkbox"]').prop('checked', check);
             }
         });
 
