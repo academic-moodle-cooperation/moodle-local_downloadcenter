@@ -93,16 +93,16 @@
     background-color: #fff;
 }
 
-.path-local-downloadcenter #region-main .card.block .form-group.downloadcenter_selector label span,
-.path-local-downloadcenter #region-main .card.block .form-group:first-child label span,
-.path-local-downloadcenter #region-main .card.block .form-group:first-child label,
-.path-local-downloadcenter #region-main .card.block .form-group:first-child {
+.path-local-downloadcenter #region-main .card.block .row.fitem.downloadcenter_selector label span,
+.path-local-downloadcenter #region-main .card.block .row.fitem:first-child label span,
+.path-local-downloadcenter #region-main .card.block .row.fitem:first-child label,
+.path-local-downloadcenter #region-main .card.block .row.fitem:first-child {
     font-weight: bold;
 }
 
-.path-local-downloadcenter #region-main .card.block .form-group {
-    margin-top: 0;
-    margin-bottom: 0;
+.path-local-downloadcenter #region-main .card.block .row.fitem {
+    margin-top: 0 !important; /* stylelint-disable-line declaration-no-important */
+    margin-bottom: 0 !important; /* stylelint-disable-line declaration-no-important */
 }
 
 /* delete first empty row used in hack :) */
@@ -127,13 +127,13 @@
 }
 
 .path-local-downloadcenter .mform .row.downloadcenter_selector {
-    margin-top: 0;
-    margin-bottom: 0;
+    margin-top: 0 !important; /* stylelint-disable-line declaration-no-important */
+    margin-bottom: 0 !important; /* stylelint-disable-line declaration-no-important */
 }
 
-.path-local-downloadcenter #region-main .mform #id_downloadoptionscontainer .form-group.row .col-md-9.checkbox,
-.path-local-downloadcenter #region-main .mform .card.block.grouped_settings .form-group.row .col-md-9,
-.path-local-downloadcenter #region-main .mform .card.block .form-group.row .col-md-9.checkbox {
+.path-local-downloadcenter #region-main .mform #id_downloadoptionscontainer .row.fitem.row .col-md-9.checkbox,
+.path-local-downloadcenter #region-main .mform .card.block.grouped_settings .row.fitem.row .col-md-9,
+.path-local-downloadcenter #region-main .mform .card.block .row.fitem.row .col-md-9.checkbox {
     max-width: 100%;
     flex: 0 0 100%;
 }
