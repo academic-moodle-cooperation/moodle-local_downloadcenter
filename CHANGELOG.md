@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+4.4.1 (2024-05-21)
+------------------
+* [FIXED] #7961 - fix ignoring "Only show files during submission" assign setting
+
+
 4.4.0 (2024-04-24)
 ------------------
 * Moodle 4.4 compatible version
