@@ -556,31 +556,33 @@ class local_downloadcenter_factory {
                 } else if ($res->modname == 'assign') {
                     require_once($CFG->dirroot . '/mod/assign/locallib.php');
                     require_once($CFG->dirroot . '/mod/assign/externallib.php');
+                    $isstudent = !has_capability('mod/assign:viewgrades', $context);
 
                     if ($res->resource->allowsubmissionsfromdate < time() || $res->resource->alwaysshowdescription) {
-                        $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'introattachment', 0, 'id', false);
-                        foreach ($fsfiles as $file) {
-                            if ($file->get_filesize() == 0) {
-                                continue;
+                        if (!$isstudent || ($isstudent && $res->resource->submissionattachments == false)) {
+                            $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'introattachment', 0, 'id', false);
+                            foreach ($fsfiles as $file) {
+                                if ($file->get_filesize() == 0) {
+                                    continue;
+                                }
+                                $filename = $resdir . '/intro' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                                $filelist[$filename] = $file;
                             }
-                            $filename = $resdir . '/intro' . $file->get_filepath() . self::shorten_filename($file->get_filename());
-                            $filelist[$filename] = $file;
-                        }
-
-                        $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'intro', 0, 'id', false);
-                        foreach ($fsfiles as $file) {
-                            if ($file->get_filesize() == 0) {
-                                continue;
+                            $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'intro', 0, 'id', false);
+                            foreach ($fsfiles as $file) {
+                                if ($file->get_filesize() == 0) {
+                                    continue;
+                                }
+                                $filename = $resdir . '/intro/files' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                                $filelist[$filename] = $file;
                             }
-                            $filename = $resdir . '/intro/files' . $file->get_filepath() . self::shorten_filename($file->get_filename());
-                            $filelist[$filename] = $file;
+
+                            $introtitle = get_string('description') . ' ' . $res->name;
+
+                            $introcontent = str_replace('@@PLUGINFILE@@', 'files', $res->resource->intro);
+                            $introcontent = self::convert_content_to_html_doc($introtitle, $introcontent);
+                            $filelist[$resdir . '/intro/intro.html'] = [$introcontent];
                         }
-
-                        $introtitle = get_string('description') . ' ' . $res->name;
-
-                        $introcontent = str_replace('@@PLUGINFILE@@', 'files', $res->resource->intro);
-                        $introcontent = self::convert_content_to_html_doc($introtitle, $introcontent);
-                        $filelist[$resdir . '/intro/intro.html'] = [$introcontent];
                     }
 
                     $submissionsstr = get_string('gradeitem:submissions', 'assign');
@@ -589,7 +591,6 @@ class local_downloadcenter_factory {
                     $feedbackplugins = $assign->get_feedback_plugins();
 
                     $params = ['assignment' => $res->instanceid];
-                    $isstudent = !has_capability('mod/assign:viewgrades', $context);
                     if ($isstudent) {
                         // When student, fetch only own submissions!
                         $submissions = $assign->get_all_submissions($USER->id);
@@ -894,11 +895,11 @@ class local_downloadcenter_factory {
     public static function shorten_filename($filename, $maxlength = 64) {
         $filename = (string)$filename;
         $filename = str_replace('/', '_', $filename);
-        if (strlen($filename) <= $maxlength) {
+        if (mb_strlen($filename) <= $maxlength) {
             return $filename;
         }
         $limit = round($maxlength / 2) - 1;
-        return substr($filename, 0, $limit) . '___' . substr($filename, (1 - $limit));
+        return mb_substr($filename, 0, $limit) . '___' . mb_substr($filename, (1 - $limit));
     }
 
     public static function convert_content_to_html_doc($title, $content, $additionalhead = '') {
