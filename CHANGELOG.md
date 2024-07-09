@@ -3,7 +3,7 @@ CHANGELOG
 
 4.4.1 (2024-05-21)
 ------------------
-* [FIXED] #7961 - fix ignoring "Only show files during submission" assign setting
+* [FIXED] #7961 - fix ignoring "Only show files during submission" assign setting [github #31]
 
 
 4.4.0 (2024-04-24)
@@ -15,7 +15,7 @@ CHANGELOG
 ------------------
 * Moodle 4.3 compatible version
 * [FEATURE] #7773 - Improve downloadcenter design
-* [FIXED] #7772 - [github #30] fix reading course format options - numsections, thanks to https://github.com/marinaglancy for the fix
+* [FIXED] #7772 - fix reading course format options - numsections, thanks to https://github.com/marinaglancy for the fix [github #30]
 * [FEATURE] #7770 - Single files are not put into subdirectories anymore. Add a setting to control whether file resources use the original filename or the course content name
 * [FEATURE] #7769 - Add a setting to control whether to number the files' and folders' names 
 
