@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+4.4.2 (2024-08-02)
+------------------
+* [UPDATE] #8015 - adapt to new publication flow
+
 4.4.1 (2024-05-21)
 ------------------
 * [FIXED] #7961 - fix ignoring "Only show files during submission" assign setting [github #31]
