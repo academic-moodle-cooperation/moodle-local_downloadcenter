@@ -339,34 +339,19 @@ class local_downloadcenter_factory {
                             'WHERE u.deleted = 0 AND eu.id=u.id '.
                             'AND files.publication = '. $res->instanceid . ' ';
 
-                        if ($res->resource->mode == PUBLICATION_MODE_UPLOAD) {
-                            // Mode upload.
-                            // SN 11.07.2016 - feature #2738:
-                            // in mod/publication/locallib : line 81, publication::__construct() { ...
-                            // .....$this->instance->obtainteacherapproval = !$this->obtainteacherapproval ...
-                            // ..} ...
-                            // So flag has to be actually inverted!
-                            if (!$res->resource->obtainteacherapproval) {
-                                // Need teacher approval.
+                        $where = [];
 
-                                $where = 'files.teacherapproval = 1';
-                            } else {
-                                // No need for teacher approval.
-                                // Teacher only hasnt rejected.
-                                $where = '(files.teacherapproval = 1 OR files.teacherapproval IS NULL)';
-                            }
-                        } else {
-                            // Mode import.
-                            if (!$res->resource->obtainstudentapproval) {
-                                // No need to ask student and teacher has approved.
-                                $where = 'files.teacherapproval = 1';
-                            } else {
-                                // Student and teacher have approved.
-                                $where = 'files.teacherapproval = 1 AND files.studentapproval = 1';
-                            }
+                        if ($res->resource->obtainteacherapproval) {
+                            // Need teacher approval.
+                            $where[] = 'files.teacherapproval = 1';
+                        }
+                        if ($res->resource->obtainstudentapproval) {
+                            $where[] = 'files.studentapproval = 1';
                         }
 
-                        $sql .= 'AND ' . $where . ' ';
+                        if (!empty($where)) {
+                            $sql .= ' AND ' . implode(' AND ', $where) . ' ';
+                        }
                         $sql .= 'GROUP BY u.id';
                     }
 
@@ -405,36 +390,9 @@ class local_downloadcenter_factory {
 
                         foreach ($records as $record) {
 
-                            $haspermission = false;
-
-                            if ($res->resource->mode == PUBLICATION_MODE_UPLOAD) {
-                                // Mode upload.
-                                // SN 11.07.2016 - feature #2738 - check comment above!
-                                if (!$res->resource->obtainteacherapproval) {
-                                    // Need teacher approval.
-                                    if ($record->teacherapproval == 1) {
-                                        // Teacher has approved.
-                                        $haspermission = true;
-                                    }
-                                } else {
-                                    // No need for teacher approval.
-                                    if (is_null($record->teacherapproval) || $record->teacherapproval == 1) {
-                                        // Teacher only hasnt rejected.
-                                        $haspermission = true;
-                                    }
-                                }
-                            } else {
-                                // Mode import.
-                                if (!$res->resource->obtainstudentapproval && $record->teacherapproval == 1) {
-                                    // No need to ask student and teacher has approved.
-                                    $haspermission = true;
-                                } else if ($res->resource->obtainstudentapproval &&
-                                    $record->teacherapproval == 1 &&
-                                    $record->studentapproval == 1) {
-                                    // Student and teacher have approved.
-                                    $haspermission = true;
-                                }
-                            }
+                            $hasteacherapproval = !$res->resource->obtainteacherapproval || $record->teacherapproval == 1;
+                            $hasstudentapproval = !$res->resource->obtainstudentapproval || $record->studentapproval == 1;
+                            $haspermission = $auser->id == $USER->id || $hasteacherapproval && $hasstudentapproval;
 
                             if (has_capability('mod/publication:approve', $context) || $haspermission) {
                                 // Is teacher or file is public.
