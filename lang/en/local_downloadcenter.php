@@ -56,3 +56,7 @@ $string['downloadoptions:filesrealnames'] = 'Download files with original file n
 $string['downloadoptions:filesrealnames_help'] = 'If enabled, file resources will be downloaded with their original file name instead of the visible name in the course.';
 $string['downloadoptions:addnumbering'] = 'Add numbering to files and folders';
 $string['downloadoptions:addnumbering_help'] = 'If enabled, course sections, files, and folders will be numbered in the order they appear in the course.';
+
+
+$string['search:hint'] = 'Type to filter activities and resources...';
+$string['search:results'] = 'Search results';

@@ -36,7 +36,7 @@ class local_downloadcenter_download_form extends moodleform {
      * @throws coding_exception
      */
     public function definition() {
-        global $COURSE;
+        global $COURSE, $OUTPUT;
         $mform = $this->_form;
 
         $resources = $this->_customdata['res'];
@@ -44,12 +44,15 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->addElement('hidden', 'courseid', $COURSE->id);
         $mform->setType('courseid', PARAM_INT);
 
+
+
         $mform->addElement('html',
             html_writer::tag('div',
                 get_string('warningmessage', 'local_downloadcenter'),
                 array('class' => 'alert alert-info alert-block')
             )
         );
+        $mform->addElement('html', $OUTPUT->render_from_template('local_downloadcenter/searchbox', []));
         $mform->addElement('static', 'warning', '', ''); // Hack to work around fieldsets!
 
         $empty = true;
