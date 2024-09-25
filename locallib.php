@@ -199,6 +199,7 @@ class local_downloadcenter_factory {
             $res->resource = $resource;
             $res->cm = $cm;
             $res->visible = $cm->visible;
+            $res->visibleoncoursepage = $cm->visibleoncoursepage == '1';
             $res->context = $cmcontext;
             $sorted[$currentsection]->res[] = $res;
         }

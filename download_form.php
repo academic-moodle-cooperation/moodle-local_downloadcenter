@@ -76,6 +76,9 @@ class local_downloadcenter_download_form extends moodleform {
                 $title = html_writer::span($res->name) . ' ' . $res->icon;
                 if (!$res->visible) {
                     $title .= html_writer::tag('span', get_string('hiddenfromstudents'), array('class' => 'badge bg-info text-white mb-1'));
+                } else if (!$sectioninfo->visible && $res->visibleoncoursepage) {
+                    $title .= html_writer::tag('span', get_string('hiddenoncoursepage'), array('class' => 'badge bg-info text-white mb-1'));
+
                 }
                 $title = html_writer::tag('span', $title, array('class' => 'itemtitle'));
                 $mform->addElement('checkbox', $name, $title);
