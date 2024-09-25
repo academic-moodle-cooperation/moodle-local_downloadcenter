@@ -36,7 +36,7 @@ class local_downloadcenter_download_form extends moodleform {
      * @throws coding_exception
      */
     public function definition() {
-        global $COURSE;
+        global $COURSE, $OUTPUT;
         $mform = $this->_form;
 
         $resources = $this->_customdata['res'];
@@ -50,6 +50,7 @@ class local_downloadcenter_download_form extends moodleform {
                 array('class' => 'alert alert-info alert-block')
             )
         );
+        $mform->addElement('html', $OUTPUT->render_from_template('local_downloadcenter/searchbox', []));
         $mform->addElement('static', 'warning', '', ''); // Hack to work around fieldsets!
 
         $empty = true;
@@ -63,12 +64,22 @@ class local_downloadcenter_download_form extends moodleform {
             $sectionname = 'item_topic_' . $sectionid;
             $mform->addElement('html', html_writer::start_tag('div', array('class' => 'card block mb-3')));
             $sectiontitle = html_writer::span($sectioninfo->title, 'sectiontitle');
+
+            if (!$sectioninfo->visible) {
+                $sectiontitle .= html_writer::tag('span', get_string('hiddenfromstudents'), array('class' => 'badge bg-info text-white ml-1 sectiontitlebadge'));
+            }
             $mform->addElement('checkbox', $sectionname, $sectiontitle);
 
             $mform->setDefault($sectionname, 1);
             foreach ($sectioninfo->res as $res) {
                 $name = 'item_' . $res->modname . '_' . $res->instanceid;
                 $title = html_writer::span($res->name) . ' ' . $res->icon;
+                if (!$res->visible) {
+                    $title .= html_writer::tag('span', get_string('hiddenfromstudents'), array('class' => 'badge bg-info text-white mb-1'));
+                } else if (!$sectioninfo->visible && $res->visibleoncoursepage) {
+                    $title .= html_writer::tag('span', get_string('hiddenoncoursepage'), array('class' => 'badge bg-info text-white mb-1'));
+
+                }
                 $title = html_writer::tag('span', $title, array('class' => 'itemtitle'));
                 $mform->addElement('checkbox', $name, $title);
                 $mform->setDefault($name, 1);

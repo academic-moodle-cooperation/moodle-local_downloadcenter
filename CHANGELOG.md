@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+
+* [FEATURE] #7583 - add badge for hidden cms
+* [FEATURE] #7011 - implement simple search box
+
 4.4.2 (2024-08-02)
 ------------------
 * [UPDATE] #8015 - adapt to new publication flow
