@@ -44,8 +44,6 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->addElement('hidden', 'courseid', $COURSE->id);
         $mform->setType('courseid', PARAM_INT);
 
-
-
         $mform->addElement('html',
             html_writer::tag('div',
                 get_string('warningmessage', 'local_downloadcenter'),
