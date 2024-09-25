@@ -49,6 +49,11 @@
     display: inline-block;
     white-space: nowrap;
 }
+
+.path-local-downloadcenter form .block .fitem label .sectiontitlebadge {
+    position: relative;
+    top: -0.2rem;
+}
 .path-local-downloadcenter form .itemtitle span,
 .path-local-downloadcenter form .block .fitem label .sectiontitle {
     vertical-align: text-bottom;

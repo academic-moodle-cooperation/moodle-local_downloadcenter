@@ -96,7 +96,7 @@ class local_downloadcenter_factory {
 
         $modinfo = get_fast_modinfo($this->course);
         $usesections = course_format_uses_sections($this->course->format);
-
+        $canviewhiddensections = has_capability('moodle/course:viewhiddensections', context_course::instance($this->course->id));
         $sorted = [];
         if ($usesections) {
             $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
@@ -108,11 +108,12 @@ class local_downloadcenter_factory {
                 if (intval($section->section) > $max) {
                     break;
                 }
-                if (!isset($sorted[$section->section]) && $section->visible) {
+                if (!isset($sorted[$section->section]) && ($section->visible || $canviewhiddensections)) {
                     $sorted[$section->section] = new stdClass;
                     $title = trim(get_section_name($this->course, $section->section));
                     $title = self::shorten_filename($title);
                     $sorted[$section->section]->title = $title;
+                    $sorted[$section->section]->visible = $section->visible;
                     if (empty($title)) {
                         $unnamedsections[] = $section->section;
                     } else {
@@ -189,7 +190,6 @@ class local_downloadcenter_factory {
             }
 
             $icon = '<img src="'.$cm->get_icon_url().'" class="activityicon" alt="'.$cm->get_module_type_name().'" /> ';
-            // TODO: $cm->visible..
             $res = new stdClass;
             $res->icon = $icon;
             $res->cmid = $cm->id;
@@ -198,6 +198,7 @@ class local_downloadcenter_factory {
             $res->instanceid = $cm->instance;
             $res->resource = $resource;
             $res->cm = $cm;
+            $res->visible = $cm->visible;
             $res->context = $cmcontext;
             $sorted[$currentsection]->res[] = $res;
         }
