@@ -10,13 +10,11 @@ const IDENTIFIERS = {
 };
 
 const allCmsPerTopic = [];
-const c = window.console;
 let resultsHolder = null;
 let resultsCount = null;
 
 
 const search = (e) => {
-    c.log('Searching...', e.target.value);
     const searchValue = e.target.value.toLowerCase();
     const showAll = searchValue.length === 0;
     let resultscount = 0;
