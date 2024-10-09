@@ -97,6 +97,8 @@ class local_downloadcenter_factory {
         $modinfo = get_fast_modinfo($this->course);
         $usesections = course_format_uses_sections($this->course->format);
         $canviewhiddensections = has_capability('moodle/course:viewhiddensections', context_course::instance($this->course->id));
+        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', context_course::instance($this->course->id));
+
         $sorted = [];
         if ($usesections) {
             $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
@@ -176,6 +178,10 @@ class local_downloadcenter_factory {
                 }
             } else {
                 $currentsection = 'default';
+            }
+
+            if ($cm->is_stealth() &&  !$canviewhiddenactivities) {
+                continue; // Don't allow stealth activities for students if the admin setting doesn't allow it!
             }
 
             $cmcontext = context_module::instance($cm->id);
