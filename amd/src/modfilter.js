@@ -49,7 +49,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
             links.insertBefore(firstsection);
 
-            // For each module type on the course, add hidden select all/none options.
+            // For each module type on the course, add hidden select all/none options..
             instance.modlist = $(document.createElement('div'));
             instance.modlist.prop('id', 'mod_select_links');
             instance.modlist.prop('class', 'm-l-2');

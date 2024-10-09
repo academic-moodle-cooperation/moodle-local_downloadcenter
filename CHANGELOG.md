@@ -2,6 +2,9 @@ CHANGELOG
 =========
 
 
+4.5.0 (2024-10-10)
+------------------
+* Moodle 4.5 compatible version
 * [FEATURE] #7583 - add badge for hidden cms
 * [FEATURE] #7011 - implement simple search box
 

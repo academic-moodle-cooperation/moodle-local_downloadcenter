@@ -48,6 +48,7 @@ const search = (e) => {
 };
 
 const submitForm = () => {
+    // We need to make sure that if a topic or a cm is not visible, it's checkbox is not checked.
     allCmsPerTopic.forEach(topic => {
         if (!topic.visible && topic.checkbox.checked) {
             topic.checkbox.checked = false;
