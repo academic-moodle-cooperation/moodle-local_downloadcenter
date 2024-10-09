@@ -181,7 +181,7 @@ class local_downloadcenter_factory {
             }
 
             if ($cm->is_stealth() &&  !$canviewhiddenactivities) {
-                continue; // Don't allow stealth activities for students if the admin setting doesn't allow it!
+                continue; // Don't allow stealth activities for students!
             }
 
             $cmcontext = context_module::instance($cm->id);
