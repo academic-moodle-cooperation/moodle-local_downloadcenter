@@ -191,3 +191,11 @@
     padding-left: 1rem;
     padding-right: 1rem;
 }
+
+.path-local-downloadcenter #region-main #downloadcenter-search-clear {
+    z-index: 10;
+    width: 2.8rem;
+    margin-left: -2.8rem;
+    padding-top: 0.7rem;
+    border-radius: 0;
+}

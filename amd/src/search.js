@@ -6,16 +6,18 @@ const IDENTIFIERS = {
     CHECKBOX: 'input[type="checkbox"]',
     TITLE: 'label .itemtitle span:not(.badge)',
     RESULTSHOLDER: 'downloadcenter-search-results',
-    RESULTSCOUNT: 'downloadcenter-search-results-count'
+    RESULTSCOUNT: 'downloadcenter-search-results-count',
+    SEARCHCLEAR: '#downloadcenter-search-clear'
 };
 
 const allCmsPerTopic = [];
 let resultsHolder = null;
 let resultsCount = null;
+let searchClearBtn = null;
+let searchInput = null;
 
 
-const search = (e) => {
-    const searchValue = e.target.value.toLowerCase();
+const search = (searchValue) => {
     const showAll = searchValue.length === 0;
     let resultscount = 0;
     allCmsPerTopic.forEach(topic => {
@@ -42,9 +44,17 @@ const search = (e) => {
     if (!showAll) {
         resultsCount.textContent = resultscount;
         resultsHolder.classList.remove('d-none');
+        searchClearBtn.classList.remove('d-none');
     } else {
         resultsHolder.classList.add('d-none');
+        searchClearBtn.classList.add('d-none');
     }
+};
+
+const searchClear = (e) => {
+    e.preventDefault();
+    searchInput.value = '';
+    search('');
 };
 
 const submitForm = () => {
@@ -63,12 +73,15 @@ const submitForm = () => {
 };
 
 export const init = () => {
-    const searchInput = document.getElementById(IDENTIFIERS.SEARCHINPUT);
-    searchInput.addEventListener('input', search);
+    searchInput = document.getElementById(IDENTIFIERS.SEARCHINPUT);
+    searchInput.addEventListener('input', (e) => { search(e.target.value.toLowerCase()); });
     const form = document.querySelector(IDENTIFIERS.FORM);
     const topics = form.querySelectorAll(IDENTIFIERS.TOPICS);
     resultsHolder = document.getElementById(IDENTIFIERS.RESULTSHOLDER);
     resultsCount = document.getElementById(IDENTIFIERS.RESULTSCOUNT);
+    searchClearBtn = document.querySelector(IDENTIFIERS.SEARCHCLEAR);
+    searchClearBtn.addEventListener('click', searchClear);
+
     form.addEventListener('submit', submitForm);
     topics.forEach(topic => {
         const elements = topic.querySelectorAll(IDENTIFIERS.FORMELEMENTS);
