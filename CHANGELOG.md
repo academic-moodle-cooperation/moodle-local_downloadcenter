@@ -7,6 +7,7 @@ CHANGELOG
 * Moodle 4.5 compatible version
 * [FEATURE] #7583 - add badge for hidden cms
 * [FEATURE] #7011 - implement simple search box
+* [FEATURE] #8067 - separate strings for info message
 
 4.4.2 (2024-08-02)
 ------------------
