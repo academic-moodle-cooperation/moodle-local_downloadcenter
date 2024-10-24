@@ -45,10 +45,9 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->setType('courseid', PARAM_INT);
 
         $coursecontext = \context_course::instance($COURSE->id);
-        $infomessagestring = get_string('infomessage_students', 'local_downloadcenter');
-        if (has_capability('moodle/course:update', $coursecontext)) {
-            $infomessagestring .= ' ' . get_string('infomessage_teachers', 'local_downloadcenter');
-        }
+        $infomessagestring = has_capability('moodle/course:update', $coursecontext) ?
+            get_string('infomessage_teachers', 'local_downloadcenter') :
+            get_string('infomessage_students', 'local_downloadcenter');
         $mform->addElement('html',
             html_writer::tag('div',
                 $infomessagestring,
