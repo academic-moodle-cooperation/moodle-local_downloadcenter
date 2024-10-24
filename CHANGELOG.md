@@ -5,9 +5,9 @@ CHANGELOG
 4.5.0 (2024-10-10)
 ------------------
 * Moodle 4.5 compatible version
-* [FEATURE] #7583 - add badge for hidden cms
+* [FEATURE] #7583 - add label for hidden and available but not shown content on the course page
 * [FEATURE] #7011 - implement simple search box
-* [FEATURE] #8067 - separate strings for info message
+* [FEATURE] #8067 - prevent available but not shown content of being downloaded by students
 
 4.4.2 (2024-08-02)
 ------------------
