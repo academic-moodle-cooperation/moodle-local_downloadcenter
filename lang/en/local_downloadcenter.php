@@ -36,7 +36,10 @@ $string['settings_title'] = 'Download center';
 $string['exclude_empty_topics'] = 'Exclude empty topics';
 $string['exclude_empty_topics_help'] = 'Exclude empty topics from the downloaded zip.';
 
-$string['warningmessage'] = 'Here you can download single or all available contents of this course in a ZIP archive.';
+$string['infomessage_students'] = 'Here you can download single or all available contents of this course in a ZIP archive.';
+$string['infomessage_teachers'] = 'Here you can download single or all available contents of this course in a ZIP archive.<br>
+(Students will be able to download only visible/ not hidden activities and resources.)';
+
 
 $string['createzip'] = 'Create ZIP archive';
 
