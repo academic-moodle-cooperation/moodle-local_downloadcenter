@@ -4,8 +4,9 @@ CHANGELOG
 
 4.4.3 (2024-10-10)
 ------------------
-* [FEATURE] #7583 - add badge for hidden cms
+* [FEATURE] #7583 - add label for hidden and available but not shown content on the course page
 * [FEATURE] #7011 - implement simple search box
+* [FEATURE] #8067 - prevent available but not shown content of being downloaded by students
 
 4.4.2 (2024-08-02)
 ------------------
