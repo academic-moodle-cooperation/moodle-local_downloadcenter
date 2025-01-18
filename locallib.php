@@ -56,6 +56,7 @@ class local_downloadcenter_factory {
         'assign',
         'glossary',
         'etherpadlite',
+        'subsection'
     ];
     /**
      * @var array
@@ -98,7 +99,7 @@ class local_downloadcenter_factory {
         $usesections = course_format_uses_sections($this->course->format);
         $canviewhiddensections = has_capability('moodle/course:viewhiddensections', context_course::instance($this->course->id));
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', context_course::instance($this->course->id));
-
+        $savedsub = [];
         $sorted = [];
         if ($usesections) {
             $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
@@ -107,6 +108,10 @@ class local_downloadcenter_factory {
             $unnamedsections = [];
             $namedsections = [];
             foreach ($sections as $section) {
+                $savedsub = $section;
+                echo '<pre>';
+                print_r($section);
+                echo '</pre>';
                 if (intval($section->section) > $max) {
                     break;
                 }
@@ -124,6 +129,10 @@ class local_downloadcenter_factory {
                     $sorted[$section->section]->res = []; // TODO: fix empty names here!!!
                 }
             }
+            echo '<pre>';
+                print_r($sorted);
+                echo '</pre>';
+            // die;
             foreach ($unnamedsections as $sectionid) {
                 $untitled = get_string('untitled', 'local_downloadcenter');
                 $title = $untitled;
@@ -210,7 +219,25 @@ class local_downloadcenter_factory {
             $sorted[$currentsection]->res[] = $res;
         }
 
+        // Place a subsection in a section as res as a test.
+        $res = new stdClass;
+        $res->icon = '';
+        $res->cmid = $savedsub->id;
+        $res->name = $savedsub->name;
+        $res->modname = 'subsection';
+        $res->instanceid = $savedsub->id;
+        $res->resource = $savedsub;
+        $res->cm = $savedsub;
+        $res->visible = $savedsub->visible;
+        $res->isstealth = false;
+        $res->context = '';
+        $sorted[$currentsection]->res[] = $res;
+
         $this->sortedresources = $sorted;
+        // echo '<pre>';
+        // print_r($sorted);
+        // echo '</pre>';
+        // die;
         return $sorted;
     }
 
