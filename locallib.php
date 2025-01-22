@@ -96,6 +96,10 @@ class local_downloadcenter_factory {
         }
 
         $modinfo = get_fast_modinfo($this->course);
+        // echo '<pre>';
+        // print_r($modinfo);
+        // echo '</pre>';
+        // die;
         $usesections = course_format_uses_sections($this->course->format);
         $canviewhiddensections = has_capability('moodle/course:viewhiddensections', context_course::instance($this->course->id));
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', context_course::instance($this->course->id));
@@ -112,6 +116,7 @@ class local_downloadcenter_factory {
                 echo '<pre>';
                 print_r($section);
                 echo '</pre>';
+                // die;
                 if (intval($section->section) > $max) {
                     break;
                 }
@@ -129,9 +134,12 @@ class local_downloadcenter_factory {
                     $sorted[$section->section]->res = []; // TODO: fix empty names here!!!
                 }
             }
-            echo '<pre>';
-                print_r($sorted);
-                echo '</pre>';
+            // Turn array around:
+            // $reversed = array_reverse($sorted);
+            // $sorted = $reversed;
+            // echo '<pre>';
+            // print_r($sorted);
+            // echo '</pre>';
             // die;
             foreach ($unnamedsections as $sectionid) {
                 $untitled = get_string('untitled', 'local_downloadcenter');
@@ -152,15 +160,29 @@ class local_downloadcenter_factory {
         $cms = [];
         $resources = [];
         foreach ($modinfo->cms as $cm) {
+            // if ($cm->modname === 'subsection') {
+            //     // continue;
+            //     echo '<pre>';
+            //     echo $cm->modname;
+            // print_r($cm);
+            // echo '</pre>';
+            //     die;
+            // }
             if (!in_array($cm->modname, $this->availableresources)) {
                 continue;
             }
-            if (!$cm->uservisible) {
+            if (!$cm->uservisible && $cm->modname != 'subsection') {
                 continue;
             }
-            if (!$cm->has_view() && $cm->modname != 'folder') {
+            if (!$cm->has_view() && $cm->modname != 'folder' && $cm->modname != 'subsection') {
                 // Exclude label and similar!
                 continue;
+            }
+            if ($cm->modname == 'subsection') {
+            // echo '<pre>';
+            // print_r($cm);
+            // echo '</pre>';
+            // die;
             }
             $cms[$cm->id] = $cm;
             $resources[$cm->modname][] = $cm->instance;
@@ -168,12 +190,28 @@ class local_downloadcenter_factory {
 
         // Preload instances!
         foreach ($resources as $modname => $instances) {
+        //     echo '<pre>';
+        // print_r($modname);
+        // echo '</pre>';
             $resources[$modname] = $DB->get_records_list($modname, 'id', $instances, 'id');
         }
+        // echo '<pre>';
+        // print_r($resources['subsection']);
+        // echo '</pre>';
+        // die;s
         $availablesections = array_keys($sorted);
         $currentsection = '';
+        $count = 0;
         foreach ($cms as $cm) {
+        //     echo '<pre>';
+        // print_r($cm);
+        // echo '</pre>';
+        // die;
             if (!isset($resources[$cm->modname][$cm->instance])) {
+        //         echo '<pre>';
+        // print_r($cm);
+        // echo '</pre>';
+        //         die;
                 continue;
             }
             $resource = $resources[$cm->modname][$cm->instance];
@@ -217,21 +255,26 @@ class local_downloadcenter_factory {
             $res->isstealth = $cm->is_stealth();
             $res->context = $cmcontext;
             $sorted[$currentsection]->res[] = $res;
+        //     echo '<pre>';
+        // print_r($sorted);
+        // echo '</pre>';
+        // die;
+            $count++;
         }
 
         // Place a subsection in a section as res as a test.
-        $res = new stdClass;
-        $res->icon = '';
-        $res->cmid = $savedsub->id;
-        $res->name = $savedsub->name;
-        $res->modname = 'subsection';
-        $res->instanceid = $savedsub->id;
-        $res->resource = $savedsub;
-        $res->cm = $savedsub;
-        $res->visible = $savedsub->visible;
-        $res->isstealth = false;
-        $res->context = '';
-        $sorted[$currentsection]->res[] = $res;
+        // $res = new stdClass;
+        // $res->icon = '';
+        // $res->cmid = $savedsub->id;
+        // $res->name = $savedsub->name;
+        // $res->modname = 'subsection';
+        // $res->instanceid = $savedsub->id;
+        // $res->resource = $savedsub;
+        // $res->cm = $savedsub;
+        // $res->visible = $savedsub->visible;
+        // $res->isstealth = false;
+        // $res->context = '';
+        // $sorted[$currentsection]->res[] = $res;
 
         $this->sortedresources = $sorted;
         // echo '<pre>';

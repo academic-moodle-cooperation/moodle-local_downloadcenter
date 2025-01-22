@@ -75,7 +75,27 @@ class local_downloadcenter_download_form extends moodleform {
             $mform->addElement('checkbox', $sectionname, $sectiontitle);
 
             $mform->setDefault($sectionname, 1);
+            // $count = 0;
+            // echo '<pre>';
+            //         print_r($resources);
+            //         echo '</pre>';
+            //         die;
             foreach ($sectioninfo->res as $res) {
+                // if ($res->modname == 'subsection') {
+                //     $res = $resources[$res->instanceid];
+                //     echo '<pre>';
+                //     print_r($res);
+                //     echo '</pre>';
+                //     die;
+                // }
+
+                // if ($count == 1) {
+
+                //     echo '<pre>';
+                //     print_r($res);
+                //     echo '</pre>';
+                //     die;
+                // }
                 $name = 'item_' . $res->modname . '_' . $res->instanceid;
                 $title = html_writer::span($res->name) . ' ' . $res->icon;
                 $badge = '';
@@ -89,6 +109,30 @@ class local_downloadcenter_download_form extends moodleform {
                 $title = html_writer::tag('span', $title . $badge, array('class' => 'itemtitle'));
                 $mform->addElement('checkbox', $name, $title);
                 $mform->setDefault($name, 1);
+
+                // if ($res->modname == 'subsection') {
+                //     $rese = $resources[$res->instanceid];
+                //     echo '<pre>';
+                //     print_r($rese);
+                //     echo '</pre>';
+                //     die;
+                //     foreach ($rese as $res) {
+                //         $name = 'item_' . $res->modname . '_' . $res->instanceid;
+                //         $title = html_writer::span($res->name) . ' ' . $res->icon;
+                //         $badge = '';
+                //         if (!$res->visible) {
+                //             $badge = html_writer::tag('span', get_string('hiddenfromstudents'), array('class' => 'badge bg-info text-white mb-1'));
+                //         }
+                //         if ($res->isstealth) {
+                //             $badge = html_writer::tag('span', get_string('hiddenoncoursepage'), array('class' => 'badge bg-info text-white mb-1'));
+
+                //         }
+                //         $title = html_writer::tag('span', $title . $badge, array('class' => 'itemtitle'));
+                //         $mform->addElement('checkbox', $name, $title);
+                //         $mform->setDefault($name, 1);
+                //     }
+                // }
+                // $count++;
             }
             $mform->addElement('html', html_writer::end_tag('div'));
         }
