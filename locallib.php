@@ -295,7 +295,7 @@ class local_downloadcenter_factory {
                         // $subresource->name = $resource->name . ' - ' . $subresource->name;
                         $subresource->issubresource = true;
                         $subresource->subsectionname = $resource->name;
-                        $subresource->subsectionitemid = $resource->instanceid;
+                        $subresource->subsectionitemid = $resource->cmid;
                         $newresources[] = $subresource;
                     }
                 } else {

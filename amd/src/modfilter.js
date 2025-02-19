@@ -87,7 +87,10 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
         const name = $checkbox.prop('name');
         const checked = $checkbox.prop('checked');
         if (name.substring(0, shortprefix.length) === shortprefix) {
-            const $parent = $checkbox.parentsUntil('form', '.card');
+            let $parent = $checkbox.parentsUntil('form', '.card');
+            if ($parent.length > 1) {
+                $parent = $parent.first();
+            }
             if (name.substring(0, prefix.length) === prefix) {
                 $parent.find('input.form-check-input').prop('checked', checked);
             } else {
