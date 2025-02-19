@@ -103,7 +103,7 @@ class local_downloadcenter_factory {
         $usesections = course_format_uses_sections($this->course->format);
         $canviewhiddensections = has_capability('moodle/course:viewhiddensections', context_course::instance($this->course->id));
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', context_course::instance($this->course->id));
-        $savedsub = [];
+        // $savedsub = [];
         $sorted = [];
         if ($usesections) {
             $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
@@ -112,10 +112,10 @@ class local_downloadcenter_factory {
             $unnamedsections = [];
             $namedsections = [];
             foreach ($sections as $section) {
-                $savedsub = $section;
-                echo '<pre>';
-                print_r($section);
-                echo '</pre>';
+                // $savedsub = $section;
+                // echo '<pre>';
+                // print_r($section);
+                // echo '</pre>';
                 // die;
                 if (intval($section->section) > $max) {
                     break;
@@ -126,6 +126,8 @@ class local_downloadcenter_factory {
                     $title = self::shorten_filename($title);
                     $sorted[$section->section]->title = $title;
                     $sorted[$section->section]->visible = $section->visible;
+                    // Item id is needed to find the corresponding subsection.
+                    $sorted[$section->section]->itemid = $section->itemid;
                     if (empty($title)) {
                         $unnamedsections[] = $section->section;
                     } else {
@@ -156,6 +158,7 @@ class local_downloadcenter_factory {
             $sorted['default'] = new stdClass;// TODO: fix here if needed!
             $sorted['default']->title = '0';
             $sorted['default']->res = [];
+            $sorted['default']->itemid = -1;
         }
         $cms = [];
         $resources = [];
@@ -256,7 +259,7 @@ class local_downloadcenter_factory {
             $res->context = $cmcontext;
             $sorted[$currentsection]->res[] = $res;
         //     echo '<pre>';
-        // print_r($sorted);
+        // print_r($res);
         // echo '</pre>';
         // die;
             $count++;
@@ -277,11 +280,57 @@ class local_downloadcenter_factory {
         // $sorted[$currentsection]->res[] = $res;
 
         $this->sortedresources = $sorted;
+
+        foreach ($sorted as $section) {
+            $resources = $section->res;
+            $newresources = [];
+            foreach ($resources as $resource) {
+                if ($resource->modname == 'subsection') {
+                    $subsectionresources = $this->get_ressources_from_subsection($sorted, $resource->instanceid);
+                    foreach ($subsectionresources as $subresource) {
+                        //                 echo '<pre>';
+                        // print_r($subresource);
+                        // echo '</pre>';
+                        // die;
+                        // $subresource->name = $resource->name . ' - ' . $subresource->name;
+                        $subresource->issubresource = true;
+                        $subresource->subsectionname = $resource->name;
+                        $subresource->subsectionitemid = $resource->instanceid;
+                        $newresources[] = $subresource;
+                    }
+                } else {
+                    $newresources[] = $resource;
+                }
+            }
+            $section->res = $newresources;
+        }
+
+        // Filter out subsections.
+        $filtered = [];
+        foreach ($sorted as $section) {
+            if (empty($section->itemid)) {
+                $filtered[] = $section;
+            }
+        }
+
         // echo '<pre>';
         // print_r($sorted);
         // echo '</pre>';
         // die;
-        return $sorted;
+        return $filtered;
+    }
+
+    public function get_ressources_from_subsection($allsections, $sectionitemid) {
+        $subsection = $this->get_subsection_from_sections($allsections, $sectionitemid);
+        return $subsection->res;
+    }
+
+    public function get_subsection_from_sections($allsections, $sectionitemid) {
+        foreach ($allsections as $section) {
+            if ($section->itemid == $sectionitemid) {
+                return $section;
+            }
+        }
     }
 
     /**

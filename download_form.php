@@ -80,6 +80,7 @@ class local_downloadcenter_download_form extends moodleform {
             //         print_r($resources);
             //         echo '</pre>';
             //         die;
+            $currentsubsectionitemid = -1;
             foreach ($sectioninfo->res as $res) {
                 // if ($res->modname == 'subsection') {
                 //     $res = $resources[$res->instanceid];
@@ -96,6 +97,26 @@ class local_downloadcenter_download_form extends moodleform {
                 //     echo '</pre>';
                 //     die;
                 // }
+                if (!empty($res->issubresource)) {
+                    if ($currentsubsectionitemid != -1 && $currentsubsectionitemid != $res->subsectionitemid) {
+                        $mform->addElement('html', html_writer::end_tag('div'));
+                    }
+                    if ($currentsubsectionitemid != $res->subsectionitemid) {
+                        $mform->addElement('html', html_writer::start_tag('div', array('class' => 'card block mb-3')));
+
+                        $sectiontitle = html_writer::span($res->subsectionname, 'sectiontitle');
+                        $sectionname = 'item_topic_' . $res->subsectionitemid;
+                        $mform->addElement('checkbox', $sectionname, $sectiontitle);
+                        $mform->setDefault($sectionname, 1);
+                    }
+                    $currentsubsectionitemid = $res->subsectionitemid;
+                } else {
+                    if ($currentsubsectionitemid != -1) {
+                        $mform->addElement('html', html_writer::end_tag('div'));
+                    }
+                    $currentsubsectionitemid = -1;
+                }
+
                 $name = 'item_' . $res->modname . '_' . $res->instanceid;
                 $title = html_writer::span($res->name) . ' ' . $res->icon;
                 $badge = '';
@@ -133,6 +154,12 @@ class local_downloadcenter_download_form extends moodleform {
                 //     }
                 // }
                 // $count++;
+                // if (!empty($res->issubresource)) {
+                //     $mform->addElement('html', html_writer::end_tag('div'));
+                // }
+            }
+            if ($currentsubsectionitemid != -1) {
+                $mform->addElement('html', html_writer::end_tag('div'));
             }
             $mform->addElement('html', html_writer::end_tag('div'));
         }
