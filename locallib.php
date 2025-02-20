@@ -56,7 +56,7 @@ class local_downloadcenter_factory {
         'assign',
         'glossary',
         'etherpadlite',
-        'subsection'
+        'subsection',
     ];
     /**
      * @var array
@@ -101,7 +101,7 @@ class local_downloadcenter_factory {
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', context_course::instance($this->course->id));
         $sorted = [];
         if ($usesections) {
-            $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
+            $sections = $DB->get_records('course_sections', ['course' => $this->course->id], 'section');
             // Thanks to https://github.com/marinaglancy for the fix!
             $max = course_get_format($this->course)->get_format_options()['numsections'] ?? count($sections);
             $unnamedsections = [];
@@ -216,14 +216,33 @@ class local_downloadcenter_factory {
             $count++;
         }
 
-        $this->sortedresources = $sorted;
+        $this->replace_subsection_resources($sorted);
 
+        // Filter out subsections.
+        $filtered = [];
         foreach ($sorted as $section) {
+            if (empty($section->itemid)) {
+                $filtered[] = $section;
+            }
+        }
+
+        $this->sortedresources = $filtered;
+
+        return $filtered;
+    }
+
+    /**
+     * Replaces the subsection resource with the actual resources from the subsection.
+     *
+     * @param array $sections All sections with the resources.
+     */
+    private function replace_subsection_resources(&$sections) {
+        foreach ($sections as $section) {
             $resources = $section->res;
             $newresources = [];
             foreach ($resources as $resource) {
                 if ($resource->modname == 'subsection') {
-                    $subsectionresources = $this->get_ressources_from_subsection($sorted, $resource->instanceid);
+                    $subsectionresources = $this->get_resources_from_subsection($sections, $resource->instanceid);
                     foreach ($subsectionresources as $subresource) {
                         $subresource->issubresource = true;
                         $subresource->subsectionname = $resource->name;
@@ -236,36 +255,41 @@ class local_downloadcenter_factory {
             }
             $section->res = $newresources;
         }
-
-        // Filter out subsections.
-        $filtered = [];
-        foreach ($sorted as $section) {
-            if (empty($section->itemid)) {
-                $filtered[] = $section;
-            }
-        }
-
-        return $filtered;
     }
 
-    public function get_ressources_from_subsection($allsections, $sectionitemid) {
+    /**
+     * Returns all the resources from a subsection.
+     *
+     * @param array $allsections
+     * @param int $sectionitemid
+     * @return array
+     */
+    public function get_resources_from_subsection($allsections, $sectionitemid) {
         $subsection = $this->get_subsection_from_sections($allsections, $sectionitemid);
         return $subsection->res;
     }
 
+    /**
+     * Returns a subsection from all sections based on the section item id.
+     *
+     * @param array $allsections
+     * @param int $sectionitemid
+     * @return stdClass|null
+     */
     public function get_subsection_from_sections($allsections, $sectionitemid) {
         foreach ($allsections as $section) {
             if ($section->itemid == $sectionitemid) {
                 return $section;
             }
         }
+        return null;
     }
 
     /**
      * @return array
      */
     public function get_js_modnames() {
-        return array($this->jsnames);
+        return [$this->jsnames];
     }
 
     /**
@@ -441,7 +465,7 @@ class local_downloadcenter_factory {
                         $records = $DB->get_records('publication_file', $conditions);
 
                         // Get user firstname/lastname.
-                        $auser = $DB->get_record('user', array('id' => $auserid), $userfields);
+                        $auser = $DB->get_record('user', ['id' => $auserid], $userfields);
 
                         foreach ($records as $record) {
 
@@ -486,7 +510,7 @@ class local_downloadcenter_factory {
                     }
                     $content = str_replace('@@PLUGINFILE@@', 'data', $res->resource->content);
                     $content = self::convert_content_to_html_doc($res->name, $content);
-                    $filelist[$filename] = array($content); // Needs to be array to be saved as file.
+                    $filelist[$filename] = [$content]; // Needs to be array to be saved as file.
 
                 } else if ($res->modname == 'book' && !$modbookmissing) {
                     $book = $res->resource;
@@ -513,13 +537,13 @@ class local_downloadcenter_factory {
                     }
 
                     // Taken from mod/book/tool/print/index.php!
-                    $allchapters = $DB->get_records('book_chapters', array('bookid' => $book->id), 'pagenum');
+                    $allchapters = $DB->get_records('book_chapters', ['bookid' => $book->id], 'pagenum');
 
                     $book->intro = str_replace('@@PLUGINFILE@@', 'data', $book->intro);
                     $content = '<a name="top"></a>';
-                    $content .= $OUTPUT->heading(format_string($book->name, true, array('context' => $context)), 1);
+                    $content .= $OUTPUT->heading(format_string($book->name, true, ['context' => $context]), 1);
                     $content .= '<p class="book_summary">' .
-                        format_text($book->intro, $book->introformat, array('noclean' => true, 'context' => $context))  .
+                        format_text($book->intro, $book->introformat, ['noclean' => true, 'context' => $context])  .
                         '</p>';
 
                     $toc = $bookrenderer->render_print_book_toc($chapters, $book, $cm);
@@ -547,12 +571,12 @@ class local_downloadcenter_factory {
                         $chaptercontent = str_replace('@@PLUGINFILE@@', 'data', $chaptercontent);
                         $content .= format_text($chaptercontent,
                             $chapter->contentformat,
-                            array('noclean' => true, 'context' => $context));
+                            ['noclean' => true, 'context' => $context]);
                         $content .= '</div>';
                         $content .= '<a href="#toc">&uarr; ' . get_string('top', 'mod_book') . '</a>';
                     }
                     $content = self::convert_content_to_html_doc($res->name, $content);
-                    $filelist[$filename] = array($content); // Needs to be array to be saved as file.
+                    $filelist[$filename] = [$content]; // Needs to be array to be saved as file.
                 } else if ($res->modname == 'lightboxgallery') {
 
                     $fs = get_file_storage();
@@ -709,13 +733,13 @@ class local_downloadcenter_factory {
                     $content = '';
                     ob_start();
                     $sitename = get_string("site") . ': <span class="strong">' . format_string($SITE->fullname) . '</span>';
-                    echo html_writer::tag('div', $sitename, array('class' => 'sitename'));
+                    echo html_writer::tag('div', $sitename, ['class' => 'sitename']);
 
                     $coursename = get_string("course") . ': <span class="strong">' . format_string($course->fullname) . ' ('. format_string($course->shortname) . ')</span>';
-                    echo html_writer::tag('div', $coursename, array('class' => 'coursename'));
+                    echo html_writer::tag('div', $coursename, ['class' => 'coursename']);
 
                     $modname = get_string("modulename", "glossary") . ': <span class="strong">' . format_string($glossary->name, true) . '</span>';
-                    echo html_writer::tag('div', $modname, array('class' => 'modname'));
+                    echo html_writer::tag('div', $modname, ['class' => 'modname']);
 
                     list($allentries, $count) = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, 0);
                     if ( $allentries ) {
@@ -733,7 +757,7 @@ class local_downloadcenter_factory {
                             // If there's a group break.
                             if ($currentpivot != $upperpivot) {
                                 $currentpivot = $upperpivot;
-                                echo html_writer::tag('div', clean_text($pivottoshow), array('class' => 'mdl-align strong'));
+                                echo html_writer::tag('div', clean_text($pivottoshow), ['class' => 'mdl-align strong']);
                             }
                             glossary_print_entry($course, $cm, $glossary, $entry, $mode, $hook, 1, $displayformat, true);
                         }
@@ -795,7 +819,7 @@ class local_downloadcenter_factory {
                             if (!empty($htmlcontent)) {
                                 $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
                                 $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . get_string('allparticipants') . '.html');
-                                $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                                $filelist[$filename] = [$htmlcontent]; // Needs to be array to be saved as file.
                             }
                         }
                         $allgroups = groups_get_activity_allowed_groups($res->cm);
@@ -804,7 +828,7 @@ class local_downloadcenter_factory {
                             if (!empty($htmlcontent)) {
                                 $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
                                 $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . $group->name . '.html');
-                                $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                                $filelist[$filename] = [$htmlcontent]; // Needs to be array to be saved as file.
                             }
                         }
                     } else {
@@ -812,7 +836,7 @@ class local_downloadcenter_factory {
                         if (!empty($htmlcontent)) {
                             $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
                             $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
-                            $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                            $filelist[$filename] = [$htmlcontent]; // Needs to be array to be saved as file.
                         }
                     }
                 }
@@ -915,6 +939,14 @@ class local_downloadcenter_factory {
         return mb_substr($filename, 0, $limit) . '___' . mb_substr($filename, (1 - $limit));
     }
 
+    /**
+     * Converts content to a full HTML document.
+     *
+     * @param string $title
+     * @param string $content
+     * @param string $additionalhead
+     * @return string
+     */
     public static function convert_content_to_html_doc($title, $content, $additionalhead = '') {
         return <<<HTML
 <!doctype html>
@@ -931,6 +963,12 @@ $content
 HTML;
     }
 
+    /**
+     * Appends CSS to the HTML content of an EtherpadLite document.
+     *
+     * @param string $htmlcontent
+     * @return string
+     */
     public static function append_etherpadlite_css($htmlcontent) {
         $csscontent = <<<CSS
 <style>
