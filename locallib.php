@@ -82,6 +82,8 @@ class local_downloadcenter_factory {
     }
 
     /**
+     * Returns an array of all the resources for the download center of the course for the user.
+     *
      * @return array
      * @throws coding_exception
      * @throws dml_exception
@@ -365,6 +367,7 @@ class local_downloadcenter_factory {
                     $insubsection = true;
                     $oldbasedir = $basedir;
 
+                    // When the subsections change, the numbering for the subsection resources should start from 1 again.
                     if ($currentsubseccmid != $res->subsectioncmid) {
                         $currentsubseccmid = $res->subsectioncmid;
                         $subresprefixid = 1;
@@ -373,16 +376,19 @@ class local_downloadcenter_factory {
                         }
                         $firstsubsec = true;
                     }
+                    // The subsections should be in a separate folder. Therefore append the subsection name to the basedir.
                     if ($addnumbering) {
                         $basedir .= '/' . sprintf($resprefixformat, $resprefixid) . '_' . $res->subsectionname;
                     } else {
                         $basedir .= '/' . self::shorten_filename($res->subsectionname);
                     }
                 } else if ($insubsection) {
+                    // Reset helper variables to ensure correct numbering of resources and subsection folders.
                     $insubsection = false;
                     $firstsubsec = false;
                     $resprefixid++;
                 }
+                // Adds numbering to the actual resources. Either to resources in section or inside a subsection (different number).
                 if ($addnumbering) {
                     if ($this->is_subsection_resource($res)) {
                         $prefix = sprintf($resprefixformat, $subresprefixid);
