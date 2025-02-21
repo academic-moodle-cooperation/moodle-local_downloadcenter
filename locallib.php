@@ -264,7 +264,7 @@ class local_downloadcenter_factory {
      * @param int $sectionitemid
      * @return array
      */
-    public function get_resources_from_subsection($allsections, $sectionitemid) {
+    private function get_resources_from_subsection($allsections, $sectionitemid) {
         $subsection = $this->get_subsection_from_sections($allsections, $sectionitemid);
         return $subsection->res;
     }
@@ -276,7 +276,7 @@ class local_downloadcenter_factory {
      * @param int $sectionitemid
      * @return stdClass|null
      */
-    public function get_subsection_from_sections($allsections, $sectionitemid) {
+    private function get_subsection_from_sections($allsections, $sectionitemid) {
         foreach ($allsections as $section) {
             if ($section->itemid == $sectionitemid) {
                 return $section;
@@ -290,6 +290,16 @@ class local_downloadcenter_factory {
      */
     public function get_js_modnames() {
         return [$this->jsnames];
+    }
+
+    /**
+     * Checks if the resource is a subsection.
+     *
+     * @param mixed $resource
+     * @return bool
+     */
+    public function is_subsection_resource($resource) {
+        return !empty($resource->issubresource);
     }
 
     /**
@@ -343,10 +353,44 @@ class local_downloadcenter_factory {
             $resprefixid = 1;
             $rescount = count($info->res);
             $resprefixformat = '%0' . strlen($rescount) . 'd';
+            $oldbasedir = $basedir;
+            $subresprefixid = 1;
+            $currentsubseccmid = -1;
+            $insubsection = false;
+            $firstsubsec = false;
             foreach ($info->res as $res) {
                 $res->name = html_entity_decode($res->name);
+                $basedir = $oldbasedir;
+                if ($this->is_subsection_resource($res)) {
+                    $insubsection = true;
+                    $oldbasedir = $basedir;
+
+                    if ($currentsubseccmid != $res->subsectioncmid) {
+                        $currentsubseccmid = $res->subsectioncmid;
+                        $subresprefixid = 1;
+                        if ($firstsubsec) {
+                            $resprefixid++;
+                        }
+                        $firstsubsec = true;
+                    }
+                    if ($addnumbering) {
+                        $basedir .= '/' . sprintf($resprefixformat, $resprefixid) . '_' . $res->subsectionname;
+                    } else {
+                        $basedir .= '/' . self::shorten_filename($res->subsectionname);
+                    }
+                } else if ($insubsection) {
+                    $insubsection = false;
+                    $firstsubsec = false;
+                    $resprefixid++;
+                }
                 if ($addnumbering) {
-                    $res->name = sprintf($resprefixformat, $resprefixid) . '_' . $res->name;
+                    if ($this->is_subsection_resource($res)) {
+                        $prefix = sprintf($resprefixformat, $subresprefixid);
+                        $subresprefixid++;
+                    } else {
+                        $prefix = sprintf($resprefixformat, $resprefixid);
+                    }
+                    $res->name = $prefix . '_' . $res->name;
                 }
                 $resdir = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
                 $filelist[$resdir] = null;
@@ -841,7 +885,9 @@ class local_downloadcenter_factory {
                     }
                 }
 
-                $resprefixid++;
+                if (!$this->is_subsection_resource($res)) {
+                    $resprefixid++;
+                }
             }
         }
 
