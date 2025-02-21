@@ -58,6 +58,7 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->addElement('static', 'warning', '', ''); // Hack to work around fieldsets!
 
         $empty = true;
+        $firstbox = true;
         $excludeempty = get_config('local_downloadcenter', 'exclude_empty_topics');
         foreach ($resources as $sectionid => $sectioninfo) {
             if ($excludeempty && empty($sectioninfo->res)) { // Only display the sections that are not empty.
@@ -66,13 +67,17 @@ class local_downloadcenter_download_form extends moodleform {
 
             $empty = false;
             $sectionname = 'item_topic_' . $sectionid;
-            $mform->addElement('html', html_writer::start_tag('div', ['class' => 'card block mb-3']));
-            $sectiontitle = html_writer::span($sectioninfo->title, 'sectiontitle');
+            $class = 'card block mb-3';
+            // Small margin for the first box for better separation.
+            $class .= $firstbox ? ' mt-3' : '';
+            $firstbox = false;
+            $mform->addElement('html', html_writer::start_tag('div', ['class' => $class]));
+            $sectiontitle = html_writer::span($sectioninfo->title, 'sectiontitle mt-1');
 
             if (!$sectioninfo->visible) {
                 $sectiontitle .= html_writer::tag('span', get_string('hiddenfromstudents'), ['class' => 'badge bg-info text-white ml-1 sectiontitlebadge']);
             }
-            $mform->addElement('checkbox', $sectionname, $sectiontitle);
+            $mform->addElement('checkbox', $sectionname, $sectiontitle, '', ['class' => 'mt-2']);
 
             $mform->setDefault($sectionname, 1);
 
@@ -85,9 +90,9 @@ class local_downloadcenter_download_form extends moodleform {
                     if ($currentsubsectionitemid != $res->subsectioncmid) {
                         $mform->addElement('html', html_writer::start_tag('div', ['class' => 'card block mb-3 mr-3']));
 
-                        $sectiontitle = html_writer::span($res->subsectionname, 'sectiontitle');
+                        $sectiontitle = html_writer::span($res->subsectionname, 'sectiontitle mt-1');
                         $sectionname = 'item_topic_' . $res->subsectioncmid;
-                        $mform->addElement('checkbox', $sectionname, $sectiontitle);
+                        $mform->addElement('checkbox', $sectionname, $sectiontitle, '', ['class' => 'mt-2']);
                         $mform->setDefault($sectionname, 1);
                     }
                     $currentsubsectionitemid = $res->subsectioncmid;
