@@ -169,7 +169,6 @@ class local_downloadcenter_factory {
         }
         $availablesections = array_keys($sorted);
         $currentsection = '';
-        $count = 0;
         foreach ($cms as $cm) {
             if (!isset($resources[$cm->modname][$cm->instance])) {
                 continue;
@@ -198,7 +197,7 @@ class local_downloadcenter_factory {
                 }
             }
 
-            if (!isset($this->jsnames[$cm->modname])) {
+            if (!isset($this->jsnames[$cm->modname]) && $cm->modname != 'subsection') {
                 $this->jsnames[$cm->modname] = get_string('modulenameplural', 'mod_' . $cm->modname);
             }
 
@@ -215,7 +214,6 @@ class local_downloadcenter_factory {
             $res->isstealth = $cm->is_stealth();
             $res->context = $cmcontext;
             $sorted[$currentsection]->res[] = $res;
-            $count++;
         }
 
         $this->replace_subsection_resources($sorted);

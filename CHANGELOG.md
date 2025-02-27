@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+4.5.1 (2025-XX-XX)
+------------------
+* [FEATURE] #8084 - Support Moodle subsections
 
 4.5.0 (2024-10-10)
 ------------------
