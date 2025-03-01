@@ -16,12 +16,11 @@
 
 namespace local_downloadcenter\event;
 
-defined('MOODLE_INTERNAL') || die();
-
-
 /**
  * Class zip_downloaded
- * @package local_downloadcenter\event
+ * @package   local_downloadcenter
+ * @copyright 2015 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class zip_downloaded extends \core\event\base {
     /**
@@ -34,6 +33,8 @@ class zip_downloaded extends \core\event\base {
     }
 
     /**
+     * Returns downloadcenter zip downloaded event name
+     *
      * @return string
      * @throws \coding_exception
      */
@@ -42,6 +43,8 @@ class zip_downloaded extends \core\event\base {
     }
 
     /**
+     * Returns the description of the event
+     *
      * @return string
      */
     public function get_description() {
@@ -50,10 +53,12 @@ class zip_downloaded extends \core\event\base {
     }
 
     /**
+     * Returns the URL to the course download center page
+     *
      * @return \moodle_url
      * @throws \moodle_exception
      */
     public function get_url() {
-        return new \moodle_url('/local/downloadcenter/index.php', array('courseid' => $this->objectid));
+        return new \moodle_url('/local/downloadcenter/index.php', ['courseid' => $this->objectid]);
     }
 }

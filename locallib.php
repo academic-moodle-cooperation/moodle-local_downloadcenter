@@ -22,26 +22,26 @@
  * @copyright     2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
 class local_downloadcenter_factory {
     /**
-     * @var
+     * @var mixed|object
      */
     private $course;
     /**
-     * @var
+     * @var mixed|object
      */
     private $user;
     /**
-     * @var
+     * @var array
      */
     private $sortedresources;
     /**
-     * @var
+     * @var array
      */
     private $filteredresources;
+    /**
+     * @var array
+     */
     private $_downloadoptions;
     /**
      * @var array
@@ -62,15 +62,11 @@ class local_downloadcenter_factory {
      * @var array
      */
     private $jsnames = [];
-    /**
-     * @var
-     */
-    private $progress;
 
     /**
      * local_downloadcenter_factory constructor.
-     * @param $course
-     * @param $user
+     * @param mixed|object $course
+     * @param mixed|object $user
      */
     public function __construct($course, $user) {
         $this->course = $course;
@@ -286,6 +282,8 @@ class local_downloadcenter_factory {
     }
 
     /**
+     * Returns the module names for the JS.
+     *
      * @return array
      */
     public function get_js_modnames() {
@@ -303,6 +301,8 @@ class local_downloadcenter_factory {
     }
 
     /**
+     * Creates a zip file with all the resources that the user wants to download and downloads it.
+     *
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -921,9 +921,11 @@ class local_downloadcenter_factory {
     }
 
     /**
-     * @param $filelist
-     * @param $folder
-     * @param $path
+     * Adds the contents of a folder to the filelist.
+     *
+     * @param array $filelist
+     * @param array $folder
+     * @param string $path
      */
     private function add_folder_contents(&$filelist, $folder, $path) {
         if (!empty($folder['subdirs'])) {
@@ -938,7 +940,9 @@ class local_downloadcenter_factory {
     }
 
     /**
-     * @param $data
+     * Parse the data from the form where the user selects the resources to download and the options.
+     *
+     * @param stdClass|null $data
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
@@ -975,7 +979,9 @@ class local_downloadcenter_factory {
     }
 
     /**
-     * @param $filename
+     * Replace slash with underscore and shorten the filename based on the maxlength.
+     *
+     * @param string $filename
      * @param int $maxlength
      * @return string
      */

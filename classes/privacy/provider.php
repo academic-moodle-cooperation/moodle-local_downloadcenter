@@ -14,17 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_downloadcenter\privacy;
+
 /**
+ * Privacy Subsystem for local_downloadcenter implementing null_provider.
+ *
  * @package   local_downloadcenter
  * @author    Simeon Naydenov
  * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-
-namespace local_downloadcenter\privacy;
-
-
 class provider implements \core_privacy\local\metadata\null_provider {
 
     /**
