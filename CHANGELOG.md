@@ -1,7 +1,7 @@
 CHANGELOG
 =========
 
-4.5.1 (2025-XX-XX)
+4.5.1 (2025-03-04)
 ------------------
 * [FEATURE] #8084 - Support Moodle subsections
 
