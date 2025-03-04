@@ -22,26 +22,26 @@
  * @copyright     2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
 class local_downloadcenter_factory {
     /**
-     * @var
+     * @var mixed|object
      */
     private $course;
     /**
-     * @var
+     * @var mixed|object
      */
     private $user;
     /**
-     * @var
+     * @var array
      */
     private $sortedresources;
     /**
-     * @var
+     * @var array
      */
     private $filteredresources;
+    /**
+     * @var array
+     */
     private $_downloadoptions;
     /**
      * @var array
@@ -56,20 +56,17 @@ class local_downloadcenter_factory {
         'assign',
         'glossary',
         'etherpadlite',
+        'subsection',
     ];
     /**
      * @var array
      */
     private $jsnames = [];
-    /**
-     * @var
-     */
-    private $progress;
 
     /**
      * local_downloadcenter_factory constructor.
-     * @param $course
-     * @param $user
+     * @param mixed|object $course
+     * @param mixed|object $user
      */
     public function __construct($course, $user) {
         $this->course = $course;
@@ -81,6 +78,8 @@ class local_downloadcenter_factory {
     }
 
     /**
+     * Returns an array of all the resources for the download center of the course for the user.
+     *
      * @return array
      * @throws coding_exception
      * @throws dml_exception
@@ -98,10 +97,9 @@ class local_downloadcenter_factory {
         $usesections = course_format_uses_sections($this->course->format);
         $canviewhiddensections = has_capability('moodle/course:viewhiddensections', context_course::instance($this->course->id));
         $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', context_course::instance($this->course->id));
-
         $sorted = [];
         if ($usesections) {
-            $sections = $DB->get_records('course_sections', array('course' => $this->course->id), 'section');
+            $sections = $DB->get_records('course_sections', ['course' => $this->course->id], 'section');
             // Thanks to https://github.com/marinaglancy for the fix!
             $max = course_get_format($this->course)->get_format_options()['numsections'] ?? count($sections);
             $unnamedsections = [];
@@ -116,6 +114,8 @@ class local_downloadcenter_factory {
                     $title = self::shorten_filename($title);
                     $sorted[$section->section]->title = $title;
                     $sorted[$section->section]->visible = $section->visible;
+                    // Item id is needed to find the corresponding subsection.
+                    $sorted[$section->section]->itemid = $section->itemid;
                     if (empty($title)) {
                         $unnamedsections[] = $section->section;
                     } else {
@@ -124,6 +124,7 @@ class local_downloadcenter_factory {
                     $sorted[$section->section]->res = []; // TODO: fix empty names here!!!
                 }
             }
+
             foreach ($unnamedsections as $sectionid) {
                 $untitled = get_string('untitled', 'local_downloadcenter');
                 $title = $untitled;
@@ -139,6 +140,7 @@ class local_downloadcenter_factory {
             $sorted['default'] = new stdClass;// TODO: fix here if needed!
             $sorted['default']->title = '0';
             $sorted['default']->res = [];
+            $sorted['default']->itemid = -1;
         }
         $cms = [];
         $resources = [];
@@ -146,10 +148,10 @@ class local_downloadcenter_factory {
             if (!in_array($cm->modname, $this->availableresources)) {
                 continue;
             }
-            if (!$cm->uservisible) {
+            if (!$cm->uservisible && $cm->modname != 'subsection') {
                 continue;
             }
-            if (!$cm->has_view() && $cm->modname != 'folder') {
+            if (!$cm->has_view() && $cm->modname != 'folder' && $cm->modname != 'subsection') {
                 // Exclude label and similar!
                 continue;
             }
@@ -191,7 +193,7 @@ class local_downloadcenter_factory {
                 }
             }
 
-            if (!isset($this->jsnames[$cm->modname])) {
+            if (!isset($this->jsnames[$cm->modname]) && $cm->modname != 'subsection') {
                 $this->jsnames[$cm->modname] = get_string('modulenameplural', 'mod_' . $cm->modname);
             }
 
@@ -210,18 +212,97 @@ class local_downloadcenter_factory {
             $sorted[$currentsection]->res[] = $res;
         }
 
-        $this->sortedresources = $sorted;
-        return $sorted;
+        $this->replace_subsection_resources($sorted);
+
+        // Filter out subsections.
+        $filtered = [];
+        foreach ($sorted as $section) {
+            if (empty($section->itemid)) {
+                $filtered[] = $section;
+            }
+        }
+
+        $this->sortedresources = $filtered;
+
+        return $filtered;
     }
 
     /**
+     * Replaces the subsection resource with the actual resources from the subsection.
+     *
+     * @param array $sections All sections with the resources.
+     */
+    private function replace_subsection_resources(&$sections) {
+        foreach ($sections as $section) {
+            $resources = $section->res;
+            $newresources = [];
+            foreach ($resources as $resource) {
+                if ($resource->modname == 'subsection') {
+                    $subsectionresources = $this->get_resources_from_subsection($sections, $resource->instanceid);
+                    foreach ($subsectionresources as $subresource) {
+                        $subresource->issubresource = true;
+                        $subresource->subsectionname = $resource->name;
+                        $subresource->subsectioncmid = $resource->cmid;
+                        $newresources[] = $subresource;
+                    }
+                } else {
+                    $newresources[] = $resource;
+                }
+            }
+            $section->res = $newresources;
+        }
+    }
+
+    /**
+     * Returns all the resources from a subsection.
+     *
+     * @param array $allsections
+     * @param int $sectionitemid
+     * @return array
+     */
+    private function get_resources_from_subsection($allsections, $sectionitemid) {
+        $subsection = $this->get_subsection_from_sections($allsections, $sectionitemid);
+        return $subsection->res;
+    }
+
+    /**
+     * Returns a subsection from all sections based on the section item id.
+     *
+     * @param array $allsections
+     * @param int $sectionitemid
+     * @return stdClass|null
+     */
+    private function get_subsection_from_sections($allsections, $sectionitemid) {
+        foreach ($allsections as $section) {
+            if ($section->itemid == $sectionitemid) {
+                return $section;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the module names for the JS.
+     *
      * @return array
      */
     public function get_js_modnames() {
-        return array($this->jsnames);
+        return [$this->jsnames];
     }
 
     /**
+     * Checks if the resource is a subsection.
+     *
+     * @param mixed $resource
+     * @return bool
+     */
+    public function is_subsection_resource($resource) {
+        return !empty($resource->issubresource);
+    }
+
+    /**
+     * Creates a zip file with all the resources that the user wants to download and downloads it.
+     *
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -272,10 +353,48 @@ class local_downloadcenter_factory {
             $resprefixid = 1;
             $rescount = count($info->res);
             $resprefixformat = '%0' . strlen($rescount) . 'd';
+            $oldbasedir = $basedir;
+            $subresprefixid = 1;
+            $currentsubseccmid = -1;
+            $insubsection = false;
+            $firstsubsec = false;
             foreach ($info->res as $res) {
                 $res->name = html_entity_decode($res->name);
+                $basedir = $oldbasedir;
+                if ($this->is_subsection_resource($res)) {
+                    $insubsection = true;
+                    $oldbasedir = $basedir;
+
+                    // When the subsections change, the numbering for the subsection resources should start from 1 again.
+                    if ($currentsubseccmid != $res->subsectioncmid) {
+                        $currentsubseccmid = $res->subsectioncmid;
+                        $subresprefixid = 1;
+                        if ($firstsubsec) {
+                            $resprefixid++;
+                        }
+                        $firstsubsec = true;
+                    }
+                    // The subsections should be in a separate folder. Therefore append the subsection name to the basedir.
+                    if ($addnumbering) {
+                        $basedir .= '/' . sprintf($resprefixformat, $resprefixid) . '_' . $res->subsectionname;
+                    } else {
+                        $basedir .= '/' . self::shorten_filename($res->subsectionname);
+                    }
+                } else if ($insubsection) {
+                    // Reset helper variables to ensure correct numbering of resources and subsection folders.
+                    $insubsection = false;
+                    $firstsubsec = false;
+                    $resprefixid++;
+                }
+                // Adds numbering to the actual resources. Either to resources in section or inside a subsection (different number).
                 if ($addnumbering) {
-                    $res->name = sprintf($resprefixformat, $resprefixid) . '_' . $res->name;
+                    if ($this->is_subsection_resource($res)) {
+                        $prefix = sprintf($resprefixformat, $subresprefixid);
+                        $subresprefixid++;
+                    } else {
+                        $prefix = sprintf($resprefixformat, $resprefixid);
+                    }
+                    $res->name = $prefix . '_' . $res->name;
                 }
                 $resdir = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
                 $filelist[$resdir] = null;
@@ -394,7 +513,7 @@ class local_downloadcenter_factory {
                         $records = $DB->get_records('publication_file', $conditions);
 
                         // Get user firstname/lastname.
-                        $auser = $DB->get_record('user', array('id' => $auserid), $userfields);
+                        $auser = $DB->get_record('user', ['id' => $auserid], $userfields);
 
                         foreach ($records as $record) {
 
@@ -439,7 +558,7 @@ class local_downloadcenter_factory {
                     }
                     $content = str_replace('@@PLUGINFILE@@', 'data', $res->resource->content);
                     $content = self::convert_content_to_html_doc($res->name, $content);
-                    $filelist[$filename] = array($content); // Needs to be array to be saved as file.
+                    $filelist[$filename] = [$content]; // Needs to be array to be saved as file.
 
                 } else if ($res->modname == 'book' && !$modbookmissing) {
                     $book = $res->resource;
@@ -466,13 +585,13 @@ class local_downloadcenter_factory {
                     }
 
                     // Taken from mod/book/tool/print/index.php!
-                    $allchapters = $DB->get_records('book_chapters', array('bookid' => $book->id), 'pagenum');
+                    $allchapters = $DB->get_records('book_chapters', ['bookid' => $book->id], 'pagenum');
 
                     $book->intro = str_replace('@@PLUGINFILE@@', 'data', $book->intro);
                     $content = '<a name="top"></a>';
-                    $content .= $OUTPUT->heading(format_string($book->name, true, array('context' => $context)), 1);
+                    $content .= $OUTPUT->heading(format_string($book->name, true, ['context' => $context]), 1);
                     $content .= '<p class="book_summary">' .
-                        format_text($book->intro, $book->introformat, array('noclean' => true, 'context' => $context))  .
+                        format_text($book->intro, $book->introformat, ['noclean' => true, 'context' => $context])  .
                         '</p>';
 
                     $toc = $bookrenderer->render_print_book_toc($chapters, $book, $cm);
@@ -500,12 +619,12 @@ class local_downloadcenter_factory {
                         $chaptercontent = str_replace('@@PLUGINFILE@@', 'data', $chaptercontent);
                         $content .= format_text($chaptercontent,
                             $chapter->contentformat,
-                            array('noclean' => true, 'context' => $context));
+                            ['noclean' => true, 'context' => $context]);
                         $content .= '</div>';
                         $content .= '<a href="#toc">&uarr; ' . get_string('top', 'mod_book') . '</a>';
                     }
                     $content = self::convert_content_to_html_doc($res->name, $content);
-                    $filelist[$filename] = array($content); // Needs to be array to be saved as file.
+                    $filelist[$filename] = [$content]; // Needs to be array to be saved as file.
                 } else if ($res->modname == 'lightboxgallery') {
 
                     $fs = get_file_storage();
@@ -662,13 +781,13 @@ class local_downloadcenter_factory {
                     $content = '';
                     ob_start();
                     $sitename = get_string("site") . ': <span class="strong">' . format_string($SITE->fullname) . '</span>';
-                    echo html_writer::tag('div', $sitename, array('class' => 'sitename'));
+                    echo html_writer::tag('div', $sitename, ['class' => 'sitename']);
 
                     $coursename = get_string("course") . ': <span class="strong">' . format_string($course->fullname) . ' ('. format_string($course->shortname) . ')</span>';
-                    echo html_writer::tag('div', $coursename, array('class' => 'coursename'));
+                    echo html_writer::tag('div', $coursename, ['class' => 'coursename']);
 
                     $modname = get_string("modulename", "glossary") . ': <span class="strong">' . format_string($glossary->name, true) . '</span>';
-                    echo html_writer::tag('div', $modname, array('class' => 'modname'));
+                    echo html_writer::tag('div', $modname, ['class' => 'modname']);
 
                     list($allentries, $count) = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, 0);
                     if ( $allentries ) {
@@ -686,7 +805,7 @@ class local_downloadcenter_factory {
                             // If there's a group break.
                             if ($currentpivot != $upperpivot) {
                                 $currentpivot = $upperpivot;
-                                echo html_writer::tag('div', clean_text($pivottoshow), array('class' => 'mdl-align strong'));
+                                echo html_writer::tag('div', clean_text($pivottoshow), ['class' => 'mdl-align strong']);
                             }
                             glossary_print_entry($course, $cm, $glossary, $entry, $mode, $hook, 1, $displayformat, true);
                         }
@@ -748,7 +867,7 @@ class local_downloadcenter_factory {
                             if (!empty($htmlcontent)) {
                                 $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
                                 $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . get_string('allparticipants') . '.html');
-                                $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                                $filelist[$filename] = [$htmlcontent]; // Needs to be array to be saved as file.
                             }
                         }
                         $allgroups = groups_get_activity_allowed_groups($res->cm);
@@ -757,7 +876,7 @@ class local_downloadcenter_factory {
                             if (!empty($htmlcontent)) {
                                 $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
                                 $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . $group->name . '.html');
-                                $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                                $filelist[$filename] = [$htmlcontent]; // Needs to be array to be saved as file.
                             }
                         }
                     } else {
@@ -765,12 +884,14 @@ class local_downloadcenter_factory {
                         if (!empty($htmlcontent)) {
                             $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
                             $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
-                            $filelist[$filename] = array($htmlcontent); // Needs to be array to be saved as file.
+                            $filelist[$filename] = [$htmlcontent]; // Needs to be array to be saved as file.
                         }
                     }
                 }
 
-                $resprefixid++;
+                if (!$this->is_subsection_resource($res)) {
+                    $resprefixid++;
+                }
             }
         }
 
@@ -800,9 +921,11 @@ class local_downloadcenter_factory {
     }
 
     /**
-     * @param $filelist
-     * @param $folder
-     * @param $path
+     * Adds the contents of a folder to the filelist.
+     *
+     * @param array $filelist
+     * @param array $folder
+     * @param string $path
      */
     private function add_folder_contents(&$filelist, $folder, $path) {
         if (!empty($folder['subdirs'])) {
@@ -817,7 +940,9 @@ class local_downloadcenter_factory {
     }
 
     /**
-     * @param $data
+     * Parse the data from the form where the user selects the resources to download and the options.
+     *
+     * @param stdClass|null $data
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
@@ -854,7 +979,9 @@ class local_downloadcenter_factory {
     }
 
     /**
-     * @param $filename
+     * Replace slash with underscore and shorten the filename based on the maxlength.
+     *
+     * @param string $filename
      * @param int $maxlength
      * @return string
      */
@@ -868,6 +995,14 @@ class local_downloadcenter_factory {
         return mb_substr($filename, 0, $limit) . '___' . mb_substr($filename, (1 - $limit));
     }
 
+    /**
+     * Converts content to a full HTML document.
+     *
+     * @param string $title
+     * @param string $content
+     * @param string $additionalhead
+     * @return string
+     */
     public static function convert_content_to_html_doc($title, $content, $additionalhead = '') {
         return <<<HTML
 <!doctype html>
@@ -884,6 +1019,12 @@ $content
 HTML;
     }
 
+    /**
+     * Appends CSS to the HTML content of an EtherpadLite document.
+     *
+     * @param string $htmlcontent
+     * @return string
+     */
     public static function append_etherpadlite_css($htmlcontent) {
         $csscontent = <<<CSS
 <style>

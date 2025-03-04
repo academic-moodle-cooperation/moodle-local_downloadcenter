@@ -23,9 +23,8 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
+ * Not used anymore!
  *
  * @param settings_navigation $settingsnav
  * @param context $context
@@ -36,6 +35,8 @@ function local_downloadcenter_extend_settings_navigation(settings_navigation $se
 }
 
 /**
+ * Extend course navigation with download center link.
+ *
  * @param navigation_node $parentnode Node where the new link is inserted
  * @param stdClass $course current course
  * @param context_course $context current course context
@@ -61,7 +62,7 @@ function local_downloadcenter_extend_navigation_course(navigation_node $parentno
         }
     }
 
-    $url = new moodle_url('/local/downloadcenter/index.php', array('courseid' => $course->id));
+    $url = new moodle_url('/local/downloadcenter/index.php', ['courseid' => $course->id]);
     $title = get_string('navigationlink', 'local_downloadcenter');
     $pix = new pix_icon('icon', $title, 'local_downloadcenter');
     $childnode = navigation_node::create(
@@ -79,6 +80,8 @@ function local_downloadcenter_extend_navigation_course(navigation_node $parentno
     $node->add_class('downloadcenterlink');
 }
 /**
+ * Not used anymore!
+ *
  * @param global_navigation $nav
  * @throws coding_exception
  * @throws moodle_exception
@@ -88,6 +91,8 @@ function local_downloadcenter_extend_navigation(global_navigation $nav) {
 }
 
 /**
+ * Get the fontawesome icon map for this plugin.
+ *
  * @return array
  */
 function local_downloadcenter_get_fontawesome_icon_map() {

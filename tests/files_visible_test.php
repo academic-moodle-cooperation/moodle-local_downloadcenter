@@ -14,21 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/*
+* TODO tests:
+*   - add resources, files and check if the students
+*
+*/
+
 /**
  * Basic downloadcenter PHP Unit tests.
  *
  * @author     Simeon Naydenov (moniNaydenov@gmail.com)
  * @package    local_downloadcenter
- * @category   phpunit
+ * @subpackage phpunit
  * @copyright  2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-defined('MOODLE_INTERNAL') || die();
-
-/*
- * TODO tests:
- *   - add resources, files and check if the students
- *
  */
 class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
@@ -38,8 +37,8 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
-        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
 
         $student1 = $this->getDataGenerator()->create_user();
         $teacher1 = $this->getDataGenerator()->create_user();
@@ -76,8 +75,8 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
-        $studentrole = $DB->get_record('role', array('shortname' => 'student'));
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
 
         $student1 = $this->getDataGenerator()->create_user();
         $teacher1 = $this->getDataGenerator()->create_user();
@@ -110,7 +109,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         $this->resetAfterTest(true);
 
-        $teacherrole = $DB->get_record('role', array('shortname' => 'editingteacher'));
+        $teacherrole = $DB->get_record('role', ['shortname' => 'editingteacher']);
 
         $this->setAdminUser();
 
@@ -139,9 +138,9 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         $fileid = file_get_unused_draft_itemid();
 
         // Add actual file there.
-        $filerecord = array('component' => 'user', 'filearea' => 'draft',
+        $filerecord = ['component' => 'user', 'filearea' => 'draft',
                             'contextid' => $context->id, 'itemid' => $fileid,
-                            'filename' => $filename, 'filepath' => '/', );
+                            'filename' => $filename, 'filepath' => '/', ];
         $fs = get_file_storage();
         $fs->create_file_from_string($filerecord, $filecontent);
 

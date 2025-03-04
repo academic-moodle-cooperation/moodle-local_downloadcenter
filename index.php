@@ -34,7 +34,7 @@ raise_memory_limit(MEMORY_HUGE);
 
 $courseid = required_param('courseid', PARAM_INT);
 
-$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 
 require_course_login($course);
 
@@ -42,7 +42,7 @@ $context = context_course::instance($course->id);
 
 require_capability('local/downloadcenter:view', $context);
 
-$PAGE->set_url(new moodle_url('/local/downloadcenter/index.php', array('courseid' => $course->id)));
+$PAGE->set_url(new moodle_url('/local/downloadcenter/index.php', ['courseid' => $course->id]));
 
 $PAGE->set_pagelayout('incourse');
 $PAGE->add_body_class('limitedwidth');
@@ -64,23 +64,23 @@ $PAGE->set_heading($course->fullname);
 
 if ($data = $downloadform->get_data()) {
 
-    $event = \local_downloadcenter\event\zip_downloaded::create(array(
+    $event = \local_downloadcenter\event\zip_downloaded::create([
         'objectid' => $PAGE->course->id,
         'context' => $PAGE->context,
-    ));
+    ]);
     $event->add_record_snapshot('course', $PAGE->course);
     $event->trigger();
 
     $downloadcenter->parse_form_data($data);
     $hash = $downloadcenter->create_zip();
 } else if ($downloadform->is_cancelled()) {
-    redirect(new moodle_url('/course/view.php', array('id' => $course->id)));
+    redirect(new moodle_url('/course/view.php', ['id' => $course->id]));
     die;
 } else {
-    $event = \local_downloadcenter\event\plugin_viewed::create(array(
+    $event = \local_downloadcenter\event\plugin_viewed::create([
         'objectid' => $PAGE->course->id,
         'context' => $PAGE->context,
-    ));
+    ]);
     $event->add_record_snapshot('course', $PAGE->course);
     $event->trigger();
     echo $OUTPUT->header();
