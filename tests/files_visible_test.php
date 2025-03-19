@@ -20,6 +20,8 @@
 *
 */
 
+namespace local_downloadcenter;
+
 /**
  * Basic downloadcenter PHP Unit tests.
  *
@@ -28,10 +30,11 @@
  * @subpackage phpunit
  * @copyright  2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers     \local_downloadcenter_factory::get_resources_for_user
  */
-class local_downloadcenter_files_visible_testcase extends advanced_testcase {
+final class files_visible_test extends \advanced_testcase {
 
-    public function test_empty() {
+    public function test_empty(): void {
         global $DB, $CFG;
         require_once(__DIR__ . '/../locallib.php');
 
@@ -52,7 +55,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         $this->setUser($student1);
 
-        $downloadcenter = new local_downloadcenter_factory($course1, null);
+        $downloadcenter = new \local_downloadcenter_factory($course1, null);
         $userresources = $downloadcenter->get_resources_for_user();
 
         foreach ($userresources as $resources) {
@@ -61,7 +64,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         $this->setUser($teacher1);
 
-        $downloadcenter = new local_downloadcenter_factory($course1, null);
+        $downloadcenter = new \local_downloadcenter_factory($course1, null);
         $userresources = $downloadcenter->get_resources_for_user();
 
         foreach ($userresources as $resources) {
@@ -69,7 +72,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         }
     }
 
-    public function test_student_visibility() {
+    public function test_student_visibility(): void {
         global $DB, $CFG;
         require_once(__DIR__ . '/../locallib.php');
 
@@ -93,7 +96,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         $resources = $this->helper_add_resources_to_course($course1, $teacher1);
 
         // Test for student  - must not see not visible resources.
-        $downloadcenter = new local_downloadcenter_factory($course1, $student1);
+        $downloadcenter = new \local_downloadcenter_factory($course1, $student1);
         $userresources = $downloadcenter->get_resources_for_user();
 
         $this->assertCount($resources->visiblefilecount, $userresources[$resources->filesection]->res);
@@ -103,7 +106,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
     }
 
-    public function test_teacher_visibility() {
+    public function test_teacher_visibility(): void {
         global $DB, $CFG;
         require_once(__DIR__ . '/../locallib.php');
 
@@ -124,7 +127,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         $this->setUser($teacher1);
 
-        $downloadcenter = new local_downloadcenter_factory($course1, $teacher1);
+        $downloadcenter = new \local_downloadcenter_factory($course1, $teacher1);
         $userresources = $downloadcenter->get_resources_for_user();
 
         $this->assertCount($resources->filecount, $userresources[$resources->filesection]->res);
@@ -133,6 +136,14 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         $this->assertCount($resources->bookcount, $userresources[$resources->booksection]->res);
     }
 
+    /**
+     * Helper function to add a file to a context.
+     *
+     * @param string $filename
+     * @param string $filecontent
+     * @param mixed $context
+     * @return int
+     */
     private function helper_add_file_to_context($filename, $filecontent , $context) {
         // Pick a random context id for specified user.
         $fileid = file_get_unused_draft_itemid();
@@ -147,6 +158,13 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
         return $fileid;
     }
 
+    /**
+     * Helper function to add resources to a course.
+     *
+     * @param \stdClass $course
+     * @param \stdClass $teacher
+     * @return \stdClass
+     */
     private function helper_add_resources_to_course($course, $teacher) {
 
         $filesection = 0;
@@ -157,9 +175,9 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_resource');
 
-        $record = new stdClass;
+        $record = new \stdClass;
         $record->course = $course->id;
-        $usercontext = context_user::instance($teacher->id);
+        $usercontext = \context_user::instance($teacher->id);
 
         // Add 10 files with random visibility.
         $filecount = 10;
@@ -225,7 +243,7 @@ class local_downloadcenter_files_visible_testcase extends advanced_testcase {
 
         }
 
-        $result = new stdClass;
+        $result = new \stdClass;
         $result->filecount = $filecount;
         $result->visiblefilecount = $visiblefilecount;
         $result->filesection = $filesection;
