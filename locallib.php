@@ -95,8 +95,10 @@ class local_downloadcenter_factory {
 
         $modinfo = get_fast_modinfo($this->course);
         $usesections = course_format_uses_sections($this->course->format);
-        $canviewhiddensections = has_capability('moodle/course:viewhiddensections', context_course::instance($this->course->id));
-        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities', context_course::instance($this->course->id));
+        $canviewhiddensections = has_capability('moodle/course:viewhiddensections',
+            context_course::instance($this->course->id));
+        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities',
+            context_course::instance($this->course->id));
         $sorted = [];
         if ($usesections) {
             $sections = $DB->get_records('course_sections', ['course' => $this->course->id], 'section');
@@ -121,7 +123,7 @@ class local_downloadcenter_factory {
                     } else {
                         $namedsections[$title] = true;
                     }
-                    $sorted[$section->section]->res = []; // TODO: fix empty names here!!!
+                    $sorted[$section->section]->res = [];
                 }
             }
 
@@ -137,7 +139,7 @@ class local_downloadcenter_factory {
                 $sorted[$sectionid]->title = $title;
             }
         } else {
-            $sorted['default'] = new stdClass;// TODO: fix here if needed!
+            $sorted['default'] = new stdClass;
             $sorted['default']->title = '0';
             $sorted['default']->res = [];
             $sorted['default']->itemid = -1;
@@ -650,7 +652,8 @@ class local_downloadcenter_factory {
                                 if ($file->get_filesize() == 0) {
                                     continue;
                                 }
-                                $filename = $resdir . '/intro' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                                $filename = $resdir . '/intro' . $file->get_filepath() .
+                                    self::shorten_filename($file->get_filename());
                                 $filelist[$filename] = $file;
                             }
                             $fsfiles = $fs->get_area_files($context->id, 'mod_assign', 'intro', 0, 'id', false);
@@ -658,7 +661,8 @@ class local_downloadcenter_factory {
                                 if ($file->get_filesize() == 0) {
                                     continue;
                                 }
-                                $filename = $resdir . '/intro/files' . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                                $filename = $resdir . '/intro/files' . $file->get_filepath() .
+                                    self::shorten_filename($file->get_filename());
                                 $filelist[$filename] = $file;
                             }
 
@@ -707,9 +711,12 @@ class local_downloadcenter_factory {
                             $component = $assignplugin->get_subtype().'_'.$assignplugin->get_type();
                             $fileareas = $assignplugin->get_file_areas();
                             foreach ($fileareas as $filearea => $name) {
-                                if ($areafiles = $fs->get_area_files($context->id, $component, $filearea, $submission->id, 'itemid, filepath, filename', false)) {
+                                $areafiles = $fs->get_area_files($context->id, $component,
+                                    $filearea, $submission->id, 'itemid, filepath, filename', false);
+                                if ($areafiles) {
                                     foreach ($areafiles as $file) {
-                                        $filename = $fullname . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                                        $filename = $fullname . $file->get_filepath() .
+                                            self::shorten_filename($file->get_filename());
                                         $filelist[$filename] = $file;
                                     }
                                 }
@@ -745,11 +752,12 @@ class local_downloadcenter_factory {
                                 $component = $feedbackplugin->get_subtype().'_'.$feedbackplugin->get_type();
                                 $fileareas = $feedbackplugin->get_file_areas();
                                 foreach ($fileareas as $filearea => $name) {
-
-                                    if ($areafiles = $fs->get_area_files($context->id, $component, $filearea, $feedback->grade->id, 'itemid, filepath, filename', false)) {
+                                    $areafiles = $fs->get_area_files($context->id, $component,
+                                        $filearea, $feedback->grade->id, 'itemid, filepath, filename', false);
+                                    if ($areafiles) {
                                         foreach ($areafiles as $file) {
-
-                                            $filename = $fullname . $file->get_filepath() . self::shorten_filename($file->get_filename());
+                                            $filename = $fullname . $file->get_filepath() .
+                                                self::shorten_filename($file->get_filename());
                                             $filelist[$filename] = $file;
                                         }
                                     }
@@ -783,10 +791,12 @@ class local_downloadcenter_factory {
                     $sitename = get_string("site") . ': <span class="strong">' . format_string($SITE->fullname) . '</span>';
                     echo html_writer::tag('div', $sitename, ['class' => 'sitename']);
 
-                    $coursename = get_string("course") . ': <span class="strong">' . format_string($course->fullname) . ' ('. format_string($course->shortname) . ')</span>';
+                    $coursename = get_string("course") . ': <span class="strong">' .
+                        format_string($course->fullname) .' ('. format_string($course->shortname) . ')</span>';
                     echo html_writer::tag('div', $coursename, ['class' => 'coursename']);
 
-                    $modname = get_string("modulename", "glossary") . ': <span class="strong">' . format_string($glossary->name, true) . '</span>';
+                    $modname = get_string("modulename", "glossary") . ': <span class="strong">' .
+                        format_string($glossary->name, true) . '</span>';
                     echo html_writer::tag('div', $modname, ['class' => 'modname']);
 
                     list($allentries, $count) = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, 0);
@@ -858,7 +868,8 @@ class local_downloadcenter_factory {
                     $etherpadconfig = get_config('etherpadlite');
                     $domain = $etherpadconfig->url;
                     $padid = $res->resource->uri;
-                    $etherpadclient = \mod_etherpadlite\api\client::get_instance($etherpadconfig->apikey, $domain); // If not working, try $domain.'api' instead.
+                    // If not working, try $domain.'api' instead.
+                    $etherpadclient = \mod_etherpadlite\api\client::get_instance($etherpadconfig->apikey, $domain);
                     // Handle groups here.
                     $groupmode = groups_get_activity_groupmode($res->cm);
                     if ($groupmode) {
@@ -866,7 +877,8 @@ class local_downloadcenter_factory {
                             $htmlcontent = $etherpadclient->get_html($padid);
                             if (!empty($htmlcontent)) {
                                 $htmlcontent = self::append_etherpadlite_css($htmlcontent->html);
-                                $filename = $resdir . '/' . self::shorten_filename($res->name . '_' . get_string('allparticipants') . '.html');
+                                $filename = $resdir . '/' . self::shorten_filename($res->name . '_' .
+                                    get_string('allparticipants') . '.html');
                                 $filelist[$filename] = [$htmlcontent]; // Needs to be array to be saved as file.
                             }
                         }
