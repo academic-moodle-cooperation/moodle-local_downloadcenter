@@ -91,7 +91,7 @@ class local_downloadcenter_download_form extends moodleform {
                         $mform->addElement('html', html_writer::end_tag('div'));
                     }
                     if ($currentsubsectionitemid != $res->subsectioncmid) {
-                        $mform->addElement('html', html_writer::start_tag('div', ['class' => 'card block mb-3 mr-3']));
+                        $mform->addElement('html', html_writer::start_tag('div', ['class' => 'card block subsection mb-3 mr-3']));
 
                         $sectiontitle = html_writer::span($res->subsectionname, 'sectiontitle mt-1');
                         $sectionname = 'item_topic_' . $res->subsectioncmid;

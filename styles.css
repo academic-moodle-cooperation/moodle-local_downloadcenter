@@ -90,8 +90,12 @@
     margin-bottom: 0.5rem;
 }
 
-.path-local-downloadcenter #region-main .card.block:nth-child(2n) {
+.path-local-downloadcenter #region-main .card.block {
     background-color: #f5f5f5;
+}
+
+.path-local-downloadcenter #region-main .card.block.subsection {
+    background-color: #fff;
 }
 
 .path-local-downloadcenter #region-main .card.block.grouped_settings {
