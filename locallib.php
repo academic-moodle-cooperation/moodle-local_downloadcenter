@@ -439,7 +439,6 @@ class local_downloadcenter_factory {
                     $conditions = [];
                     $conditions['publication'] = $res->instanceid;
 
-                    $filesforzipping = [];
                     $filearea = 'attachment';
                     // Find out current groups mode.
                     $groupmode = groups_get_activity_groupmode($cm);
@@ -800,7 +799,7 @@ class local_downloadcenter_factory {
                     echo html_writer::tag('div', $modname, ['class' => 'modname']);
 
                     list($allentries, $count) = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, 0);
-                    if ( $allentries ) {
+                    if ($allentries) {
                         foreach ($allentries as $entry) {
                             $pivot = $entry->{$pivotkey};
                             $upperpivot = core_text::strtoupper($pivot);

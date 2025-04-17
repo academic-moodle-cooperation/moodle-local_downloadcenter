@@ -35,7 +35,7 @@ namespace local_downloadcenter;
 final class files_visible_test extends \advanced_testcase {
 
     public function test_empty(): void {
-        global $DB, $CFG;
+        global $DB;
         require_once(__DIR__ . '/../locallib.php');
 
         $this->resetAfterTest(true);
@@ -73,7 +73,7 @@ final class files_visible_test extends \advanced_testcase {
     }
 
     public function test_student_visibility(): void {
-        global $DB, $CFG;
+        global $DB;
         require_once(__DIR__ . '/../locallib.php');
 
         $this->resetAfterTest(true);
@@ -107,7 +107,7 @@ final class files_visible_test extends \advanced_testcase {
     }
 
     public function test_teacher_visibility(): void {
-        global $DB, $CFG;
+        global $DB;
         require_once(__DIR__ . '/../locallib.php');
 
         $this->resetAfterTest(true);
@@ -171,7 +171,6 @@ final class files_visible_test extends \advanced_testcase {
         $foldersection = 1;
         $pagesection = 2;
         $booksection = 3;
-        $publicationsection = 5;
 
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_resource');
 

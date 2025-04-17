@@ -74,7 +74,9 @@ const submitForm = () => {
 
 export const init = () => {
     searchInput = document.getElementById(IDENTIFIERS.SEARCHINPUT);
-    searchInput.addEventListener('input', (e) => { search(e.target.value.toLowerCase()); });
+    searchInput.addEventListener('input', (e) => {
+ search(e.target.value.toLowerCase());
+});
     const form = document.querySelector(IDENTIFIERS.FORM);
     const topics = form.querySelectorAll(IDENTIFIERS.TOPICS);
     resultsHolder = document.getElementById(IDENTIFIERS.RESULTSHOLDER);

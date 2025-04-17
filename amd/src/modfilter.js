@@ -29,19 +29,19 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             {key: 'hidetypes', component: 'backup'}
         ]).done(function(strs) {
             // Init strings.. new moodle super cool way...
-            instance.strings['all'] = strs[0];
-            instance.strings['none'] = strs[1];
-            instance.strings['select'] = strs[2];
-            instance.strings['showtypes'] = strs[3];
-            instance.strings['hidetypes'] = strs[4];
+            instance.strings.all = strs[0];
+            instance.strings.none = strs[1];
+            instance.strings.select = strs[2];
+            instance.strings.showtypes = strs[3];
+            instance.strings.hidetypes = strs[4];
 
             const firstsection = $('div[role="main"] > form .card.block').first();
             instance.formid = firstsection.closest('form').prop('id');
 
             // Add global select all/none options..
             const showTypeOptionsLink = '<span class="font-weight-bold ml-3 text-nowrap">' +
-                '(<a id="downloadcenter-bytype" href="#">' + instance.strings['showtypes'] + '</a>)' + '</span>';
-            let html = instance.html_generator('included', instance.strings['select']);
+                '(<a id="downloadcenter-bytype" href="#">' + instance.strings.showtypes + '</a>)' + '</span>';
+            let html = instance.htmlGenerator('included', instance.strings.select);
             let links = $(document.createElement('div'));
             links.addClass('grouped_settings section_level block card');
             links.html(html);
@@ -63,7 +63,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
                 }
 
                 const img = '<img src="' + url.imageUrl('icon', 'mod_' + mod) + '" class="activityicon" />';
-                html = instance.html_generator('mod_' + mod, img + instance.modnames[mod]);
+                html = instance.htmlGenerator('mod_' + mod, img + instance.modnames[mod]);
                 const modlinks = $(document.createElement('div'));
                 modlinks.addClass('grouped_settings section_level');
                 modlinks.html(html);
@@ -72,11 +72,19 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             }
 
             // Attach events to links!
-            $('#downloadcenter-all-included').click(function(e) { instance.helper(e, true,  'item_'); });
-            $('#downloadcenter-none-included').click(function(e) { instance.helper(e, false, 'item_'); });
-            $('#downloadcenter-bytype').click(function(e) { e.preventDefault(); instance.toggletypes(); });
+            $('#downloadcenter-all-included').click(function(e) {
+                instance.helper(e, true, 'item_');
+            });
+            $('#downloadcenter-none-included').click(function(e) {
+                instance.helper(e, false, 'item_');
+            });
+            $('#downloadcenter-bytype').click(function(e) {
+                e.preventDefault(); instance.toggletypes();
+            });
             // Attach event to checkboxes!
-            $('input.form-check-input').click(function() { instance.checkboxhandler($(this)); instance.updateFormState(); });
+            $('input.form-check-input').click(function() {
+                instance.checkboxhandler($(this)); instance.updateFormState();
+            });
         });
 
     };
@@ -115,11 +123,11 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
         // Change text of type toggle link.
         const link = $('#downloadcenter-bytype');
         if (this.currentlyshown) {
-            link.text(this.strings['showtypes']);
+            link.text(this.strings.showtypes);
         } else {
-            link.text(this.strings['hidetypes']);
+            link.text(this.strings.hidetypes);
         }
-        this.modlist.animate({height: 'toggle' }, 500, 'swing');
+        this.modlist.animate({height: 'toggle'}, 500, 'swing');
 
         this.currentlyshown = !this.currentlyshown;
 
@@ -127,9 +135,12 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
     ModFilter.prototype.initlinks = function(links, mod) {
         const instance = this;
-        $('#downloadcenter-all-mod_' + mod).click(function(e) { instance.helper(e, true, 'item_', mod); });
-        $('#downloadcenter-none-mod_' + mod).click(function(e) { instance.helper(e, false, 'item_', mod); });
-
+        $('#downloadcenter-all-mod_' + mod).click(function(e) {
+            instance.helper(e, true, 'item_', mod);
+        });
+        $('#downloadcenter-none-mod_' + mod).click(function(e) {
+            instance.helper(e, false, 'item_', mod);
+        });
     };
 
     ModFilter.prototype.helper = function(e, check, type, mod) {
@@ -160,13 +171,13 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
         this.updateFormState();
     };
 
-    ModFilter.prototype.html_generator = function(idtype, heading) {
-        let links = '<a id="downloadcenter-all-' + idtype + '" href="#">' + this.strings['all'] + '</a> / ';
-        links += '<a id="downloadcenter-none-' + idtype + '" href="#">' + this.strings['none'] + '</a>';
-        return this.row_generator(heading, links);
+    ModFilter.prototype.htmlGenerator = function(idtype, heading) {
+        let links = '<a id="downloadcenter-all-' + idtype + '" href="#">' + this.strings.all + '</a> / ';
+        links += '<a id="downloadcenter-none-' + idtype + '" href="#">' + this.strings.none + '</a>';
+        return this.rowGenerator(heading, links);
     };
 
-    ModFilter.prototype.row_generator = function(heading, content) {
+    ModFilter.prototype.rowGenerator = function(heading, content) {
         let ret = '<div class="form-group row fitem downloadcenter_selector">';
         ret += '<div class="col-md-3"></div>';
         ret += '<div class="col-md-9">';

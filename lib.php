@@ -24,17 +24,6 @@
  */
 
 /**
- * Not used anymore!
- *
- * @param settings_navigation $settingsnav
- * @param context $context
- * @return null
- */
-function local_downloadcenter_extend_settings_navigation(settings_navigation $settingsnav, context $context) {
-    return; // Not used anymore!
-}
-
-/**
  * Extend course navigation with download center link.
  *
  * @param navigation_node $parentnode Node where the new link is inserted
@@ -56,7 +45,7 @@ function local_downloadcenter_extend_navigation_course(navigation_node $parentno
     ];
     $beforekey = null;
     foreach ($keys as $key => $type) {
-        if ($foundnode = $parentnode->find($key, $type)) {
+        if ($parentnode->find($key, $type)) {
             $beforekey = $key;
             break;
         }
@@ -78,16 +67,6 @@ function local_downloadcenter_extend_navigation_course(navigation_node $parentno
     $node->nodetype = navigation_node::TYPE_SETTING;
     $node->collapse = true;
     $node->add_class('downloadcenterlink');
-}
-/**
- * Not used anymore!
- *
- * @param global_navigation $nav
- * @throws coding_exception
- * @throws moodle_exception
- */
-function local_downloadcenter_extend_navigation(global_navigation $nav) {
-    return; // Not used anymore!
 }
 
 /**
