@@ -23,7 +23,7 @@ Teachers make documents available in a Moodle course during the semester. In add
 At any time during or at the end of the course, students can easily save published content locally for personal use and use it for example offline to prepare for an exam. 
 Teachers can download and archive this content in the same way, with hidden content also available for selection by the teacher. In addition, all submissions of an assignment can also be downloaded in a compact form including feedback.
 
-Note: Currently, the course contents assignment, book, file, glossary, page, folder, ligthbox gallery, Etherpad Lite and student folder are available for selection in the Download Center.
+Note: Currently, the course contents assignment, book, file, glossary, page, folder, ligthbox gallery, Etherpad Lite and student folder are available for selection in the Download Center. Furthermore, Download Center supports Moodle subsections and keeps the structure of sections and subsections when downloading.
 
 
 Installation
