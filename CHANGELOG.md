@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.0.0 (2025-XX-XX)
+------------------
+* [FIXED] #8320 - File download using "Download files with original file name" setting now uses the original file extension [github PR #33 @PatTutor]
+
 4.5.1 (2025-03-04)
 ------------------
 * [FEATURE] #8084 - Support Moodle subsections
