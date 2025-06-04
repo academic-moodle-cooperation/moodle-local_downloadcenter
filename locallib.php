@@ -416,11 +416,12 @@ class local_downloadcenter_factory {
                     }
                     unset($filelist[$resdir]);
 
-                    $extension = mimeinfo_from_type('extension', $file->get_mimetype());
-
                     $currentextension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-                    if (!empty($currentextension)) {
+                    if (empty($currentextension)) {
+                        $extension = mimeinfo_from_type('extension', $file->get_mimetype());
+                    } else {
                         $filename = mb_substr($filename, 0, -mb_strlen($currentextension) - 1);
+                        $extension = ".{$currentextension}";
                     }
                     $fullfilename = $filename . $extension;
                     $filei = 1;
