@@ -964,7 +964,6 @@ class local_downloadcenter_factory {
         $filtered = [];
 
         $sortedresources = $this->get_resources_for_user();
-        $excludeempty = get_config('local_downloadcenter', 'exclude_empty_topics');
 
         foreach ($sortedresources as $sectionid => $info) {
             if (!isset($data['item_topic_' . $sectionid])) {
@@ -979,9 +978,6 @@ class local_downloadcenter_factory {
                     continue;
                 }
                 $filtered[$sectionid]->res[] = $res;
-            }
-            if ($excludeempty && empty($filtered[$sectionid]->res)) {
-                unset($filtered[$sectionid]);
             }
         }
 

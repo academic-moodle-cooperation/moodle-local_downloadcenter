@@ -59,15 +59,8 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->addElement('html', $OUTPUT->render_from_template('local_downloadcenter/searchbox', []));
         $mform->addElement('static', 'warning', '', ''); // Hack to work around fieldsets!
 
-        $empty = true;
         $firstbox = true;
-        $excludeempty = get_config('local_downloadcenter', 'exclude_empty_topics');
         foreach ($resources as $sectionid => $sectioninfo) {
-            if ($excludeempty && empty($sectioninfo->res)) { // Only display the sections that are not empty.
-                continue;
-            }
-
-            $empty = false;
             $sectionname = 'item_topic_' . $sectionid;
             $class = 'card block mb-3';
             // Small margin for the first box for better separation.
@@ -128,9 +121,6 @@ class local_downloadcenter_download_form extends moodleform {
             $mform->addElement('html', html_writer::end_tag('div'));
         }
 
-        if ($empty) {
-            $mform->addElement('html', html_writer::tag('h2', get_string('no_downloadable_content', 'local_downloadcenter')));
-        }
         // Create a new section for the download options!
         $mform->addElement('header', 'downloadoptions', get_string('downloadoptions', 'local_downloadcenter'));
         $mform->addElement('checkbox', 'filesrealnames', get_string('downloadoptions:filesrealnames', 'local_downloadcenter'));
