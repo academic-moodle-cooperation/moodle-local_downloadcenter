@@ -320,8 +320,8 @@ class local_downloadcenter_factory {
         }
 
         $modbookmissing = true;
-        if (file_exists($CFG->dirroot . '/mod/book/tool/print/locallib.php')) {
-            require_once($CFG->dirroot . '/mod/book/tool/print/locallib.php');
+        if (file_exists($CFG->dirroot . '/mod/book/locallib.php')) {
+            require_once($CFG->dirroot . '/mod/book/locallib.php');
             $modbookmissing = false;
         }
 
