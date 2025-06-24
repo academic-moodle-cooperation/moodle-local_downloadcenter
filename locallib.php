@@ -62,6 +62,13 @@ class local_downloadcenter_factory {
      * @var array
      */
     private $jsnames = [];
+    /**
+     * Array to keep track of the path duplicates to ensure unique paths.
+     * This is needed when numbering is not used, so that different sections, or subsections with the same
+     * name do not land in the same folder. Also that activites with the same name do not get overwritten.
+     * @var array
+     */
+    private $pathcount = [];
 
     /**
      * local_downloadcenter_factory constructor.
@@ -293,7 +300,7 @@ class local_downloadcenter_factory {
     }
 
     /**
-     * Checks if the resource is a subsection.
+     * Checks if the resource is in a subsection.
      *
      * @param mixed $resource
      * @return bool
@@ -348,6 +355,10 @@ class local_downloadcenter_factory {
             $basedir = clean_filename($info->title);
             if ($addnumbering) {
                 $basedir = sprintf($topicprefixformat, $topicprefixid) . '_' . $basedir;
+            } else if (!$addnumbering && !empty($info->res)) {
+                // If numbering is not used, we still need to ensure that the basedir is unique, so that different sections
+                // with the same name do not land in the same folder.
+                $basedir .= self::get_number_directory_duplicates($basedir);
             }
             $topicprefixid++;
             $basedir = self::shorten_filename($basedir);
@@ -366,9 +377,11 @@ class local_downloadcenter_factory {
                 if ($this->is_subsection_resource($res)) {
                     $insubsection = true;
                     $oldbasedir = $basedir;
+                    $newsection = false;
 
                     // When the subsections change, the numbering for the subsection resources should start from 1 again.
                     if ($currentsubseccmid != $res->subsectioncmid) {
+                        $newsection = true;
                         $currentsubseccmid = $res->subsectioncmid;
                         $subresprefixid = 1;
                         if ($firstsubsec) {
@@ -379,6 +392,11 @@ class local_downloadcenter_factory {
                     // The subsections should be in a separate folder. Therefore append the subsection name to the basedir.
                     if ($addnumbering) {
                         $basedir .= '/' . sprintf($resprefixformat, $resprefixid) . '_' . $res->subsectionname;
+                    } else if (!$addnumbering && $newsection) {
+                        // We ensure that the subsection folder is unique, so that different subsections
+                        // with the same name do not land in the same folder.
+                        $basedir .= '/' . self::shorten_filename($res->subsectionname);
+                        $basedir .= self::get_number_directory_duplicates($basedir);
                     } else {
                         $basedir .= '/' . self::shorten_filename($res->subsectionname);
                     }
@@ -399,6 +417,10 @@ class local_downloadcenter_factory {
                     $res->name = $prefix . '_' . $res->name;
                 }
                 $resdir = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
+                if (!$addnumbering) {
+                    // This ensures that activities with the same name do not get overwritten.
+                    $resdir .= self::get_number_directory_duplicates($resdir);
+                }
                 $filelist[$resdir] = null;
                 $context = $res->context;
                 if ($res->modname == 'resource') {
@@ -930,6 +952,24 @@ class local_downloadcenter_factory {
         // Finish the archive.
         $zipwriter->finish();
         die;
+    }
+
+    /**
+     * Counts the number of duplicates for a given file path and returns the number as a string if there are duplicates.
+     * If there are no duplicates, it returns an empty string. This is used to add a number to the filename if there are duplicates.
+     *
+     * @param string $filepath
+     * @return string
+     */
+    private function get_number_directory_duplicates($filepath) {
+        $countnumber = '';
+        if (array_key_exists($filepath, $this->pathcount)) {
+            $countnumber = $this->pathcount[$filepath];
+            $this->pathcount[$filepath]++;
+        } else {
+            $this->pathcount[$filepath] = 1;
+        }
+        return (string)$countnumber;
     }
 
     /**
