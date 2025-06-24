@@ -3,7 +3,7 @@ Download Center
 
 This file is part of the local_downloadcenter plugin for Moodle - <http://moodle.org/>
 
-*Author:*    Simeon Naydenov
+*Author:*    Simeon Naydenov, Clemens Marx
 
 *Copyright:* [Academic Moodle Cooperation](http://www.academic-moodle-cooperation.org)
 

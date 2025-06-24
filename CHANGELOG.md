@@ -1,9 +1,14 @@
 CHANGELOG
 =========
 
-5.0.0 (2025-XX-XX)
+5.0.0 (2025-05-22)
 ------------------
-* [FIXED] #8320 - File download using "Download files with original file name" setting now uses the original file extension [github PR #33 @PatTutor]
+* Moodle 5.0 compatible version
+* [FIXED] #8320 - File download using "Download files with original file name" setting now uses the original file extension. [github PR #33 @PatTutor]
+* [UPDATE] #8294 - Removed admin setting to exclude empty topics. Empty topics are always displayed but never downloaded.
+* [UPDATE] #8355 - Sections and modules with the same name are numbered continously for differentiation in the archive now.
+* [FEATURE] #8329 - Multilangfilter v2 is now supported. Downloaded ZIP files have the correct title when multilang v2 filter is used.
+
 
 4.5.1 (2025-03-04)
 ------------------
