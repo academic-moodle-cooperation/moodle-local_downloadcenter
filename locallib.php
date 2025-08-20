@@ -309,6 +309,142 @@ class local_downloadcenter_factory {
         return !empty($resource->issubresource);
     }
 
+    private function filter_empty_sections() {
+        $sections = [];
+        $filteredresources = $this->filteredresources;
+        foreach ($filteredresources as $section) {
+            if (!empty($section->res)) {
+                $sections[] = $section;
+            }
+        }
+        return $sections;
+    }
+
+    /**
+     * Builds a dictionary of section base directory names that have duplicates.
+     * Key is the cleaned section title (basedir), value is 1 if duplicate, 0 otherwise.
+     *
+     * @param array $sections
+     * @return array
+     */
+    private function return_duplicates_dictionary($sections) {
+        $titlecounts = [];
+        // First, count occurrences of each cleaned section title.
+        foreach ($sections as $section) {
+            if (!isset($section->title)) {
+                continue;
+            }
+            $title = html_entity_decode($section->title);
+            $basedir = clean_filename($title);
+            if (!isset($titlecounts[$basedir])) {
+                $titlecounts[$basedir] = 0;
+            }
+            $titlecounts[$basedir]++;
+        }
+        // Now, build the dictionary: 1 if duplicate, 0 otherwise.
+        $duplicates = [];
+        foreach ($titlecounts as $basedir => $count) {
+            $duplicates[$basedir] = $count > 1 ? 1 : 0;
+        }
+        return $duplicates;
+    }
+
+    private function section_pathnames() {
+        $pathlist = [];
+        $sections = $this->filter_empty_sections();
+        $duplicates = $this->return_duplicates_dictionary($sections);
+
+        $addnumbering = $this->_downloadoptions['addnumbering'];
+        $topicprefixid = 1;
+        $topicscount = count($sections);
+        $topicprefixformat = '%0' . strlen($topicscount) . 'd';
+        foreach ($sections as $section) {
+            $title = html_entity_decode($section->title);
+            $basedir = clean_filename($title);
+            if ($addnumbering) {
+                $basedir = sprintf($topicprefixformat, $topicprefixid) . '_' . $basedir;
+                $topicprefixid++;
+            } else if (!$addnumbering) {
+                if ($duplicates[$basedir] > 0) {
+                    $basedir .= $duplicates[$basedir]++;
+                }
+            }
+            $basedir = self::shorten_filename($basedir);
+            $pathlist[$basedir] = null;
+        }
+        return $pathlist;
+    }
+
+    /**
+     * Returns all subsection (name, id) pairs, renaming duplicates with a numeric suffix.
+     *
+     * For each subsectionname that appears with multiple different subsectioncmid values,
+     * the function appends a number to the name (e.g., 'Subsection1', 'Subsection2', ...).
+     * Subsection names that are unique are returned as-is.
+     *
+     * @param array $resources Array of resource objects, each possibly with subsectionname and subsectioncmid.
+     * @return array Array of arrays: [['subsectionname' => string, 'subsectioncmid' => int], ...]
+     */
+    private function preprocess_resource_names($resources, $addprefixnumbering) {
+        if (!$addprefixnumbering) {
+            $result = [];
+            $nameToIds = [];
+            foreach ($resources as $res) {
+                if ($this->is_subsection_resource($res)) {
+                    $name = $res->subsectionname;
+                    $id = $res->subsectioncmid;
+                    if (!isset($nameToIds[$name])) {
+                        $nameToIds[$name] = [];
+                    }
+                    if (!in_array($id, $nameToIds[$name])) {
+                        $nameToIds[$name][] = $id;
+                    }
+                }
+            }
+            // Original logic: only add suffix for duplicates, unique names as-is.
+            foreach ($nameToIds as $name => $ids) {
+                if (count($ids) > 1) {
+                    $index = 1;
+                    foreach ($ids as $id) {
+                        $result[$id] = $name . $index;
+                        $index++;
+                    }
+                } else {
+                    $result[$ids[0]] = $name;
+                }
+            }
+            foreach ($resources as $res) {
+                $res->name = html_entity_decode($res->name);
+                $subsecid = $res->subsectioncmid;
+                $res->subsectionname = $result[$subsecid] ?? '';
+            }
+        } else if ($addprefixnumbering) {
+            $resourceindex = 0;
+            $subresourceindex = 1;
+            $currentsubseccmid = -1;
+            $count = count($resources);
+            $prefixformat = '%0' . strlen($count) . 'd';
+            foreach ($resources as $res) {
+                if ($this->is_subsection_resource($res)) {
+                    if ($currentsubseccmid != $res->subsectioncmid) {
+                        $currentsubseccmid = $res->subsectioncmid;
+                        $subresourceindex = 1;
+                        $resourceindex++;
+                    }
+                    $res->subsectionname = sprintf($prefixformat, $resourceindex) . '_' . $res->subsectionname;
+                    $res->name = sprintf($prefixformat, $subresourceindex) . '_' . $res->name;
+                    $res->prefixindex = sprintf($prefixformat, $subresourceindex);
+                    $subresourceindex++;
+                } else {
+                    $resourceindex++;
+                    $res->name = sprintf($prefixformat, $resourceindex) . '_'. $res->name;
+                    $res->prefixindex = sprintf($prefixformat, $resourceindex);
+                }
+            }
+        }
+        return $resources;
+    }
+
     /**
      * Creates a zip file with all the resources that the user wants to download and downloads it.
      *
@@ -338,88 +474,32 @@ class local_downloadcenter_factory {
         $fs = get_file_storage();
 
         $filelist = [];
-        $filteredresources = $this->filteredresources;
 
         // Needed for mod_publication!
         $userfields = \core_user\fields::for_userpic();
-        $ufields = $userfields->get_sql('u', false, '', 'id', false)->selects;
-        $useridentityfields = $CFG->showuseridentity != '' ? 'u.'.str_replace(', ', ', u.', $CFG->showuseridentity) . ', ' : '';
 
-        $topicprefixid = 1;
-        $topicscount = count($filteredresources);
-        $topicprefixformat = '%0' . strlen($topicscount) . 'd';
         $filesrealnames = $this->_downloadoptions['filesrealnames'];
         $addnumbering = $this->_downloadoptions['addnumbering'];
-        foreach ($filteredresources as $topicid => $info) {
-            $info->title = html_entity_decode($info->title);
-            $basedir = clean_filename($info->title);
-            if ($addnumbering) {
-                $basedir = sprintf($topicprefixformat, $topicprefixid) . '_' . $basedir;
-            } else if (!$addnumbering && !empty($info->res)) {
-                // If numbering is not used, we still need to ensure that the basedir is unique, so that different sections
-                // with the same name do not land in the same folder.
-                $basedir .= self::get_number_directory_duplicates($basedir);
-            }
-            $topicprefixid++;
-            $basedir = self::shorten_filename($basedir);
-            $filelist[$basedir] = null;
-            $resprefixid = 1;
-            $rescount = count($info->res);
-            $resprefixformat = '%0' . strlen($rescount) . 'd';
-            $oldbasedir = $basedir;
-            $subresprefixid = 1;
-            $currentsubseccmid = -1;
-            $insubsection = false;
-            $firstsubsec = false;
-            foreach ($info->res as $res) {
-                $res->name = html_entity_decode($res->name);
-                $basedir = $oldbasedir;
-                if ($this->is_subsection_resource($res)) {
-                    $insubsection = true;
-                    $oldbasedir = $basedir;
-                    $newsection = false;
+        $pathlist = $this->section_pathnames();
+        $sections = $this->filter_empty_sections();
+        for ($i = 0; $i < count($sections); $i++) {
+            $sectionresources = array_values($sections)[$i]->res;
+            $basedir = array_keys($pathlist)[$i];
 
-                    // When the subsections change, the numbering for the subsection resources should start from 1 again.
-                    if ($currentsubseccmid != $res->subsectioncmid) {
-                        $newsection = true;
-                        $currentsubseccmid = $res->subsectioncmid;
-                        $subresprefixid = 1;
-                        if ($firstsubsec) {
-                            $resprefixid++;
-                        }
-                        $firstsubsec = true;
-                    }
-                    // The subsections should be in a separate folder. Therefore append the subsection name to the basedir.
-                    if ($addnumbering) {
-                        $basedir .= '/' . sprintf($resprefixformat, $resprefixid) . '_' . $res->subsectionname;
-                    } else if (!$addnumbering && $newsection) {
-                        // We ensure that the subsection folder is unique, so that different subsections
-                        // with the same name do not land in the same folder.
-                        $basedir .= '/' . self::shorten_filename($res->subsectionname);
-                        $basedir .= self::get_number_directory_duplicates($basedir);
-                    } else {
-                        $basedir .= '/' . self::shorten_filename($res->subsectionname);
-                    }
-                } else if ($insubsection) {
-                    // Reset helper variables to ensure correct numbering of resources and subsection folders.
-                    $insubsection = false;
-                    $firstsubsec = false;
-                    $resprefixid++;
+            $filelist[$basedir] = null;
+            $sectionresources = $this->preprocess_resource_names($sectionresources, $addnumbering);
+
+            foreach ($sectionresources as $res) {
+                $res->name = html_entity_decode($res->name);
+                if ($this->is_subsection_resource($res)) {
+                    $resdir = $basedir . '/' . $res->subsectionname . '/' . self::shorten_filename(clean_filename($res->name));
+                } else {
+                    $resdir = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
                 }
-                // Adds numbering to the actual resources. Either to resources in section or inside a subsection (different number).
-                if ($addnumbering) {
-                    if ($this->is_subsection_resource($res)) {
-                        $prefix = sprintf($resprefixformat, $subresprefixid);
-                        $subresprefixid++;
-                    } else {
-                        $prefix = sprintf($resprefixformat, $resprefixid);
-                    }
-                    $res->name = $prefix . '_' . $res->name;
-                }
-                $resdir = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
                 if (!$addnumbering) {
                     // This ensures that activities with the same name do not get overwritten.
-                    $resdir .= self::get_number_directory_duplicates($resdir);
+                    // echo
+                    $resdir = self::get_number_directory_duplicates($resdir, $filelist);
                 }
                 $filelist[$resdir] = null;
                 $context = $res->context;
@@ -429,12 +509,16 @@ class local_downloadcenter_factory {
 
                     if ($filesrealnames) {
                         $realfilename = $file->get_filename();
-                        if ($addnumbering) {
-                            $realfilename = sprintf($resprefixformat, $resprefixid) . '_' . $realfilename;
+                        if($addnumbering) {
+                            $realfilename = $res->prefixindex . '_' . $realfilename;
                         }
-                        $filename = $basedir . '/' . self::shorten_filename($realfilename);
+                        if ($this->is_subsection_resource($res)) {
+                            $filename = $basedir . '/' . $res->subsectionname . '/' . self::shorten_filename(clean_filename($realfilename));
+                        } else {
+                            $filename = $basedir . '/' . self::shorten_filename(clean_filename($realfilename));
+                        }
                     } else {
-                        $filename = $basedir . '/' . self::shorten_filename(clean_filename($res->name));
+                        $filename = $resdir;
                     }
                     unset($filelist[$resdir]);
 
@@ -574,12 +658,7 @@ class local_downloadcenter_factory {
                             $filelist[$filename] = $file;
                         }
                     }
-                    if (count($fsfiles) == 0) {
-                        unset($filelist[$resdir]);
-                        $filename = $basedir . '/' . self::shorten_filename($res->name . '.html');
-                    } else {
-                        $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
-                    }
+                    $filename = $resdir . '.html';
                     $content = str_replace('@@PLUGINFILE@@', 'data', $res->resource->content);
                     $content = self::convert_content_to_html_doc($res->name, $content);
                     $filelist[$filename] = [$content]; // Needs to be array to be saved as file.
@@ -601,12 +680,7 @@ class local_downloadcenter_factory {
                             $filelist[$filename] = $file;
                         }
                     }
-                    if (count($fsfiles) == 0) {
-                        unset($filelist[$resdir]);
-                        $filename = $basedir . '/' . self::shorten_filename($res->name . '.html');
-                    } else {
-                        $filename = $resdir . '/' . self::shorten_filename($res->name . '.html');
-                    }
+                    $filename = $resdir . '.html';
 
                     // Taken from mod/book/tool/print/index.php!
                     $allchapters = $DB->get_records('book_chapters', ['bookid' => $book->id], 'pagenum');
@@ -923,9 +997,9 @@ class local_downloadcenter_factory {
                     }
                 }
 
-                if (!$this->is_subsection_resource($res)) {
-                    $resprefixid++;
-                }
+                // if (!$this->is_subsection_resource($res)) {
+                //     $resprefixid++;
+                // }
             }
         }
 
@@ -935,6 +1009,10 @@ class local_downloadcenter_factory {
 
         $zipwriter = \core_files\archive_writer::get_stream_writer($filename, \core_files\archive_writer::ZIP_WRITER);
 
+        // echo '<pre>';
+        // print_r($filelist);
+        // echo '</pre>';
+        // die;
         // Stream the files into the zip.
         foreach ($filelist as $pathinzip => $file) {
             if ($file instanceof \stored_file) {
@@ -961,15 +1039,34 @@ class local_downloadcenter_factory {
      * @param string $filepath
      * @return string
      */
-    private function get_number_directory_duplicates($filepath) {
+    // TODO: Schauen ob es existiert, wenn ja, dann ändern mit '1' und +1, ansonsten nicht
+    private function get_number_directory_duplicates($filepath, &$filelist) {
         $countnumber = '';
         if (array_key_exists($filepath, $this->pathcount)) {
-            $countnumber = $this->pathcount[$filepath];
+            if ($this->pathcount[$filepath] == 1) {
+                // echo '<pre>';
+                // print_r($filelist);
+                // echo '</pre>';
+                // die;
+                $matchingKeys = preg_grep('/^' . preg_quote($filepath, '/') . '/', array_keys($filelist));
+                foreach ($matchingKeys as $key) {
+                    $newkey = $filepath . '1' . substr($key, strlen($filepath));
+                    $filelist[$newkey] = $filelist[$key];
+                    unset($filelist[$key]);
+                }
+                // echo '<pre>';
+                // print_r($filelist);
+                // echo '</pre>';
+                // die;
+                // throw new Exception("Debug");
+            }
             $this->pathcount[$filepath]++;
+            $countnumber = $this->pathcount[$filepath];
         } else {
             $this->pathcount[$filepath] = 1;
         }
-        return (string)$countnumber;
+        $filepath .= $countnumber;
+        return $filepath;
     }
 
     /**
