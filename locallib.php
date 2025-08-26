@@ -309,6 +309,11 @@ class local_downloadcenter_factory {
         return !empty($resource->issubresource);
     }
 
+    /**
+     * Filters out empty sections from the resource list.
+     *
+     * @return array Containing only the sections with resources.
+     */
     private function filter_empty_sections() {
         $sections = [];
         $filteredresources = $this->filteredresources;
@@ -322,14 +327,15 @@ class local_downloadcenter_factory {
 
     /**
      * Builds a dictionary of section base directory names that have duplicates.
-     * Key is the cleaned section title (basedir), value is 1 if duplicate, 0 otherwise.
+     * Key is the cleaned section title, value is 1 if duplicate, 0 otherwise.
+     * Needed to preprocess the section names (to avoid overwriting duplicates).
      *
      * @param array $sections
      * @return array
      */
     private function return_duplicates_dictionary($sections) {
         $titlecounts = [];
-        // First, count occurrences of each cleaned section title.
+        // Count occurrences of each cleaned section title.
         foreach ($sections as $section) {
             if (!isset($section->title)) {
                 continue;
@@ -341,7 +347,7 @@ class local_downloadcenter_factory {
             }
             $titlecounts[$basedir]++;
         }
-        // Now, build the dictionary: 1 if duplicate, 0 otherwise.
+        // Build the dictionary: 1 if duplicate, 0 otherwise.
         $duplicates = [];
         foreach ($titlecounts as $basedir => $count) {
             $duplicates[$basedir] = $count > 1 ? 1 : 0;
@@ -349,6 +355,12 @@ class local_downloadcenter_factory {
         return $duplicates;
     }
 
+    /**
+     * Returns an array of a dictionary with the section path names with cleaned duplicates.
+     * The keys are the cleaned section titles, and the values are the resource arrays.
+     *
+     * @return array
+     */
     private function section_pathnames() {
         $pathlist = [];
         $sections = $this->filter_empty_sections();
@@ -370,20 +382,24 @@ class local_downloadcenter_factory {
                 }
             }
             $basedir = self::shorten_filename($basedir);
-            $pathlist[$basedir] = null;
+            $pathlist[$basedir] = $section->res;
         }
         return $pathlist;
     }
 
     /**
-     * Returns all subsection (name, id) pairs, renaming duplicates with a numeric suffix.
+     * Preprocesses resource names for subsections, handling duplicate names and optional prefix numbering.
      *
-     * For each subsectionname that appears with multiple different subsectioncmid values,
-     * the function appends a number to the name (e.g., 'Subsection1', 'Subsection2', ...).
-     * Subsection names that are unique are returned as-is.
+     * If $addprefixnumbering is false: Finds all resources that are in a subsection and adds suffix numbering to resource
+     * names that are duplicate.
      *
-     * @param array $resources Array of resource objects, each possibly with subsectionname and subsectioncmid.
-     * @return array Array of arrays: [['subsectionname' => string, 'subsectioncmid' => int], ...]
+     * If $addprefixnumbering is true: Adds a numeric prefix to all subsection names and resource names, regardless of duplicates.
+     *
+     * Returns the modified $resources array, with updated name and subsectionname properties.
+     *
+     * @param array $resources Array of resource objects.
+     * @param bool $addprefixnumbering If true, all names get a numeric prefix; if false, only duplicates get a suffix.
+     * @return array The modified array of resource objects, with updated name and subsectionname properties.
      */
     private function preprocess_resource_names($resources, $addprefixnumbering) {
         if (!$addprefixnumbering) {
@@ -481,11 +497,7 @@ class local_downloadcenter_factory {
         $filesrealnames = $this->_downloadoptions['filesrealnames'];
         $addnumbering = $this->_downloadoptions['addnumbering'];
         $pathlist = $this->section_pathnames();
-        $sections = $this->filter_empty_sections();
-        for ($i = 0; $i < count($sections); $i++) {
-            $sectionresources = array_values($sections)[$i]->res;
-            $basedir = array_keys($pathlist)[$i];
-
+        foreach($pathlist as $basedir => $sectionresources) {
             $filelist[$basedir] = null;
             $sectionresources = $this->preprocess_resource_names($sectionresources, $addnumbering);
 
@@ -498,8 +510,7 @@ class local_downloadcenter_factory {
                 }
                 if (!$addnumbering) {
                     // This ensures that activities with the same name do not get overwritten.
-                    // echo
-                    $resdir = self::get_number_directory_duplicates($resdir, $filelist);
+                    $resdir = self::get_and_update_filepath($resdir, $filelist);
                 }
                 $filelist[$resdir] = null;
                 $context = $res->context;
@@ -996,10 +1007,6 @@ class local_downloadcenter_factory {
                         }
                     }
                 }
-
-                // if (!$this->is_subsection_resource($res)) {
-                //     $resprefixid++;
-                // }
             }
         }
 
@@ -1009,10 +1016,6 @@ class local_downloadcenter_factory {
 
         $zipwriter = \core_files\archive_writer::get_stream_writer($filename, \core_files\archive_writer::ZIP_WRITER);
 
-        // echo '<pre>';
-        // print_r($filelist);
-        // echo '</pre>';
-        // die;
         // Stream the files into the zip.
         foreach ($filelist as $pathinzip => $file) {
             if ($file instanceof \stored_file) {
@@ -1033,32 +1036,25 @@ class local_downloadcenter_factory {
     }
 
     /**
-     * Counts the number of duplicates for a given file path and returns the number as a string if there are duplicates.
-     * If there are no duplicates, it returns an empty string. This is used to add a number to the filename if there are duplicates.
+     * Ensures unique file paths in the zip by tracking and renaming duplicates.
      *
-     * @param string $filepath
-     * @return string
+     * If the given $filepath has already been used, appends a number to the path to make it unique.
+     * If this is the first duplicate, also renames any existing keys in $filelist to start with suffix 1.
+     *
+     * @param string $filepath The file path to check and possibly rename for uniqueness.
+     * @param array $filelist Reference to the array of file paths (keys) and files (values) being added to the zip.
+     * @return string The unique file path, possibly with a numeric suffix appended.
      */
-    // TODO: Schauen ob es existiert, wenn ja, dann ändern mit '1' und +1, ansonsten nicht
-    private function get_number_directory_duplicates($filepath, &$filelist) {
+    private function get_and_update_filepath($filepath, &$filelist) {
         $countnumber = '';
         if (array_key_exists($filepath, $this->pathcount)) {
             if ($this->pathcount[$filepath] == 1) {
-                // echo '<pre>';
-                // print_r($filelist);
-                // echo '</pre>';
-                // die;
                 $matchingKeys = preg_grep('/^' . preg_quote($filepath, '/') . '/', array_keys($filelist));
                 foreach ($matchingKeys as $key) {
                     $newkey = $filepath . '1' . substr($key, strlen($filepath));
                     $filelist[$newkey] = $filelist[$key];
                     unset($filelist[$key]);
                 }
-                // echo '<pre>';
-                // print_r($filelist);
-                // echo '</pre>';
-                // die;
-                // throw new Exception("Debug");
             }
             $this->pathcount[$filepath]++;
             $countnumber = $this->pathcount[$filepath];
