@@ -519,7 +519,7 @@ class local_downloadcenter_factory {
      * @return void
      */
     private function handle_publication($resource, $resdir, &$filelist) {
-        global $DB, $USER;
+        global $DB, $USER, $CFG;
         $userfields = \core_user\fields::for_userpic();
         $context = $resource->context;
         $fs = get_file_storage();
@@ -920,7 +920,7 @@ class local_downloadcenter_factory {
      * @return void
      */
     private function handle_glossary($resource, $resdir, &$filelist) {
-        global $CFG;
+        global $CFG, $SITE;
         $fs = get_file_storage();
         $context = $resource->context;
         $hook = 'ALL'; // Setting up default values as taken from mod/glossary/print.php!
