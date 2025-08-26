@@ -404,21 +404,21 @@ class local_downloadcenter_factory {
     private function preprocess_resource_names($resources, $addprefixnumbering) {
         if (!$addprefixnumbering) {
             $result = [];
-            $nameToIds = [];
+            $duplicateids = [];
             foreach ($resources as $res) {
                 if ($this->is_subsection_resource($res)) {
                     $name = $res->subsectionname;
                     $id = $res->subsectioncmid;
-                    if (!isset($nameToIds[$name])) {
-                        $nameToIds[$name] = [];
+                    if (!isset($duplicateids[$name])) {
+                        $duplicateids[$name] = [];
                     }
-                    if (!in_array($id, $nameToIds[$name])) {
-                        $nameToIds[$name][] = $id;
+                    if (!in_array($id, $duplicateids[$name])) {
+                        $duplicateids[$name][] = $id;
                     }
                 }
             }
             // Original logic: only add suffix for duplicates, unique names as-is.
-            foreach ($nameToIds as $name => $ids) {
+            foreach ($duplicateids as $name => $ids) {
                 if (count($ids) > 1) {
                     $index = 1;
                     foreach ($ids as $id) {
@@ -497,7 +497,7 @@ class local_downloadcenter_factory {
         $filesrealnames = $this->_downloadoptions['filesrealnames'];
         $addnumbering = $this->_downloadoptions['addnumbering'];
         $pathlist = $this->section_pathnames();
-        foreach($pathlist as $basedir => $sectionresources) {
+        foreach ($pathlist as $basedir => $sectionresources) {
             $filelist[$basedir] = null;
             $sectionresources = $this->preprocess_resource_names($sectionresources, $addnumbering);
 
@@ -520,11 +520,12 @@ class local_downloadcenter_factory {
 
                     if ($filesrealnames) {
                         $realfilename = $file->get_filename();
-                        if($addnumbering) {
+                        if ($addnumbering) {
                             $realfilename = $res->prefixindex . '_' . $realfilename;
                         }
                         if ($this->is_subsection_resource($res)) {
-                            $filename = $basedir . '/' . $res->subsectionname . '/' . self::shorten_filename(clean_filename($realfilename));
+                            $filename = $basedir . '/' . $res->subsectionname . '/' .
+                                self::shorten_filename(clean_filename($realfilename));
                         } else {
                             $filename = $basedir . '/' . self::shorten_filename(clean_filename($realfilename));
                         }
@@ -1049,8 +1050,8 @@ class local_downloadcenter_factory {
         $countnumber = '';
         if (array_key_exists($filepath, $this->pathcount)) {
             if ($this->pathcount[$filepath] == 1) {
-                $matchingKeys = preg_grep('/^' . preg_quote($filepath, '/') . '/', array_keys($filelist));
-                foreach ($matchingKeys as $key) {
+                $matchingpaths = preg_grep('/^' . preg_quote($filepath, '/') . '/', array_keys($filelist));
+                foreach ($matchingpaths as $key) {
                     $newkey = $filepath . '1' . substr($key, strlen($filepath));
                     $filelist[$newkey] = $filelist[$key];
                     unset($filelist[$key]);
