@@ -30,7 +30,6 @@ namespace local_downloadcenter;
  * @subpackage phpunit
  * @copyright  2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @covers     \local_downloadcenter_factory::get_resources_for_user
  */
 final class files_visible_test extends \advanced_testcase {
     public function test_empty(): void {
