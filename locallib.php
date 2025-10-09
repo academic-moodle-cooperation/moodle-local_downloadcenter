@@ -429,10 +429,15 @@ class local_downloadcenter_factory {
                     $result[$ids[0]] = $name;
                 }
             }
+            // Update resource names; only touch subsection properties when applicable.
             foreach ($resources as $res) {
                 $res->name = html_entity_decode($res->name);
-                $subsecid = $res->subsectioncmid;
-                $res->subsectionname = $result[$subsecid] ?? '';
+                if ($this->is_subsection_resource($res) && isset($res->subsectioncmid)) {
+                    $subsecid = $res->subsectioncmid;
+                    if (isset($result[$subsecid])) {
+                        $res->subsectionname = $result[$subsecid];
+                    }
+                }
             }
         } else if ($addprefixnumbering) {
             $resourceindex = 0;
