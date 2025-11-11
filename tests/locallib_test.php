@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_downloadcenter; // Match plugin namespace recommendation.
+
 /**
  * Unit tests for locallib.php
  *
@@ -22,7 +24,7 @@
  * @copyright   2025 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class locallib_test extends \advanced_testcase {
+final class locallib_test extends \advanced_testcase {
     /**
      * Ensure the plugin class under test is available.
      */

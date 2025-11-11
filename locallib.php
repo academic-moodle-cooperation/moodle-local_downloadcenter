@@ -122,7 +122,7 @@ class local_downloadcenter_factory {
                     break;
                 }
                 if (!isset($sorted[$section->section]) && ($section->visible || $canviewhiddensections)) {
-                    $sorted[$section->section] = new stdClass;
+                    $sorted[$section->section] = new stdClass();
                     $title = trim(get_section_name($this->course, $section->section));
                     $title = self::shorten_filename($title);
                     $sorted[$section->section]->title = $title;
@@ -150,7 +150,7 @@ class local_downloadcenter_factory {
                 $sorted[$sectionid]->title = $title;
             }
         } else {
-            $sorted['default'] = new stdClass;
+            $sorted['default'] = new stdClass();
             $sorted['default']->title = '0';
             $sorted['default']->res = [];
             $sorted['default']->itemid = -1;
@@ -201,7 +201,7 @@ class local_downloadcenter_factory {
 
             $cmcontext = context_module::instance($cm->id);
             if ($cm->modname == 'glossary') {
-                if ( !has_capability('mod/glossary:manageentries', $cmcontext) && !$resource->allowprintview) {
+                if (!has_capability('mod/glossary:manageentries', $cmcontext) && !$resource->allowprintview) {
                     continue;
                 }
             }
@@ -211,7 +211,7 @@ class local_downloadcenter_factory {
             }
 
             $icon = '<img src="' . $cm->get_icon_url() . '" class="activityicon" alt="' . $cm->get_module_type_name() . '" /> ';
-            $res = new stdClass;
+            $res = new stdClass();
             $res->icon = $icon;
             $res->cmid = $cm->id;
             $res->name = $cm->get_formatted_name();
@@ -462,7 +462,7 @@ class local_downloadcenter_factory {
                     $subresourceindex++;
                 } else {
                     $resourceindex++;
-                    $res->name = sprintf($prefixformat, $resourceindex) . '_'. $res->name;
+                    $res->name = sprintf($prefixformat, $resourceindex) . '_' . $res->name;
                     $res->prefixindex = sprintf($prefixformat, $resourceindex);
                 }
             }
@@ -1234,7 +1234,7 @@ class local_downloadcenter_factory {
             if (!isset($data['item_topic_' . $sectionid])) {
                 continue;
             }
-            $filtered[$sectionid] = new stdClass;
+            $filtered[$sectionid] = new stdClass();
             $filtered[$sectionid]->title = $info->title;
             $filtered[$sectionid]->res = [];
             foreach ($info->res as $res) {
