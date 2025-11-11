@@ -50,8 +50,10 @@ class local_downloadcenter_download_form extends moodleform {
         $infomessagestring = has_capability('moodle/course:update', $coursecontext) ?
             get_string('infomessage_teachers', 'local_downloadcenter') :
             get_string('infomessage_students', 'local_downloadcenter');
-        $mform->addElement('html',
-            html_writer::tag('div',
+        $mform->addElement(
+            'html',
+            html_writer::tag(
+                'div',
                 $infomessagestring,
                 ['class' => 'alert alert-info alert-block']
             )
@@ -70,8 +72,11 @@ class local_downloadcenter_download_form extends moodleform {
             $sectiontitle = html_writer::span($sectioninfo->title, 'sectiontitle mt-1');
 
             if (!$sectioninfo->visible) {
-                $sectiontitle .= html_writer::tag('span', get_string('hiddenfromstudents'),
-                    ['class' => 'badge bg-info text-white ml-1 sectiontitlebadge']);
+                $sectiontitle .= html_writer::tag(
+                    'span',
+                    get_string('hiddenfromstudents'),
+                    ['class' => 'badge bg-info text-white ml-1 sectiontitlebadge']
+                );
             }
             $mform->addElement('checkbox', $sectionname, $sectiontitle, '', ['class' => 'mt-2']);
 
@@ -103,13 +108,18 @@ class local_downloadcenter_download_form extends moodleform {
                 $title = html_writer::span($res->name) . ' ' . $res->icon;
                 $badge = '';
                 if (!$res->visible) {
-                    $badge = html_writer::tag('span', get_string('hiddenfromstudents'),
-                        ['class' => 'badge bg-info text-white mb-1']);
+                    $badge = html_writer::tag(
+                        'span',
+                        get_string('hiddenfromstudents'),
+                        ['class' => 'badge bg-info text-white mb-1']
+                    );
                 }
                 if ($res->isstealth) {
-                    $badge = html_writer::tag('span', get_string('hiddenoncoursepage'),
-                        ['class' => 'badge bg-info text-white mb-1']);
-
+                    $badge = html_writer::tag(
+                        'span',
+                        get_string('hiddenoncoursepage'),
+                        ['class' => 'badge bg-info text-white mb-1']
+                    );
                 }
                 $title = html_writer::tag('span', $title . $badge, ['class' => 'itemtitle']);
                 $mform->addElement('checkbox', $name, $title);
@@ -131,6 +141,5 @@ class local_downloadcenter_download_form extends moodleform {
         $mform->addHelpButton('addnumbering', 'downloadoptions:addnumbering', 'local_downloadcenter');
 
         $this->add_action_buttons(true, get_string('createzip', 'local_downloadcenter'));
-
     }
 }

@@ -23,7 +23,6 @@
  * @license       http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
 require_once(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/locallib.php');
 require_once(__DIR__ . '/download_form.php');
@@ -53,17 +52,18 @@ $userresources = $downloadcenter->get_resources_for_user();
 
 $PAGE->requires->js_call_amd('local_downloadcenter/modfilter', 'init', $downloadcenter->get_js_modnames());
 
-$downloadform = new local_downloadcenter_download_form(null,
+$downloadform = new local_downloadcenter_download_form(
+    null,
     ['res' => $userresources],
     'post',
     '',
-    ['data-double-submit-protection' => 'off']);
+    ['data-double-submit-protection' => 'off']
+);
 
 $PAGE->set_title(get_string('navigationlink', 'local_downloadcenter') . ': ' . $course->fullname);
 $PAGE->set_heading($course->fullname);
 
 if ($data = $downloadform->get_data()) {
-
     $event = \local_downloadcenter\event\zip_downloaded::create([
         'objectid' => $PAGE->course->id,
         'context' => $PAGE->context,

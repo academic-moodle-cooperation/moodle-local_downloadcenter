@@ -42,7 +42,7 @@ class local_downloadcenter_factory {
     /**
      * @var array
      */
-    private $_downloadoptions;
+    private $downloadoptions;
     /**
      * @var array
      */
@@ -78,7 +78,7 @@ class local_downloadcenter_factory {
     public function __construct($course, $user) {
         $this->course = $course;
         $this->user = $user;
-        $this->_downloadoptions = [
+        $this->downloadoptions = [
             'filesrealnames' => false,
             'addnumbering' => false,
         ];
@@ -102,10 +102,14 @@ class local_downloadcenter_factory {
 
         $modinfo = get_fast_modinfo($this->course);
         $usesections = course_format_uses_sections($this->course->format);
-        $canviewhiddensections = has_capability('moodle/course:viewhiddensections',
-            context_course::instance($this->course->id));
-        $canviewhiddenactivities = has_capability('moodle/course:viewhiddenactivities',
-            context_course::instance($this->course->id));
+        $canviewhiddensections = has_capability(
+            'moodle/course:viewhiddensections',
+            context_course::instance($this->course->id)
+        );
+        $canviewhiddenactivities = has_capability(
+            'moodle/course:viewhiddenactivities',
+            context_course::instance($this->course->id)
+        );
         $sorted = [];
         if ($usesections) {
             $sections = $DB->get_records('course_sections', ['course' => $this->course->id], 'section');
@@ -206,7 +210,7 @@ class local_downloadcenter_factory {
                 $this->jsnames[$cm->modname] = get_string('modulenameplural', 'mod_' . $cm->modname);
             }
 
-            $icon = '<img src="'.$cm->get_icon_url().'" class="activityicon" alt="'.$cm->get_module_type_name().'" /> ';
+            $icon = '<img src="' . $cm->get_icon_url() . '" class="activityicon" alt="' . $cm->get_module_type_name() . '" /> ';
             $res = new stdClass;
             $res->icon = $icon;
             $res->cmid = $cm->id;
@@ -366,7 +370,7 @@ class local_downloadcenter_factory {
         $sections = $this->filter_empty_sections();
         $duplicates = $this->return_duplicates_dictionary($sections);
 
-        $addnumbering = $this->_downloadoptions['addnumbering'];
+        $addnumbering = $this->downloadoptions['addnumbering'];
         $topicprefixid = 1;
         $topicscount = count($sections);
         $topicprefixformat = '%0' . strlen($topicscount) . 'd';
@@ -477,8 +481,8 @@ class local_downloadcenter_factory {
      */
     private function handle_resource($resource, $resdir, &$filelist, $basedir) {
         $fs = get_file_storage();
-        $filesrealnames = $this->_downloadoptions['filesrealnames'];
-        $addnumbering = $this->_downloadoptions['addnumbering'];
+        $filesrealnames = $this->downloadoptions['filesrealnames'];
+        $addnumbering = $this->downloadoptions['addnumbering'];
         $context = $resource->context;
         $files = $fs->get_area_files($context->id, 'mod_resource', 'content', 0, 'sortorder DESC, id ASC', false);
         $file = array_shift($files); // Get only the first file - such are the requirements!
@@ -538,7 +542,7 @@ class local_downloadcenter_factory {
         $currentgroup = groups_get_activity_group($cm, true);
 
         // Get all ppl that are allowed to submit assignments.
-        list($esql, $params) = get_enrolled_sql($context, 'mod/publication:view', $currentgroup);
+        [$esql, $params] = get_enrolled_sql($context, 'mod/publication:view', $currentgroup);
         $showall = false;
 
         if (
@@ -609,7 +613,6 @@ class local_downloadcenter_factory {
             $auser = $DB->get_record('user', ['id' => $auserid], $userfields);
 
             foreach ($records as $record) {
-
                 $hasteacherapproval = !$resource->resource->obtainteacherapproval || $record->teacherapproval == 1;
                 $hasstudentapproval = !$resource->resource->obtainstudentapproval || $record->studentapproval == 1;
                 $haspermission = $auser->id == $USER->id || $hasteacherapproval && $hasstudentapproval;
@@ -951,7 +954,7 @@ class local_downloadcenter_factory {
             format_string($glossary->name, true) . '</span>';
         echo html_writer::tag('div', $modname, ['class' => 'modname']);
 
-        list($allentries, $count) = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, 0);
+        [$allentries, $count] = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, 0);
         if ($allentries) {
             foreach ($allentries as $entry) {
                 $pivot = $entry->{$pivotkey};
@@ -1097,7 +1100,7 @@ class local_downloadcenter_factory {
 
         $filelist = [];
 
-        $addnumbering = $this->_downloadoptions['addnumbering'];
+        $addnumbering = $this->downloadoptions['addnumbering'];
         $pathlist = $this->section_pathnames();
         foreach ($pathlist as $basedir => $sectionresources) {
             $filelist[$basedir] = null;
@@ -1244,8 +1247,8 @@ class local_downloadcenter_factory {
         }
 
         $this->filteredresources = $filtered;
-        $this->_downloadoptions['filesrealnames'] = isset($data['filesrealnames']);
-        $this->_downloadoptions['addnumbering'] = isset($data['addnumbering']);
+        $this->downloadoptions['filesrealnames'] = isset($data['filesrealnames']);
+        $this->downloadoptions['addnumbering'] = isset($data['addnumbering']);
     }
 
     /**
@@ -1332,7 +1335,5 @@ ul.indent {
 </body>
 CSS;
         return str_replace('</body>', $csscontent, $htmlcontent);
-
     }
-
 }
