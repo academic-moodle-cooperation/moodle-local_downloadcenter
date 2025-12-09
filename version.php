@@ -30,4 +30,3 @@ $plugin->requires  = 2025100600;
 $plugin->component = 'local_downloadcenter';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = "v5.1.0";
-
