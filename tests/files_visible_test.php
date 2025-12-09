@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
-* TODO tests:
-*   - add resources, files and check if the students
-*
-*/
+ * TODO tests:
+ *   - add resources, files and check if the students
+ *
+ */
 
 namespace local_downloadcenter;
 
@@ -33,7 +33,6 @@ namespace local_downloadcenter;
  * @covers     \local_downloadcenter_factory::get_resources_for_user
  */
 final class files_visible_test extends \advanced_testcase {
-
     public function test_empty(): void {
         global $DB;
         require_once(__DIR__ . '/../locallib.php');
@@ -103,7 +102,6 @@ final class files_visible_test extends \advanced_testcase {
         $this->assertCount($resources->visiblefoldercount, $userresources[$resources->foldersection]->res);
         $this->assertCount($resources->visiblepagecount, $userresources[$resources->pagesection]->res);
         $this->assertCount($resources->visiblebookcount, $userresources[$resources->booksection]->res);
-
     }
 
     public function test_teacher_visibility(): void {
@@ -144,14 +142,19 @@ final class files_visible_test extends \advanced_testcase {
      * @param mixed $context
      * @return int
      */
-    private function helper_add_file_to_context($filename, $filecontent , $context) {
+    private function helper_add_file_to_context($filename, $filecontent, $context) {
         // Pick a random context id for specified user.
         $fileid = file_get_unused_draft_itemid();
 
         // Add actual file there.
-        $filerecord = ['component' => 'user', 'filearea' => 'draft',
-                            'contextid' => $context->id, 'itemid' => $fileid,
-                            'filename' => $filename, 'filepath' => '/', ];
+        $filerecord = [
+            'component' => 'user',
+            'filearea' => 'draft',
+            'contextid' => $context->id,
+            'itemid' => $fileid,
+            'filename' => $filename,
+            'filepath' => '/',
+        ];
         $fs = get_file_storage();
         $fs->create_file_from_string($filerecord, $filecontent);
 
@@ -166,7 +169,6 @@ final class files_visible_test extends \advanced_testcase {
      * @return \stdClass
      */
     private function helper_add_resources_to_course($course, $teacher) {
-
         $filesection = 0;
         $foldersection = 1;
         $pagesection = 2;
@@ -174,7 +176,7 @@ final class files_visible_test extends \advanced_testcase {
 
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_resource');
 
-        $record = new \stdClass;
+        $record = new \stdClass();
         $record->course = $course->id;
         $usercontext = \context_user::instance($teacher->id);
 
@@ -196,7 +198,6 @@ final class files_visible_test extends \advanced_testcase {
         $foldercount = 10;
         $visiblefoldercount = 0;
         for ($i = 0; $i < $foldercount; $i++) {
-
             $record->visible = rand(0, 1000) > 500;
             $visiblefoldercount += intval($record->visible);
             $record->files = $this->helper_add_file_to_context('resource' . ($i + 1) . '.jpg', 'some random content', $usercontext);
@@ -208,7 +209,7 @@ final class files_visible_test extends \advanced_testcase {
 
         unset($record->files);
         $record->section = $pagesection;
-        $pagecount  = 10;
+        $pagecount = 10;
         $visiblepagecount = 0;
         for ($i = 0; $i < $pagecount; $i++) {
             $record->visible = rand(0, 1000) > 500;
@@ -226,7 +227,7 @@ final class files_visible_test extends \advanced_testcase {
         unset($record->contentformat);
 
         $record->section = $booksection;
-        $bookcount  = 10;
+        $bookcount = 10;
         $visiblebookcount = 0;
         for ($i = 0; $i < $bookcount; $i++) {
             $record->visible = rand(0, 1000) > 500;
@@ -239,10 +240,9 @@ final class files_visible_test extends \advanced_testcase {
             for ($j = 0; $j < 5; $j++) {
                 $generator->create_chapter(['bookid' => $book->id]);
             }
-
         }
 
-        $result = new \stdClass;
+        $result = new \stdClass();
         $result->filecount = $filecount;
         $result->visiblefilecount = $visiblefilecount;
         $result->filesection = $filesection;
@@ -261,6 +261,4 @@ final class files_visible_test extends \advanced_testcase {
 
         return $result;
     }
-
-
 }
