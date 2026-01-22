@@ -4,6 +4,7 @@ CHANGELOG
 5.1.0 (2025-10-06)
 ------------------
 * Moodle 5.1 compatible version
+* [FIXED] #8648 - Fix glossary download
 
 5.0.0 (2025-05-22)
 ------------------
