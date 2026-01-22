@@ -954,7 +954,7 @@ class local_downloadcenter_factory {
             format_string($glossary->name, true) . '</span>';
         echo html_writer::tag('div', $modname, ['class' => 'modname']);
 
-        [$allentries, $count] = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, 0);
+        [$allentries, $count] = glossary_get_entries_by_letter($glossary, $context, 'ALL', 0, null);
         if ($allentries) {
             foreach ($allentries as $entry) {
                 $pivot = $entry->{$pivotkey};
@@ -985,12 +985,17 @@ class local_downloadcenter_factory {
         $fileurl = $CFG->wwwroot . '/pluginfile.php/' . $context->id . '/mod_glossary/';
         $content = str_replace($fileurl, 'data/', $content);
         $filename = $resdir . '/' . self::shorten_filename($resource->name . '.html');
-        $linkrel = '<link href="css/styles.css" rel="stylesheet">';
-        $linkrel .= '<style> .img-fluid { max-width: 100%; height: auto;}</style>';
-        $content = '<div class="path-mod-glossary" id="#page-mod-glossary-print">' . $content . '</div>';
+           $linkrel = '<style>' .
+            '.img-fluid { max-width: 100%; height: auto; } ' .
+            'table.glossarypost.dictionary, table.glossarypost.dictionary td.entry { width: 100%; } ' .
+            '.attachments { display: flex; align-items: center; gap: .25rem; } ' .
+            '.attachments a:first-child { flex: 0 0 auto; } ' .
+            '.attachments a:first-child img.icon { width: 24px; height: 24px; flex: 0 0 24px; display: inline-block; } ' .
+            '.attachments a + a { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }' .
+            '</style>';
+        $content = '<div class="path-mod-glossary" id="page-mod-glossary-print">' . $content . '</div>';
         $content = self::convert_content_to_html_doc($resource->name, $content, $linkrel);
         $filelist[$filename] = [$content];
-        $filelist[$resdir . '/css/styles.css'] = $CFG->dirroot . '/mod/glossary/styles.css';
 
         // Handle attachments.
         $fsfiles = $fs->get_area_files(
