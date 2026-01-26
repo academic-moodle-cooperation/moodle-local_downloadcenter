@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+5.0.1 (2026-01-14)
+------------------
+* [FIXED] #8650 - Fix glossary download and remove CSS folder download
+
 5.0.0 (2025-05-22)
 ------------------
 * Moodle 5.0 compatible version

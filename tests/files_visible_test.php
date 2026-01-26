@@ -33,7 +33,6 @@ namespace local_downloadcenter;
  * @covers     \local_downloadcenter_factory::get_resources_for_user
  */
 final class files_visible_test extends \advanced_testcase {
-
     public function test_empty(): void {
         global $DB;
         require_once(__DIR__ . '/../locallib.php');
@@ -103,7 +102,6 @@ final class files_visible_test extends \advanced_testcase {
         $this->assertCount($resources->visiblefoldercount, $userresources[$resources->foldersection]->res);
         $this->assertCount($resources->visiblepagecount, $userresources[$resources->pagesection]->res);
         $this->assertCount($resources->visiblebookcount, $userresources[$resources->booksection]->res);
-
     }
 
     public function test_teacher_visibility(): void {
@@ -144,7 +142,7 @@ final class files_visible_test extends \advanced_testcase {
      * @param mixed $context
      * @return int
      */
-    private function helper_add_file_to_context($filename, $filecontent , $context) {
+    private function helper_add_file_to_context($filename, $filecontent, $context) {
         // Pick a random context id for specified user.
         $fileid = file_get_unused_draft_itemid();
 
@@ -174,7 +172,7 @@ final class files_visible_test extends \advanced_testcase {
 
         $generator = $this->getDataGenerator()->get_plugin_generator('mod_resource');
 
-        $record = new \stdClass;
+        $record = new \stdClass();
         $record->course = $course->id;
         $usercontext = \context_user::instance($teacher->id);
 
@@ -196,7 +194,6 @@ final class files_visible_test extends \advanced_testcase {
         $foldercount = 10;
         $visiblefoldercount = 0;
         for ($i = 0; $i < $foldercount; $i++) {
-
             $record->visible = rand(0, 1000) > 500;
             $visiblefoldercount += intval($record->visible);
             $record->files = $this->helper_add_file_to_context('resource' . ($i + 1) . '.jpg', 'some random content', $usercontext);
@@ -239,10 +236,9 @@ final class files_visible_test extends \advanced_testcase {
             for ($j = 0; $j < 5; $j++) {
                 $generator->create_chapter(['bookid' => $book->id]);
             }
-
         }
 
-        $result = new \stdClass;
+        $result = new \stdClass();
         $result->filecount = $filecount;
         $result->visiblefilecount = $visiblefilecount;
         $result->filesection = $filesection;
@@ -261,6 +257,4 @@ final class files_visible_test extends \advanced_testcase {
 
         return $result;
     }
-
-
 }
