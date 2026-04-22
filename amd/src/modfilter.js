@@ -95,16 +95,21 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
         const name = $checkbox.prop('name');
         const checked = $checkbox.prop('checked');
         if (name.substring(0, shortprefix.length) === shortprefix) {
-            let $parent = $checkbox.parentsUntil('form', '.card');
-            if ($parent.length > 1) {
-                $parent = $parent.first();
-            }
+            const $parent = $checkbox.closest('.card.block');
             if (name.substring(0, prefix.length) === prefix) {
                 $parent.find('input.form-check-input').prop('checked', checked);
+            }
+            if (checked) {
+                $checkbox.parentsUntil('form', '.card.block').each(function() {
+                    $(this).find('input.form-check-input[name^="item_topic"]').first().prop('checked', true);
+                });
             } else {
-                if (checked) {
-                    $parent.find('input.form-check-input[name^="item_topic"]').prop('checked', true);
-                }
+                $checkbox.parentsUntil('form', '.card.block').each(function() {
+                    const $card = $(this);
+                    if ($card.find('input.form-check-input[name^="item_"]:not([name^="item_topic"]):checked').length === 0) {
+                        $card.find('input.form-check-input[name^="item_topic"]').first().prop('checked', false);
+                    }
+                });
             }
         }
     };
@@ -145,6 +150,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
 
     ModFilter.prototype.helper = function(e, check, type, mod) {
         e.preventDefault();
+        const instance = this;
         let prefix = '';
         if (typeof mod !== 'undefined') {
             prefix = 'item_' + mod + '_';
@@ -162,9 +168,7 @@ define(['jquery', 'core/str', 'core/url'], function($, Str, url) {
             }
             if (name.substring(0, len) === type) {
                 checkbox.prop('checked', check);
-            }
-            if (check) {
-                checkbox.closest('.card.block').find('.fitem:first-child input[type="checkbox"]').prop('checked', check);
+                instance.checkboxhandler(checkbox);
             }
         });
 
