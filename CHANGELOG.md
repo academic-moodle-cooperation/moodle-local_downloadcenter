@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+5.2.0 (2026-04-20)
+------------------
+* Moodle 5.2 compatible version
+* [FIXED] #8698 - Selecting by type now selects the correct activities in the subsections
+* [FEATURE] #8682 - Table of contents for the downloaded archive
+
 5.1.0 (2025-10-06)
 ------------------
 * Moodle 5.1 compatible version
