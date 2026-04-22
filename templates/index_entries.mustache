@@ -1,0 +1,58 @@
+{{!
+    This file is part of local_downloadcenter for Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_downloadcenter/index_entries
+
+    Recursive list entries for the offline Download center table of contents.
+
+    Example context (json):
+    {
+        "hasentries": true,
+        "entries": [
+            {
+                "title": "Folder",
+                "haslink": false,
+                "haschildren": true,
+                "hasentries": true,
+                "entries": [
+                    {
+                        "title": "File.pdf",
+                        "link": "./Folder/File.pdf",
+                        "titleattribute": "Folder/File.pdf",
+                        "haslink": true,
+                        "haschildren": false
+                    }
+                ]
+            }
+        ]
+    }
+}}
+{{#hasentries}}
+    <ul class="downloadcenter-index-files downloadcenter-index-filetree">
+        {{#entries}}
+            {{#haslink}}
+                <li><a href="{{link}}" title="{{titleattribute}}">{{title}}</a></li>
+            {{/haslink}}
+            {{#haschildren}}
+                <li class="downloadcenter-index-entry">
+                    <span class="downloadcenter-index-entry-title">{{title}}</span>
+                    {{> local_downloadcenter/index_entries}}
+                </li>
+            {{/haschildren}}
+        {{/entries}}
+    </ul>
+{{/hasentries}}

@@ -194,32 +194,29 @@ final class locallib_test extends \advanced_testcase {
     }
 
     /**
-     * The generated index tree should contain only files and preserve the ZIP directory structure.
+     * Grouped file entries should preserve the relative directory structure.
      */
-    public function test_build_index_file_tree_ignores_directories_and_generated_index(): void {
+    public function test_build_index_file_entries_from_paths_preserves_relative_structure(): void {
         $this->resetAfterTest();
 
         $factory = $this->make_factory();
-        $filelist = [
-            'Topic One' => null,
-            'Topic One/Page.html' => ['<html></html>'],
-            'Topic One/Subsection A/File A.pdf' => '/tmp/file-a.pdf',
-            \local_downloadcenter_factory::INDEX_FILENAME => ['generated index'],
-            'Empty topic' => null,
+        $paths = [
+            'Topic One/Page.html',
+            'Topic One/Subsection A/File A.pdf',
         ];
 
-        $tree = $this->call_private($factory, 'build_index_file_tree', [$filelist]);
+        $entries = $this->call_private($factory, 'build_index_file_entries_from_paths', [$paths, 'Topic One']);
 
-        $this->assertArrayHasKey('Topic One', $tree['dirs']);
-        $this->assertArrayNotHasKey('Empty topic', $tree['dirs']);
-        $this->assertSame(
-            [['name' => 'Page.html', 'path' => 'Topic One/Page.html']],
-            $tree['dirs']['Topic One']['files']
-        );
-        $this->assertSame(
-            [['name' => 'File A.pdf', 'path' => 'Topic One/Subsection A/File A.pdf']],
-            $tree['dirs']['Topic One']['dirs']['Subsection A']['files']
-        );
+        $this->assertSame('Page.html', $entries[0]['title']);
+        $this->assertSame('./Topic%20One/Page.html', $entries[0]['link']);
+        $this->assertTrue($entries[0]['haslink']);
+
+        $this->assertSame('Subsection A', $entries[1]['title']);
+        $this->assertFalse($entries[1]['haslink']);
+        $this->assertTrue($entries[1]['haschildren']);
+        $this->assertTrue($entries[1]['hasentries']);
+        $this->assertSame('File A.pdf', $entries[1]['entries'][0]['title']);
+        $this->assertSame('./Topic%20One/Subsection%20A/File%20A.pdf', $entries[1]['entries'][0]['link']);
     }
 
     /**
@@ -245,8 +242,10 @@ final class locallib_test extends \advanced_testcase {
         ]);
 
         $this->assertSame('Glorssary test.html', $entry['title']);
-        $this->assertSame('General/New subsection/Glorssary test/Glorssary test.html', $entry['link']);
-        $this->assertNull($entry['children']);
+        $this->assertSame('./General/New%20subsection/Glorssary%20test/Glorssary%20test.html', $entry['link']);
+        $this->assertSame('General/New subsection/Glorssary test/Glorssary test.html', $entry['titleattribute']);
+        $this->assertTrue($entry['haslink']);
+        $this->assertFalse($entry['haschildren']);
     }
 
     /**
@@ -265,9 +264,26 @@ final class locallib_test extends \advanced_testcase {
                 'title' => 'Section One',
                 'items' => [
                     [
+                        'title' => 'A1',
+                        'haslink' => false,
+                        'haschildren' => true,
+                        'hasentries' => true,
+                        'entries' => [
+                            [
+                                'title' => 'intro.html',
+                                'link' => './Section%20One/A1/intro/intro.html',
+                                'titleattribute' => 'Section One/A1/intro/intro.html',
+                                'haslink' => true,
+                                'haschildren' => false,
+                            ],
+                        ],
+                    ],
+                    [
                         'title' => 'Page File.html',
-                        'link' => 'Section One/Page File.html',
-                        'children' => null,
+                        'link' => './Section%20One/Page%20File.html',
+                        'titleattribute' => 'Section One/Page File.html',
+                        'haslink' => true,
+                        'haschildren' => false,
                     ],
                 ],
                 'subsections' => [
@@ -276,8 +292,10 @@ final class locallib_test extends \advanced_testcase {
                         'items' => [
                             [
                                 'title' => 'Doc & Notes.pdf',
-                                'link' => 'Section One/Sub Section/Doc & Notes.pdf',
-                                'children' => null,
+                                'link' => './Section%20One/Sub%20Section/Doc%20%26%20Notes.pdf',
+                                'titleattribute' => 'Section One/Sub Section/Doc & Notes.pdf',
+                                'haslink' => true,
+                                'haschildren' => false,
                             ],
                         ],
                     ],
@@ -292,6 +310,8 @@ final class locallib_test extends \advanced_testcase {
         $this->assertStringContainsString('/course/view.php?id=' . $course->id, $html);
         $this->assertStringContainsString('<h2>Section One</h2>', $html);
         $this->assertStringContainsString('<h3>Sub Section</h3>', $html);
+        $this->assertStringContainsString('downloadcenter-index-entry-title">A1</span>', $html);
+        $this->assertStringContainsString('href="./Section%20One/A1/intro/intro.html"', $html);
         $this->assertStringContainsString('href="./Section%20One/Page%20File.html"', $html);
         $this->assertStringContainsString('href="./Section%20One/Sub%20Section/Doc%20%26%20Notes.pdf"', $html);
         $this->assertStringNotContainsString('href="./index.html"', $html);
