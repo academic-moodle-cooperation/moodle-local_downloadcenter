@@ -7,8 +7,8 @@ Feature: Both students and teachers should be able to supported activities in th
       | teacher1 | Tina      | Teacher1 | teacher1@example.com |
       | student1 | Sam1      | Student1 | student1@example.com |
     And the following "courses" exist:
-      | fullname | shortname | category |
-      | Course 1 | C1        | 0        |
+      | fullname | shortname | category | numsections |
+      | Course 1 | C1        | 0        | 2           |
     And the following "course enrolments" exist:
       | user     | course | role           |
       | teacher1 | C1     | editingteacher |
@@ -62,6 +62,27 @@ Feature: Both students and teachers should be able to supported activities in th
     And I am on "Course 1" course homepage
     And I navigate to "Download center" in current page administration
     Then I should see "Test Page"
+
+  @javascript
+  Scenario: Type options select parent section for activities inside subsections
+    Given the following "activities" exist:
+      | activity   | name            | course | idnumber    | section |
+      | subsection | Subsection 1    | C1     | subsection1 | 1       |
+      | page       | Subsection page | C1     | page1       | 3       |
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage
+    And I navigate to "Download center" in current page administration
+    When I click on "#downloadcenter-none-included" "css_element"
+    And I click on "#downloadcenter-bytype" "css_element"
+    And I wait "1" seconds
+    And I click on "#downloadcenter-all-mod_page" "css_element"
+    Then the field with xpath "//input[@name='item_topic_1']" matches value "1"
+    And the field "Subsection 1" matches value "1"
+    And the field "Subsection page" matches value "1"
+    When I click on "#downloadcenter-none-mod_page" "css_element"
+    Then the field with xpath "//input[@name='item_topic_1']" matches value ""
+    And the field "Subsection 1" matches value ""
+    And the field "Subsection page" matches value ""
 
   Scenario: Check for prefence of a mockup book activity module in the Download Center
     Given I log in as "teacher1"
