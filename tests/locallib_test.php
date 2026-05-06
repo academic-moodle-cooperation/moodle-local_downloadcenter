@@ -59,11 +59,23 @@ final class locallib_test extends \advanced_testcase {
      */
     private function call_preprocess(array $resources, bool $addprefixnumbering): array {
         $factory = $this->make_factory();
-        $ref = new \ReflectionMethod(\local_downloadcenter_factory::class, 'preprocess_resource_names');
-        $ref->setAccessible(true);
         /** @var array $result */
-        $result = $ref->invoke($factory, $resources, $addprefixnumbering);
+        $result = $this->call_private($factory, 'preprocess_resource_names', [$resources, $addprefixnumbering]);
         return $result;
+    }
+
+    /**
+     * Invoke a private factory method via reflection.
+     *
+     * @param \local_downloadcenter_factory $factory
+     * @param string $method
+     * @param array $args
+     * @return mixed
+     */
+    private function call_private(\local_downloadcenter_factory $factory, string $method, array $args = []) {
+        $ref = new \ReflectionMethod(\local_downloadcenter_factory::class, $method);
+        $ref->setAccessible(true);
+        return $ref->invokeArgs($factory, $args);
     }
 
     /**
@@ -179,5 +191,129 @@ final class locallib_test extends \advanced_testcase {
         // Final non-subsection: next global index 4.
         $this->assertSame('4_B', $out[4]->name);
         $this->assertSame('4', $out[4]->prefixindex);
+    }
+
+    /**
+     * Grouped file entries should preserve the relative directory structure.
+     */
+    public function test_build_index_file_entries_from_paths_preserves_relative_structure(): void {
+        $this->resetAfterTest();
+
+        $factory = $this->make_factory();
+        $paths = [
+            'Topic One/Page.html',
+            'Topic One/Subsection A/File A.pdf',
+        ];
+
+        $entries = $this->call_private($factory, 'build_index_file_entries_from_paths', [$paths, 'Topic One']);
+
+        $this->assertSame('Page.html', $entries[0]['title']);
+        $this->assertSame('./Topic%20One/Page.html', $entries[0]['link']);
+        $this->assertTrue($entries[0]['haslink']);
+
+        $this->assertSame('Subsection A', $entries[1]['title']);
+        $this->assertFalse($entries[1]['haslink']);
+        $this->assertTrue($entries[1]['haschildren']);
+        $this->assertTrue($entries[1]['hasentries']);
+        $this->assertSame('File A.pdf', $entries[1]['entries'][0]['title']);
+        $this->assertSame('./Topic%20One/Subsection%20A/File%20A.pdf', $entries[1]['entries'][0]['link']);
+    }
+
+    /**
+     * Generated support files for HTML activities should not become table of contents entries.
+     */
+    public function test_create_index_entry_uses_primary_glossary_html_only(): void {
+        $this->resetAfterTest();
+
+        $factory = $this->make_factory();
+        $resource = (object) [
+            'modname' => 'glossary',
+            'name' => 'Glorssary test',
+        ];
+        $filepaths = [
+            'General/New subsection/Glorssary test/Glorssary test.html',
+            'General/New subsection/Glorssary test/data/attachment/3/Screenshot.png',
+        ];
+
+        $entry = $this->call_private($factory, 'create_index_entry', [
+            $resource,
+            'General/New subsection/Glorssary test',
+            $filepaths,
+        ]);
+
+        $this->assertSame('Glorssary test.html', $entry['title']);
+        $this->assertSame('./General/New%20subsection/Glorssary%20test/Glorssary%20test.html', $entry['link']);
+        $this->assertSame('General/New subsection/Glorssary test/Glorssary test.html', $entry['titleattribute']);
+        $this->assertTrue($entry['haslink']);
+        $this->assertFalse($entry['haschildren']);
+    }
+
+    /**
+     * The generated HTML should link to archive files and back to the source course.
+     */
+    public function test_create_index_html_links_files_and_source_course(): void {
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course([
+            'fullname' => 'Long Course Name',
+            'shortname' => 'SHORT',
+        ]);
+        $factory = new \local_downloadcenter_factory($course, (object)['id' => 2]);
+        $sections = [
+            [
+                'title' => 'Section One',
+                'items' => [
+                    [
+                        'title' => 'A1',
+                        'haslink' => false,
+                        'haschildren' => true,
+                        'hasentries' => true,
+                        'entries' => [
+                            [
+                                'title' => 'intro.html',
+                                'link' => './Section%20One/A1/intro/intro.html',
+                                'titleattribute' => 'Section One/A1/intro/intro.html',
+                                'haslink' => true,
+                                'haschildren' => false,
+                            ],
+                        ],
+                    ],
+                    [
+                        'title' => 'Page File.html',
+                        'link' => './Section%20One/Page%20File.html',
+                        'titleattribute' => 'Section One/Page File.html',
+                        'haslink' => true,
+                        'haschildren' => false,
+                    ],
+                ],
+                'subsections' => [
+                    1 => [
+                        'title' => 'Sub Section',
+                        'items' => [
+                            [
+                                'title' => 'Doc & Notes.pdf',
+                                'link' => './Section%20One/Sub%20Section/Doc%20%26%20Notes.pdf',
+                                'titleattribute' => 'Section One/Sub Section/Doc & Notes.pdf',
+                                'haslink' => true,
+                                'haschildren' => false,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $html = $this->call_private($factory, 'create_index_html', [$sections]);
+
+        $this->assertStringContainsString('Table of contents', $html);
+        $this->assertStringContainsString('Long Course Name', $html);
+        $this->assertStringContainsString('/course/view.php?id=' . $course->id, $html);
+        $this->assertStringContainsString('<h2>Section One</h2>', $html);
+        $this->assertStringContainsString('<h3>Sub Section</h3>', $html);
+        $this->assertStringContainsString('downloadcenter-index-entry-title">A1</span>', $html);
+        $this->assertStringContainsString('href="./Section%20One/A1/intro/intro.html"', $html);
+        $this->assertStringContainsString('href="./Section%20One/Page%20File.html"', $html);
+        $this->assertStringContainsString('href="./Section%20One/Sub%20Section/Doc%20%26%20Notes.pdf"', $html);
+        $this->assertStringNotContainsString('href="./index.html"', $html);
     }
 }

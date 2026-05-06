@@ -24,6 +24,11 @@
  */
 class local_downloadcenter_factory {
     /**
+     * Name of the generated table of contents file in the ZIP archive.
+     */
+    const INDEX_FILENAME = 'index.html';
+
+    /**
      * @var mixed|object
      */
     private $course;
@@ -79,6 +84,7 @@ class local_downloadcenter_factory {
         $this->course = $course;
         $this->user = $user;
         $this->downloadoptions = [
+            'createindex' => true,
             'filesrealnames' => false,
             'addnumbering' => false,
         ];
@@ -1104,12 +1110,18 @@ class local_downloadcenter_factory {
         $fs = get_file_storage();
 
         $filelist = [];
+        $indexsections = [];
 
         $addnumbering = $this->downloadoptions['addnumbering'];
         $pathlist = $this->section_pathnames();
         foreach ($pathlist as $basedir => $sectionresources) {
             $filelist[$basedir] = null;
             $sectionresources = $this->preprocess_resource_names($sectionresources, $addnumbering);
+            $indexsection = [
+                'title' => $basedir,
+                'items' => [],
+                'subsections' => [],
+            ];
 
             foreach ($sectionresources as $res) {
                 $res->name = html_entity_decode($res->name);
@@ -1123,6 +1135,7 @@ class local_downloadcenter_factory {
                     $resdir = self::get_and_update_filepath($resdir, $filelist);
                 }
                 $filelist[$resdir] = null;
+                $filepathsbefore = array_keys($filelist);
 
                 if ($res->modname == 'resource') {
                     $this->handle_resource($res, $resdir, $filelist, $basedir);
@@ -1144,7 +1157,33 @@ class local_downloadcenter_factory {
                 } else if ($res->modname == 'etherpadlite') {
                     $this->handle_etherpadlite($res, $resdir, $filelist);
                 }
+
+                $entry = $this->create_index_entry($res, $resdir, $this->get_added_file_paths($filepathsbefore, $filelist));
+                if (empty($entry)) {
+                    continue;
+                }
+
+                if ($this->is_subsection_resource($res)) {
+                    $subsectionid = $res->subsectioncmid;
+                    if (!isset($indexsection['subsections'][$subsectionid])) {
+                        $indexsection['subsections'][$subsectionid] = [
+                            'title' => $res->subsectionname,
+                            'items' => [],
+                        ];
+                    }
+                    $indexsection['subsections'][$subsectionid]['items'][] = $entry;
+                } else {
+                    $indexsection['items'][] = $entry;
+                }
             }
+
+            if (!empty($indexsection['items']) || !empty($indexsection['subsections'])) {
+                $indexsections[] = $indexsection;
+            }
+        }
+
+        if ($this->downloadoptions['createindex']) {
+            $filelist[self::INDEX_FILENAME] = [$this->create_index_html($indexsections)];
         }
 
         \core\session\manager::write_close();
@@ -1252,8 +1291,307 @@ class local_downloadcenter_factory {
         }
 
         $this->filteredresources = $filtered;
+        $this->downloadoptions['createindex'] = isset($data['createindex']);
         $this->downloadoptions['filesrealnames'] = isset($data['filesrealnames']);
         $this->downloadoptions['addnumbering'] = isset($data['addnumbering']);
+    }
+
+    /**
+     * Creates the HTML table of contents for the ZIP archive.
+     *
+     * @param array $sections The structured section data for the table of contents.
+     * @return string
+     */
+    private function create_index_html($sections) {
+        global $CFG, $OUTPUT, $SITE;
+
+        $coursecontext = context_course::instance($this->course->id);
+        $coursename = format_string($this->course->fullname, true, ['context' => $coursecontext]);
+        $courseshortname = format_string($this->course->shortname, true, ['context' => $coursecontext]);
+        $courselink = (new moodle_url('/course/view.php', ['id' => $this->course->id]))->out(false);
+        $sitecontext = context_system::instance();
+        $sitename = format_string($SITE->fullname, true, ['context' => $sitecontext]);
+
+        $summarydata = (object) [
+            'courselink' => s($courselink),
+            'coursename' => s($coursename),
+        ];
+
+        $title = get_string('index:title', 'local_downloadcenter');
+        $templatedata = [
+            'language' => get_html_lang_attribute_value(current_language()),
+            'righttoleft' => right_to_left(),
+            'pagetitle' => $title . ': ' . $coursename,
+            'siteurl' => $CFG->wwwroot,
+            'sitename' => $sitename,
+            'title' => $title,
+            'courselink' => $courselink,
+            'coursename' => $coursename,
+            'courseshortname' => $courseshortname,
+            'summary' => get_string('index:summary', 'local_downloadcenter', $summarydata),
+            'nofiles' => get_string('index:nofiles', 'local_downloadcenter'),
+            'hassections' => !empty($sections),
+            'sections' => $this->prepare_index_sections_for_template($sections),
+        ];
+
+        return $OUTPUT->render_from_template('local_downloadcenter/index', $templatedata);
+    }
+
+    /**
+     * Gets file paths that were added to the file list after an activity was handled.
+     *
+     * @param array $filepathsbefore
+     * @param array $filelist
+     * @return array
+     */
+    private function get_added_file_paths($filepathsbefore, $filelist) {
+        $knownpaths = array_flip($filepathsbefore);
+        $paths = [];
+        foreach ($filelist as $path => $file) {
+            if (isset($knownpaths[$path]) || !$this->is_filelist_file($file)) {
+                continue;
+            }
+            $paths[] = $path;
+        }
+        sort($paths, SORT_NATURAL | SORT_FLAG_CASE);
+        return $paths;
+    }
+
+    /**
+     * Creates one table of contents entry for an activity or resource.
+     *
+     * @param stdClass $resource
+     * @param string $resdir
+     * @param array $filepaths
+     * @return array|null
+     */
+    private function create_index_entry($resource, $resdir, $filepaths) {
+        $filepaths = $this->get_index_paths_for_resource($resource, $resdir, $filepaths);
+        if (empty($filepaths)) {
+            return null;
+        }
+
+        if (!$this->should_group_index_paths($resource, $filepaths)) {
+            $path = reset($filepaths);
+            return $this->create_index_link_entry(basename($path), $path);
+        }
+
+        return [
+            'title' => html_entity_decode($resource->name),
+            'haslink' => false,
+            'haschildren' => true,
+            'hasentries' => true,
+            'entries' => $this->build_index_file_entries_from_paths($filepaths, $resdir),
+        ];
+    }
+
+    /**
+     * Filters the generated files down to the paths that should be shown in the table of contents.
+     *
+     * @param stdClass $resource
+     * @param string $resdir
+     * @param array $filepaths
+     * @return array
+     */
+    private function get_index_paths_for_resource($resource, $resdir, $filepaths) {
+        if (empty($filepaths)) {
+            return [];
+        }
+
+        $htmlpaths = [];
+        foreach ($filepaths as $path) {
+            if (preg_match('/\.html?$/i', $path)) {
+                $htmlpaths[] = $path;
+            }
+        }
+
+        if ($resource->modname == 'page' || $resource->modname == 'book') {
+            $mainhtml = $resdir . '.html';
+            return in_array($mainhtml, $filepaths) ? [$mainhtml] : $htmlpaths;
+        }
+
+        if ($resource->modname == 'glossary') {
+            $paths = [];
+            foreach ($htmlpaths as $path) {
+                if (strpos($path, $resdir . '/data/') !== 0) {
+                    $paths[] = $path;
+                }
+            }
+            return $paths;
+        }
+
+        if ($resource->modname == 'etherpadlite') {
+            return $htmlpaths;
+        }
+
+        return $filepaths;
+    }
+
+    /**
+     * Checks whether a resource should be rendered as a grouped file list.
+     *
+     * @param stdClass $resource
+     * @param array $filepaths
+     * @return bool
+     */
+    private function should_group_index_paths($resource, $filepaths) {
+        $groupedmods = [
+            'assign',
+            'folder',
+            'lightboxgallery',
+            'publication',
+        ];
+
+        return count($filepaths) > 1 || in_array($resource->modname, $groupedmods);
+    }
+
+    /**
+     * Prepares structured sections for the Mustache template.
+     *
+     * @param array $sections
+     * @return array
+     */
+    private function prepare_index_sections_for_template($sections) {
+        $templatecontexts = [];
+        foreach ($sections as $section) {
+            $subsections = [];
+            foreach ($section['subsections'] as $subsection) {
+                $subsections[] = [
+                    'title' => $subsection['title'],
+                    'hasentries' => !empty($subsection['items']),
+                    'entries' => $subsection['items'],
+                ];
+            }
+
+            $templatecontexts[] = [
+                'title' => $section['title'],
+                'hasentries' => !empty($section['items']),
+                'entries' => $section['items'],
+                'subsections' => $subsections,
+            ];
+        }
+
+        return $templatecontexts;
+    }
+
+    /**
+     * Creates a link entry for the Mustache template.
+     *
+     * @param string $title
+     * @param string $path
+     * @return array
+     */
+    private function create_index_link_entry($title, $path) {
+        return [
+            'title' => $title,
+            'link' => './' . self::encode_index_href_path($path),
+            'titleattribute' => $path,
+            'haslink' => true,
+            'haschildren' => false,
+        ];
+    }
+
+    /**
+     * Builds a nested directory tree from the given file paths.
+     *
+     * @param array $paths
+     * @param string $basepath
+     * @return array
+     */
+    private function build_index_file_tree_from_paths($paths, $basepath = '') {
+        sort($paths, SORT_NATURAL | SORT_FLAG_CASE);
+
+        $tree = [
+            'dirs' => [],
+            'files' => [],
+        ];
+
+        foreach ($paths as $path) {
+            $displaypath = $path;
+            if ($basepath !== '' && strpos($displaypath, $basepath . '/') === 0) {
+                $displaypath = substr($displaypath, strlen($basepath) + 1);
+            }
+
+            $parts = array_values(array_filter(explode('/', $displaypath), 'strlen'));
+            if (empty($parts)) {
+                continue;
+            }
+
+            $filename = array_pop($parts);
+            $node = &$tree;
+            foreach ($parts as $directory) {
+                if (!isset($node['dirs'][$directory])) {
+                    $node['dirs'][$directory] = [
+                        'dirs' => [],
+                        'files' => [],
+                    ];
+                }
+                $node = &$node['dirs'][$directory];
+            }
+            $node['files'][] = [
+                'name' => $filename,
+                'path' => $path,
+            ];
+            unset($node);
+        }
+
+        return $tree;
+    }
+
+    /**
+     * Builds recursive Mustache entries from the given file paths.
+     *
+     * @param array $paths
+     * @param string $basepath
+     * @return array
+     */
+    private function build_index_file_entries_from_paths($paths, $basepath = '') {
+        return $this->convert_index_file_tree_to_entries($this->build_index_file_tree_from_paths($paths, $basepath));
+    }
+
+    /**
+     * Converts a file tree to recursive Mustache entries.
+     *
+     * @param array $tree
+     * @return array
+     */
+    private function convert_index_file_tree_to_entries($tree) {
+        $entries = [];
+        foreach ($tree['files'] as $file) {
+            $entries[] = $this->create_index_link_entry($file['name'], $file['path']);
+        }
+
+        foreach ($tree['dirs'] as $directory => $subtree) {
+            $entries[] = [
+                'title' => $directory,
+                'haslink' => false,
+                'haschildren' => true,
+                'hasentries' => !empty($subtree['files']) || !empty($subtree['dirs']),
+                'entries' => $this->convert_index_file_tree_to_entries($subtree),
+            ];
+        }
+
+        return $entries;
+    }
+
+    /**
+     * Checks whether a file list entry will be streamed as an actual file.
+     *
+     * @param mixed $file
+     * @return bool
+     */
+    private function is_filelist_file($file) {
+        return $file instanceof \stored_file || is_array($file) || is_string($file);
+    }
+
+    /**
+     * Encodes a ZIP path for use as a relative URL while preserving path separators.
+     *
+     * @param string $path
+     * @return string
+     */
+    private static function encode_index_href_path($path) {
+        return implode('/', array_map('rawurlencode', explode('/', $path)));
     }
 
     /**

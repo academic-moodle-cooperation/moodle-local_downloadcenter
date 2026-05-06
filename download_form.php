@@ -133,6 +133,9 @@ class local_downloadcenter_download_form extends moodleform {
 
         // Create a new section for the download options!
         $mform->addElement('header', 'downloadoptions', get_string('downloadoptions', 'local_downloadcenter'));
+        $mform->addElement('checkbox', 'createindex', get_string('downloadoptions:createindex', 'local_downloadcenter'));
+        $mform->setDefault('createindex', 1);
+        $mform->addHelpButton('createindex', 'downloadoptions:createindex', 'local_downloadcenter');
         $mform->addElement('checkbox', 'filesrealnames', get_string('downloadoptions:filesrealnames', 'local_downloadcenter'));
         $mform->setDefault('filesrealnames', 0);
         $mform->addHelpButton('filesrealnames', 'downloadoptions:filesrealnames', 'local_downloadcenter');
