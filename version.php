@@ -18,7 +18,7 @@
  * Version details.
  *
  * @package   local_downloadcenter
- * @author    Simeon Naydenov
+ * @author    Simeon Naydenov, Clemens Marx
  * @copyright 2020 Academic Moodle Cooperation {@link http://www.academic-moodle-cooperation.org}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
